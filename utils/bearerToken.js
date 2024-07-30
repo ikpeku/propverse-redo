@@ -61,31 +61,16 @@ exports.getCurrentUser = async(req, res, next) => {
 
     const bearerHeader = req.headers["authorization"];
 
-    if(bearerHeader) {
         if(typeof bearerHeader !== "undefined") {
             const token =  bearerHeader.split(" ")[1];
-
             //expected out-put: { email: user.email, userId: user._id, status: user.account_type}
-        const  result = await  jwt.verify(token, process.env.JWT_SIGN, async(err, payload) => {
+             jwt.verify(token, process.env.JWT_SIGN, async(err, payload) => {
                 if(payload) {
                     req.payload = payload
-                        next()
                 } 
             })
-
-            if(!result) {
-                  next()
-            }
             
-        } else {
-            next()
-        }
+        } 
 
-    } else {
-       next()
-    }
-
-
-
-
+           next()
 }
