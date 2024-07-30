@@ -59,31 +59,31 @@ exports.verifyUser = async (req, res, next) => {
         // delete user verification record
         await ValidationUser.deleteOne({ userId });
 
-        const findReferral = await Referral.find({ userId: data._id })
-          .where("referralId")
-          .equals(refId)
-          .exec();
+        // const findReferral = await Referral.find({ userId: data._id })
+        //   .where("referralId")
+        //   .equals(refId)
+        //   .exec();
 
-        if (findReferral) {
-          if (refId) {
-            const refdata = await User.findOne({ verify_account: true })
-              .where("referral.referralId")
-              .equals(refId)
-              .exec();
+        // if (findReferral) {
+        //   if (refId) {
+        //     const refdata = await User.findOne({ verify_account: true })
+        //       .where("referral.referralId")
+        //       .equals(refId)
+        //       .exec();
 
-            if (refdata) {
-              refdata.referral.award += 10;
-              refdata.referral.number_of_referral += 1;
+        //     if (refdata) {
+        //       refdata.referral.award += 10;
+        //       refdata.referral.number_of_referral += 1;
 
-              refdata.save();
+        //       refdata.save();
 
-              await Referral.deleteMany({
-                userId: data._id,
-                referralId: refId,
-              });
-            }
-          }
-        }
+        //       await Referral.deleteMany({
+        //         userId: data._id,
+        //         referralId: refId,
+        //       });
+        //     }
+        //   }
+        // }
 
         const token = await authTokenInit.createToken(data);
 
@@ -96,7 +96,7 @@ exports.verifyUser = async (req, res, next) => {
             .json({
               success: true,
               message: "user is verify successfully",
-              // data: userData,
+              data,
               token: token.token,
               expiresIn: token.expiredAt,
             })

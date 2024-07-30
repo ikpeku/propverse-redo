@@ -1,28 +1,6 @@
 const mongoose = require("mongoose");
 const { model , Schema} = mongoose;
 
-const documentModel = new Schema({
-  location: {
-    type: String,
-    default: "",
-  },
-  originalname: {
-    type: String,
-    // default: "",
-  },
-  mimetype: {
-    type: String,
-    // default: "",
-  },
-  size: {
-    type: String,
-    // default: "",
-  },
-  key: {
-    type: String,
-    // default: "",
-  },
-});
 
 const userSchema = new Schema(
   {
@@ -92,8 +70,50 @@ const userSchema = new Schema(
         type: String,
         default: "",
       },
-      front_document_photo: documentModel,
-      bank_statement: documentModel,
+      front_document_photo:   {
+        location: {
+          type: String,
+          default: "",
+        },
+        originalname: {
+          type: String,
+          // default: "",
+        },
+        mimetype: {
+          type: String,
+          // default: "",
+        },
+        size: {
+          type: String,
+          // default: "",
+        },
+        key: {
+          type: String,
+          // default: "",
+        },
+      },
+      bank_statement:   {
+        location: {
+          type: String,
+          default: "",
+        },
+        originalname: {
+          type: String,
+          // default: "",
+        },
+        mimetype: {
+          type: String,
+          // default: "",
+        },
+        size: {
+          type: String,
+          // default: "",
+        },
+        key: {
+          type: String,
+          // default: "",
+        },
+      },
     },
 
     accreditation: {
