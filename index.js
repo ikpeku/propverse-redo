@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 
 const cors = require("cors");
 
+const Authentication = require("./routes/auth/authentication")
+
 const { config } = require("dotenv");
 const { corsConfigs } = require("./utils/corsConfig");
 const { requestUser } = require("./utils/userCookie");
@@ -34,6 +36,7 @@ app.use(jsonParser);
 
 app.use(requestUser)
 
+app.use("/api/auth", Authentication)
 
 
 /**
