@@ -41,7 +41,7 @@ route.post(
   "/signup",
   (req, res, next) => {
     (req.body.account_type = "Non Institutional Investor"),
-    (req.body.status = "Investor"),
+    // (req.body.status = "Investor"),
     next();
   },
   registrationValidator,
@@ -53,7 +53,7 @@ route.post(
   "/developer/signup",
   (req, res, next) => {
     (req.body.account_type = "Project manager"),
-    (req.body.status = "Developer");
+    // (req.body.status = "Developer");
     next();
   },
   developerRegistrationValidator,
@@ -66,7 +66,7 @@ route.post(
   "/institutional/signup",
   (req, res, next) => {
     (req.body.account_type = "Institutional Investor"),
-    (req.body.status = "Investor");
+    // (req.body.status = "Investor");
     next();
   },
   developerRegistrationValidator,

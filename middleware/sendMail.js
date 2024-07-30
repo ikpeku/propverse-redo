@@ -1,6 +1,6 @@
 
 const bcrypt = require("bcryptjs");
-
+const ValidationUser = require("../model/verifyUser");
 const nodemailer = require("nodemailer");
 const { v4: uuid4 } = require("uuid");
 require("dotenv").config();
