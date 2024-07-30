@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator");
 const ValidationUser = require("../../model/verifyUser");
 const User = require("../../model/user");
+const Developer_Due_Diligence = require("../../model/developer/due_deligence") 
+
 const bcrypt = require("bcryptjs");
 const { sendSignUpVerifyEmail } = require("../../middleware/sendMail");
 
@@ -59,31 +61,11 @@ exports.verifyUser = async (req, res, next) => {
         // delete user verification record
         await ValidationUser.deleteOne({ userId });
 
-        // const findReferral = await Referral.find({ userId: data._id })
-        //   .where("referralId")
-        //   .equals(refId)
-        //   .exec();
 
-        // if (findReferral) {
-        //   if (refId) {
-        //     const refdata = await User.findOne({ verify_account: true })
-        //       .where("referral.referralId")
-        //       .equals(refId)
-        //       .exec();
+        if(data.account_type === "Developer") {
+          await Developer_Due_Diligence.create({_id: userId, user: userId})
+        }
 
-        //     if (refdata) {
-        //       refdata.referral.award += 10;
-        //       refdata.referral.number_of_referral += 1;
-
-        //       refdata.save();
-
-        //       await Referral.deleteMany({
-        //         userId: data._id,
-        //         referralId: refId,
-        //       });
-        //     }
-        //   }
-        // }
 
         const token = await authTokenInit.createToken(data);
 
@@ -91,7 +73,6 @@ exports.verifyUser = async (req, res, next) => {
 
         return (
           res
-            // .cookie("access_token", token, { httpOnly: true, expires: expiredTokenDate })
             .status(200)
             .json({
               success: true,

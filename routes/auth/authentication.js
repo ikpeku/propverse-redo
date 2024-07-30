@@ -29,7 +29,6 @@ const { tokenValidate } = require("../../controller/auth/refreshToken");
 const { validateotp } = require("../../controller/auth/validateotp");
 
 
-
 // signup a admin
 route.post(
   "/admin-signup",
@@ -40,8 +39,7 @@ route.post(
 route.post(
   "/signup",
   (req, res, next) => {
-    (req.body.account_type = "Non Institutional Investor"),
-    // (req.body.status = "Investor"),
+    (req.body.account_type = "Non-Institutional Investor"),
     next();
   },
   registrationValidator,
@@ -52,8 +50,7 @@ route.post(
 route.post(
   "/developer/signup",
   (req, res, next) => {
-    (req.body.account_type = "Project manager"),
-    // (req.body.status = "Developer");
+    (req.body.account_type = "Developer"),
     next();
   },
   developerRegistrationValidator,
@@ -66,7 +63,6 @@ route.post(
   "/institutional/signup",
   (req, res, next) => {
     (req.body.account_type = "Institutional Investor"),
-    // (req.body.status = "Investor");
     next();
   },
   developerRegistrationValidator,
@@ -91,17 +87,17 @@ route.post("/resetPasswordRequest", resetPassWordValidator, resetPassword);
 route.post(
   "/changePasswordRequest/:userId",
   changePassWordValidator,
-  changePassWordValidator
+  changePassword
 );
 
 // forget password
-route.post("/forgetPasswordRequest", forgetPassWordValidator, forgetPassWordValidator);
+route.post("/forgetPasswordRequest", forgetPassWordValidator, forgetPassword);
 
 // forget password
 route.post(
   "/resendForgetPasswordRequest",
   resendForgetPassWordValidator,
-  resendForgetPassWordValidator
+  resendForgetPassword
 );
 
 route.post("/google", googleRegistrationValidator, googleAuth);

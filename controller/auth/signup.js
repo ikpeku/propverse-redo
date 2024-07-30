@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require("uuid");
 exports.signUpUser = async (req, res, next) => {
   const errors = validationResult(req);
 
-  const { username, email, password, account_type, phone_number, refId , status} =
+  const { username, email, password, account_type, phone_number, refId} =
     req.body;
 
 
@@ -37,7 +37,6 @@ exports.signUpUser = async (req, res, next) => {
       email,
       account_type,
       phone_number: phone,
-      status,
       referral: { referralId },
     });
 
@@ -81,7 +80,6 @@ exports.signUpAdmin = async (req, res, next) => {
       email,
       account_type: "Admin",
       phone_number: "08 XXX XXXX",
-      status: "Admin",
       verify_account: true,
       referral: { referralId },
     });

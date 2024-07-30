@@ -31,8 +31,8 @@ const userSchema = new Schema(
       type: String,
       enum: [
         "Institutional Investor",
-        "Project manager",
-        "Non Institutional Investor",
+        "Developer",
+        "Non-Institutional Investor",
         "Admin"
       ],
       default: "Non Institutional Investor",
@@ -58,12 +58,71 @@ const userSchema = new Schema(
       },
     },
 
+    company_profile: {
+      title:{
+        type: String,
+        default: "",
+      },
+      logo: {
+        location: {
+          type: String,
+          default: "",
+        },
+        originalname: {
+          type: String,
+          default: "",
+        },
+        mimetype: {
+          type: String,
+          default: "",
+        },
+        size: {
+          type: String,
+          default: "",
+        },
+        key: {
+          type: String,
+          default: "",
+        },
+      },
+      about: {
+        type: String,
+        default: "",
+      },
+      cover_image: {
+        location: {
+          type: String,
+          default: "",
+        },
+        originalname: {
+          type: String,
+          default: "",
+        },
+        mimetype: {
+          type: String,
+          default: "",
+        },
+        size: {
+          type: String,
+          default: "",
+        },
+        key: {
+          type: String,
+          default: "",
+        },
+      },
+    },
+
+
+
+
     referral: {
       referralId: {
         type: String,
         default: "",
       },
     },
+
    
     kyc: {
       document_type: {

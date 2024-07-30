@@ -5,10 +5,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const Authentication = require("./routes/auth/authentication")
+const Developer = require("./routes/developer/developerroute")
 
 const { config } = require("dotenv");
 const { corsConfigs } = require("./utils/corsConfig");
-const { requestUser } = require("./utils/userCookie");
+const { getCurrentUser } = require("./utils/bearerToken");
 const app = express();
 
 config({ path: "./.env" });
@@ -34,9 +35,10 @@ const jsonParser = bodyParser.json();
 app.use(jsonParser);
 
 
-app.use(requestUser)
+app.use(getCurrentUser)
 
 app.use("/api/auth", Authentication)
+app.use("/api/developer", Developer)
 
 
 /**
@@ -51,7 +53,7 @@ app.use((error, req, res, next) => {
     const status = error.statusCode || 500;
     const message = error.message;
     const data = error.data;
-    res.status(status).json({ message, data })
+    res.status(status).json({status: "failed", message, succeeded: false ,data })
 })
 
 
