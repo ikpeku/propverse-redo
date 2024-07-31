@@ -1,42 +1,40 @@
-const mongoose = require("mongoose");
-const { model , Schema} = mongoose;
-
+const mongoose = require('mongoose');
+const { model, Schema } = mongoose;
 
 const userSchema = new Schema(
   {
-
     avatar: {
       type: String,
       default:
-        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
     },
     email: {
       type: String,
-      required: [true, "Please add the user email address"],
-      unique: [true, "Email address already in used"],
+      required: [true, 'Please add the user email address'],
+      unique: [true, 'Email address already in used'],
     },
     password: {
       type: String,
-      required: [true, "Please add the user password"],
+      required: [true, 'Please add the user password'],
     },
     username: {
       type: String,
-      required: [true, "Please add user name"],
+      required: [true, 'Please add user name'],
     },
     phone_number: {
       type: String,
-      default: "0X0000000",
+      default: '0X0000000',
     },
     account_type: {
       type: String,
       enum: [
-        "Institutional Investor",
-        "Developer",
-        "Non-Institutional Investor",
-        "Admin"
+        'Institutional Investor',
+        'Developer',
+        'Non-Institutional Investor',
+        'Admin',
       ],
-      default: "Non Institutional Investor",
-      require: [true, "All fields are required"],
+      default: 'Non Institutional Investor',
+      require: [true, 'All fields are required'],
     },
     verify_account: {
       type: Boolean,
@@ -46,93 +44,89 @@ const userSchema = new Schema(
     payout_account: {
       bank_name: {
         type: String,
-        default: "",
+        default: '',
       },
       account_name: {
         type: String,
-        default: "",
+        default: '',
       },
       account_number: {
         type: String,
-        default: "",
+        default: '',
       },
     },
 
     company_profile: {
-      title:{
+      title: {
         type: String,
-        default: "",
+        default: '',
       },
       logo: {
         location: {
           type: String,
-          default: "",
+          default: '',
         },
         originalname: {
           type: String,
-          default: "",
+          default: '',
         },
         mimetype: {
           type: String,
-          default: "",
+          default: '',
         },
         size: {
           type: String,
-          default: "",
+          default: '',
         },
         key: {
           type: String,
-          default: "",
+          default: '',
         },
       },
       about: {
         type: String,
-        default: "",
+        default: '',
       },
       cover_image: {
         location: {
           type: String,
-          default: "",
+          default: '',
         },
         originalname: {
           type: String,
-          default: "",
+          default: '',
         },
         mimetype: {
           type: String,
-          default: "",
+          default: '',
         },
         size: {
           type: String,
-          default: "",
+          default: '',
         },
         key: {
           type: String,
-          default: "",
+          default: '',
         },
       },
     },
-
-
-
 
     referral: {
       referralId: {
         type: String,
-        default: "",
+        default: '',
       },
     },
 
-   
     kyc: {
       document_type: {
         type: String,
-        default: "",
+        default: '',
       },
-      front_document_photo:   {
+      front_document_photo: {
         location: {
           type: String,
-          default: "",
+          default: '',
         },
         originalname: {
           type: String,
@@ -151,10 +145,10 @@ const userSchema = new Schema(
           // default: "",
         },
       },
-      bank_statement:   {
+      bank_statement: {
         location: {
           type: String,
-          default: "",
+          default: '',
         },
         originalname: {
           type: String,
@@ -183,18 +177,18 @@ const userSchema = new Schema(
 
       verify_method: {
         type: String,
-        enum: ["individual", "entity", ""],
-        default: "",
+        enum: ['individual', 'entity', ''],
+        default: '',
       },
 
-      isSubmitted:{
+      isSubmitted: {
         type: Boolean,
         default: false,
       },
       status: {
         type: String,
-        default: "not verified",
-        enum: ["not verified", "processing", "verified"],
+        default: 'not verified',
+        enum: ['not verified', 'processing', 'verified'],
       },
       isVerify: {
         type: Boolean,
@@ -202,121 +196,121 @@ const userSchema = new Schema(
       },
       accredited_method: {
         type: String,
-        default: "",
+        default: '',
       },
       individual: {
         accredited_verify_method: {
           type: String,
-          default: "",
+          default: '',
         },
         method: {
           type: String,
-          default: "",
+          default: '',
           enum: [
-            "verify_method_1",
-            "verify_method_2",
-            "verify_method_3",
-            "verify_method_4",
-            "",
+            'verify_method_1',
+            'verify_method_2',
+            'verify_method_3',
+            'verify_method_4',
+            '',
           ],
         },
         verify_method_1: {
           letter_of_verification: {
             location: {
               type: String,
-              default: "",
+              default: '',
             },
             originalname: {
               type: String,
-              default: "",
+              default: '',
             },
             mimetype: {
               type: String,
-              default: "",
+              default: '',
             },
             size: {
               type: String,
-              default: "",
+              default: '',
             },
             key: {
               type: String,
-              default: "",
+              default: '',
             },
           },
           verifier_detail: {
             title: {
               type: String,
-              default: "",
+              default: '',
             },
             name: {
               type: String,
-              default: "",
+              default: '',
             },
             email: {
               type: String,
-              default: "",
+              default: '',
             },
           },
-          added: Date
+          added: Date,
         },
         verify_method_2: {
           networth_estimate: {
             proof1: {
               location: {
                 type: String,
-                default: "",
+                default: '',
               },
               originalname: {
                 type: String,
-                default: "",
+                default: '',
               },
               mimetype: {
                 type: String,
-                default: "",
+                default: '',
               },
               size: {
                 type: String,
-                default: "",
+                default: '',
               },
               key: {
                 type: String,
-                default: "",
+                default: '',
               },
             },
             proof2: {
               location: {
                 type: String,
-                default: "",
+                default: '',
               },
               originalname: {
                 type: String,
-                default: "",
+                default: '',
               },
               mimetype: {
                 type: String,
-                default: "",
+                default: '',
               },
               size: {
                 type: String,
-                default: "",
+                default: '',
               },
               key: {
                 type: String,
-                default: "",
+                default: '',
               },
             },
           },
-          added: Date
+          added: Date,
         },
         verify_method_3: {
           account_type: {
             type: String,
-            default: "",
+            default: '',
           },
           gross_income1: {
             year: {
               type: String,
-              default: "",
+              default: '',
             },
             amount: {
               type: Number,
@@ -326,7 +320,7 @@ const userSchema = new Schema(
           gross_income2: {
             year: {
               type: String,
-              default: "",
+              default: '',
             },
             amount: {
               type: Number,
@@ -337,95 +331,95 @@ const userSchema = new Schema(
             document1: {
               year: {
                 type: String,
-                default: "",
+                default: '',
               },
               name: {
                 type: String,
-                default: "",
+                default: '',
               },
               file: {
                 location: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
                 originalname: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
                 mimetype: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
                 size: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
                 key: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
               },
             },
             document2: {
               year: {
                 type: String,
-                default: "",
+                default: '',
               },
               name: {
                 type: String,
-                default: "",
+                default: '',
               },
               file: {
                 location: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
                 originalname: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
                 mimetype: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
                 size: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
                 key: {
                   type: String,
-                  default: "",
+                  default: '',
                 },
               },
             },
           },
-          added: Date
+          added: Date,
         },
 
         verify_method_4: {
           proof_of_finra_lincence: {
             location: {
               type: String,
-              default: "",
+              default: '',
             },
             originalname: {
               type: String,
-              default: "",
+              default: '',
             },
             mimetype: {
               type: String,
-              default: "",
+              default: '',
             },
             size: {
               type: String,
-              default: "",
+              default: '',
             },
             key: {
               type: String,
-              default: "",
+              default: '',
             },
           },
-          added: Date
+          added: Date,
         },
       },
       isDocumentSubmitted: {
@@ -437,12 +431,12 @@ const userSchema = new Schema(
         added: Date,
         investment_entity: {
           type: String,
-          default: "",
+          default: '',
         },
         details: {
           entity_legal_name: {
             type: String,
-            default: "",
+            default: '',
           },
           isOwner: {
             type: Boolean,
@@ -451,40 +445,40 @@ const userSchema = new Schema(
           date: {
             day: {
               type: String,
-              default: "",
+              default: '',
             },
             month: {
               type: String,
-              default: "",
+              default: '',
             },
             year: {
               type: String,
-              default: "",
+              default: '',
             },
           },
           country: {
             type: String,
-            default: "",
+            default: '',
           },
           city: {
             type: String,
-            default: "",
+            default: '',
           },
           address: {
             type: String,
-            default: "",
+            default: '',
           },
           mobile: {
             type: String,
-            default: "",
+            default: '',
           },
           social: {
             type: String,
-            default: "",
+            default: '',
           },
           tax_id: {
             type: String,
-            default: "",
+            default: '',
           },
           signatory: {
             type: Boolean,
@@ -495,40 +489,34 @@ const userSchema = new Schema(
           {
             location: {
               type: String,
-              default: "",
+              default: '',
             },
             originalname: {
               type: String,
-              default: "",
+              default: '',
             },
             mimetype: {
               type: String,
-              default: "",
+              default: '',
             },
             size: {
               type: String,
-              default: "",
+              default: '',
             },
             key: {
               type: String,
-              default: "",
+              default: '',
             },
           },
         ],
       },
     },
-   
-    
   },
   {
     timestamps: true,
   }
 );
 
+userSchema.post('find', (res, next) => {});
 
-
-userSchema.post("find", (res, next) => {
-  
-})
-
-module.exports = model("user", userSchema);
+module.exports = model('user', userSchema);
