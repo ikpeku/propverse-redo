@@ -1,5 +1,5 @@
 const express = require("express");
-const { get_Developers } = require("../../controller/Admin/Developers/adminDevelopers");
+const { get_Developers , get_Due_Deligence} = require("../../controller/Admin/Developers/adminDevelopers");
 const route = express.Router();
 
 
@@ -8,6 +8,7 @@ const route = express.Router();
  */
 
 route.get("/developers/:userId", get_Developers)
+route.get("/get_Due_Deligence/:userId", get_Due_Deligence)
 
 
 

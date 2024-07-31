@@ -1,7 +1,7 @@
-const { errorHandler } = require('./error');
-const jwt = require('jsonwebtoken');
+const { errorHandler } = require("./error");
+const jwt = require("jsonwebtoken");
 
-const User = require('../model/user');
+const User = require("../model/user");
 
 // exports.verifyToken = async (req, res, next) => {
 //     const { userId } = req.params
@@ -51,31 +51,19 @@ const User = require('../model/user');
 // }
 
 exports.getCurrentUser = async (req, res, next) => {
-  const bearerHeader = req.headers['authorization'];
+  const bearerHeader = req.headers["authorization"];
 
-  if (bearerHeader) {
-    if (typeof bearerHeader !== 'undefined') {
-      const token = bearerHeader.split(' ')[1];
+  if (typeof bearerHeader !== "undefined") {
+    const token = bearerHeader.split(" ")[1];
 
-      //expected out-put: { email: user.email, userId: user._id, status: user.account_type}
-      const result = await jwt.verify(
-        token,
-        process.env.JWT_SIGN,
-        async (err, payload) => {
-          if (payload) {
-            req.payload = payload;
-            next();
-          }
-        }
-      );
-
-      if (!result) {
-        next();
+    //expected out-put: { email: user.email, userId: user._id, status: user.account_type}
+    jwt.verify(token, process.env.JWT_SIGN, async (err, payload) => {
+      if (payload) {
+        req.payload = payload;
       }
-    } else {
-      next();
-    }
-  } else {
-    next();
+    });
   }
+  
+  next();
+
 };

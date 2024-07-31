@@ -1,6 +1,9 @@
 const { SchemaTypes } = require("mongoose");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+// const mongoosePaginate = require('mongoose-paginate-v2');
+var aggregatePaginate = require("mongoose-aggregate-paginate-v2");
+
 
 const developer_due_deligence_Schema = new Schema(
   {
@@ -322,6 +325,9 @@ const developer_due_deligence_Schema = new Schema(
     timestamps: true,
   }
 );
+
+// developer_due_deligence_Schema.plugin(mongoosePaginate);
+developer_due_deligence_Schema.plugin(aggregatePaginate);
 
 module.exports = mongoose.model("due_deligence", developer_due_deligence_Schema);
 
