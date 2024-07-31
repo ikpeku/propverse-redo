@@ -4,13 +4,16 @@ const {
   getAllFunds,
   getSingleFund,
 } = require('../../controller/institutional/fund');
+const { getCurrentUser } = require('../../utils/bearerToken');
 const {
-  authInstitutionalUser,
+  checkInstitutionalUser,
 } = require('../../middleware/users/institutional');
-const { getLoggedInUser } = require('../../utils/bearerToken');
+const { fundPurposeInquiry } = require('../../controller/institutional/user');
 const route = express.Router();
 
-route.post('/fund', createFund);
+route.post('/fund', getCurrentUser, checkInstitutionalUser, createFund);
+route.post('/fund-inquiry', getCurrentUser, checkInstitutionalUser, fundPurposeInquiry);
+
 route.get('/funds', getAllFunds);
 route.get('/fund/:id', getSingleFund);
 

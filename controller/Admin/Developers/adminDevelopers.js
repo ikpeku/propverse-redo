@@ -1,6 +1,8 @@
+const { GeneralMailOption } = require("../../../middleware/sendMail");
 const Due_Deligence = require("../../../model/developer/due_deligence")
 const Developers = require("../../../model/user");
 const { errorHandler } = require("../../../utils/error");
+const { mailerController } = require("../../../utils/mailer");
 
 exports.get_Developers = async (req, res, next) => {
     const page = parseInt(req?.query?.page) || 1;
@@ -61,9 +63,9 @@ exports.get_Due_Deligence = async (req, res, next) => {
   const limit = parseInt(req?.query?.limit) || 10;
   const searchText = req?.query?.searchText;
     
-  const { userId } = req.params;
+//   const { userId } = req.params;
 
-  const { userId: payloadUserId, status } = req.payload;
+//   const { userId: payloadUserId, status } = req.payload;
 
   const options = {
     page,
@@ -75,7 +77,9 @@ exports.get_Due_Deligence = async (req, res, next) => {
 
     const myAggregate = Due_Deligence.aggregate([
 
-       
+       {
+        $match: {isSubmited: true}
+       },
         {
             $lookup:{
                 from: "users",
@@ -125,3 +129,44 @@ exports.get_Due_Deligence = async (req, res, next) => {
     next(errorHandler(500, "bad request"));
   }
 };
+
+
+
+
+exports.approveDueDeligence = async(req,res,next) => {
+    req.body.isAdminAproved = "Verified"
+    next()
+}
+exports.rejectDueDeligence = async(req,res,next) => {
+    req.body.isAdminAproved = "Rejected"
+    next()
+}
+exports.statusDueDeligence = async(req,res,next) => {
+    const {userId} = req.params
+    const {isAdminAproved, rejection_reason} = req.body
+
+    try {
+        // console.log(userId, isAdminAproved)
+
+      const data = await Due_Deligence.findByIdAndUpdate(userId, {
+            isAdminAproved
+        }, {new:true}).populate("user");
+        
+        if(!data) {
+
+           return next(errorHandler(500, "updated fail"))
+        }
+
+        if(isAdminAproved === "Rejected") {
+// console.log(rejection_reason, data.user.email)
+
+     mailerController(GeneralMailOption({email: data.user.email, text: rejection_reason, title: "Propsverse Due Deligence Rejection"}))
+
+        }
+
+        return res.status(200).json({ status: "success", data: data});
+        
+    } catch (error) {
+        next(errorHandler(500, "updated fail"))
+    }
+}

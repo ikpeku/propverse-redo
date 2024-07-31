@@ -62,8 +62,6 @@ exports.getCurrentUser = async (req, res, next) => {
         req.payload = payload;
       }
     });
-  }
-  
+  }  
   next();
-
 };

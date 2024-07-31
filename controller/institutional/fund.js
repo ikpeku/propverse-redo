@@ -2,10 +2,12 @@ const Fund = require('../../model/institutional/fund');
 
 exports.createFund = async (req, res) => {
   try {
-    const newFund = new Fund(req.body);
+     const newFund = new Fund({
+      ...req.body,
+      user: req.payload.userId
+    });
 
-    await newFund.validate();
-
+    // Save the fund
     const savedFund = await newFund.save();
 
     res.status(201).json({

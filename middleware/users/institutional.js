@@ -1,28 +1,28 @@
-require('dotenv').config();
-const User = require('../../model/user');
 const { errorHandler } = require('../../utils/error');
 
-const authInstitutionalUser = async (req, res, next) => {
+exports.checkInstitutionalUser = (req, res, next) => {
   try {
-    const id = req.id;
-    if (id) {
-      const user = await User.findById(id);
+    const { userId, status } = req.payload;
 
-      if (!user) {
-        throw errorHandler(404, 'Account not found!');
-      }
+    if (!userId) {
+      return next(errorHandler(401, 'Login is required'));
+    }
 
-      if (!user.account_type === 'Institutional Investor') {
-        throw errorHandler(403, 'Account is not an Institutional Investor!'); 
-      }
-
+    if (status === 'Institutional Investor') {
+      req.userId = userId;
       next();
     } else {
-      throw errorHandler(401, 'Please login!'); 
+      return next(
+        errorHandler(
+          403,
+          'Access denied. Only institutional investors can create funds'
+        )
+      );
     }
   } catch (error) {
-    next(error);
+    console.error('Middleware Error:', error);
+    return next(
+      errorHandler(500, 'An error occurred while processing the request')
+    );
   }
 };
-
-module.exports = { authInstitutionalUser };

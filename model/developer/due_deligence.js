@@ -16,8 +16,9 @@ const developer_due_deligence_Schema = new Schema(
       required: true,
     },
      isAdminAproved: {
-      type: Boolean,
-      default: false,
+      type: String,
+      default: "Non Verified",
+      enums: ["Non Verified", "Verified", "Rejected"]
     },
     isSubmited: {
         type: Boolean,
