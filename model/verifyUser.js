@@ -10,3 +10,6 @@ const verifyUserSchema = new Schema({
 })
 
 module.exports = mongoose.model('VerifyUsers', verifyUserSchema)
+
+
+
