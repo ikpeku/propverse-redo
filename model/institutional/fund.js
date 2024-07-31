@@ -4,9 +4,8 @@ const { model, Schema } = mongoose;
 const fundSchema = new Schema(
   {
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
 
     name: {

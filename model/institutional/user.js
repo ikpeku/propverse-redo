@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const User = require('../user');
 
 const institutionalUserSchema = new Schema({
-  funds: [{ type: Schema.Types.ObjectId, ref: 'Fund' }],
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
 
   fund_purpose_inquiry: {
     type: String,
@@ -37,9 +40,7 @@ const institutionalUserSchema = new Schema({
   },
 });
 
-const InstitutionalUser = User.discriminator(
-  'InstitutionalUser',
-  institutionalUserSchema
-);
+const InstitutionalUser = mongoose.model("InstitutionalUser", institutionalUserSchema);
+
 
 module.exports = InstitutionalUser;
