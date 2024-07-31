@@ -6,6 +6,7 @@ const cors = require("cors");
 
 const Authentication = require("./routes/auth/authentication")
 const Developer = require("./routes/developer/developerroute")
+const Admin = require("./routes/admin/adminRoute")
 
 const { config } = require("dotenv");
 const { corsConfigs } = require("./utils/corsConfig");
@@ -39,6 +40,7 @@ app.use(getCurrentUser)
 
 app.use("/api/auth", Authentication)
 app.use("/api/developer", Developer)
+app.use("/api/admin", Admin)
 
 
 /**

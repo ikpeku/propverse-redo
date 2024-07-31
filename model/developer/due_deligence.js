@@ -13,10 +13,10 @@ const developer_due_deligence_Schema = new Schema(
       ref: "user",
       required: true,
     },
-     // isAdminAproved: {
-    //   type: Boolean,
-    //   default: false,
-    // },
+     isAdminAproved: {
+      type: Boolean,
+      default: false,
+    },
     isSubmited: {
         type: Boolean,
         default: false,

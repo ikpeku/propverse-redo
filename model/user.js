@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { model , Schema} = mongoose;
-
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const userSchema = new Schema(
   {
@@ -22,6 +22,10 @@ const userSchema = new Schema(
     username: {
       type: String,
       required: [true, "Please add user name"],
+    },
+    country: {
+      type: String,
+      default: "",
     },
     phone_number: {
       type: String,
@@ -527,8 +531,10 @@ const userSchema = new Schema(
 
 
 
-userSchema.post("find", (res, next) => {
+// userSchema.post("find", (res, next) => {
   
-})
+// })
+
+userSchema.plugin(mongoosePaginate);
 
 module.exports = model("user", userSchema);
