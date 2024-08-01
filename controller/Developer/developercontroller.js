@@ -1,6 +1,7 @@
 // const User = require("../../model/user")
-const Due_Deligence = require("../../model/developer/due_deligence")
-const { errorHandler } = require("../../utils/error")
+const Due_Deligence = require("../../model/developer/due_deligence");
+const Docs = require("../../model/developer/property_docs");
+const { errorHandler } = require("../../utils/error");
 
 exports.get_Due_deligence = async (req, res, next) => {
     const { userId } = req.params
@@ -187,6 +188,76 @@ exports.update_Due_deligence = async (req, res, next) => {
         next(error)
     }
 }
+
+
+/**
+ * handle developer docs
+ */
+exports.createDocs = async(req, res,next) => {
+    const {investor_name, sendBy, recieveBy, documents } = req.body
+    try {
+
+        if(documents?.length === 0){
+            return next(errorHandler(400, "No uploaded file"));
+        }
+
+        const data = await Docs.create({investor_name, sendTo, recieveBy, documents, status: "Uploaded"})
+
+        return res.status(200).json({status:"success", data})
+       
+    } catch (error) {
+        next(errorHandler(400, "Unauthorise"))
+    }
+}
+
+
+
+exports.allSentDocs = async(req, res,next) => {
+   
+    const {userId} = req.params
+   
+    try {
+
+        const data = await Docs.find({sendBy: userId})
+
+        return res.status(200).json({status:"success", data})
+       
+    } catch (error) {
+        next(errorHandler(400, "failed to fetch"))
+    }
+}
+
+
+
+exports.allRecievedDocs = async(req, res,next) => {
+    const {userId} = req.params
+   
+    try {
+        const data = await Docs.find({recieveBy: userId})
+
+        return res.status(200).json({status:"success", data})
+       
+    } catch (error) {
+        next(errorHandler(400, "failed to fetch"))
+    }
+}
+
+exports.docDetail = async(req, res,next) => {
+    const {docId} = req.params
+   
+    try {
+        const data = await Docs.findById(docId)
+
+        return res.status(200).json({status:"success", data})
+       
+    } catch (error) {
+        next(errorHandler(400, "failed to fetch"))
+    }
+}
+
+
+
+
 
 
 

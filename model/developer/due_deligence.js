@@ -326,7 +326,7 @@ const developer_due_deligence_Schema = new Schema(
   }
 );
 
-// developer_due_deligence_Schema.plugin(mongoosePaginate);
+
 developer_due_deligence_Schema.plugin(aggregatePaginate);
 
 module.exports = mongoose.model("due_deligence", developer_due_deligence_Schema);
