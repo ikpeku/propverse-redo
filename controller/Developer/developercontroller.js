@@ -1,4 +1,5 @@
 // const User = require("../../model/user")
+const { ObjectId } = require("mongodb");
 const Due_Deligence = require("../../model/developer/due_deligence");
 const Docs = require("../../model/developer/property_docs");
 const { errorHandler } = require("../../utils/error");
@@ -189,19 +190,20 @@ exports.update_Due_deligence = async (req, res, next) => {
     }
 }
 
-
 /**
  * handle developer docs
  */
 exports.createDocs = async(req, res,next) => {
-    const {investor_name, sendBy, recieveBy, documents } = req.body
+    const {investor_name, documents } = req.body
+    const {userId} = req.params
     try {
 
         if(documents?.length === 0){
             return next(errorHandler(400, "No uploaded file"));
         }
 
-        const data = await Docs.create({investor_name, sendTo, recieveBy, documents, status: "Uploaded"})
+
+        const data = await Docs.create({investor_name, user:userId ,documents, status: "Uploaded"})
 
         return res.status(200).json({status:"success", data})
        
@@ -210,37 +212,60 @@ exports.createDocs = async(req, res,next) => {
     }
 }
 
-
-
-exports.allSentDocs = async(req, res,next) => {
+exports.userUploadedDocs = async(req, res,next) => {
    
     const {userId} = req.params
+
+    const page = parseInt(req?.query?.page) || 1;
+
+    const limit = parseInt(req?.query?.limit) || 10;
+    const searchText = req?.query?.searchText;
+  
+  
+    const options = {
+      page,
+      limit,
+    };
+
+    let query = [
+        {
+            $match: {user: new ObjectId(userId)}
+        }
+    ]
+
+    if(searchText) {
+        query.push({
+            $match: {
+              $or: [
+                {
+                    investor_name: {
+                    $regex: ".*" + searchText + ".*",
+                    $options: "i",
+                  },
+                },
+              ],
+            },
+          })
+      }
+    
    
     try {
 
-        const data = await Docs.find({sendBy: userId})
+        const myAggregate = Docs.aggregate(query);
+      
+          const paginationResult = await Docs.aggregatePaginate(
+            myAggregate,
+            options
+          );
+      
+          return res.status(200).json({ status: "success", data: paginationResult });
 
-        return res.status(200).json({status:"success", data})
        
     } catch (error) {
         next(errorHandler(400, "failed to fetch"))
     }
 }
 
-
-
-exports.allRecievedDocs = async(req, res,next) => {
-    const {userId} = req.params
-   
-    try {
-        const data = await Docs.find({recieveBy: userId})
-
-        return res.status(200).json({status:"success", data})
-       
-    } catch (error) {
-        next(errorHandler(400, "failed to fetch"))
-    }
-}
 
 exports.docDetail = async(req, res,next) => {
     const {docId} = req.params

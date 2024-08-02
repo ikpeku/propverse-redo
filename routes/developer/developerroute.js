@@ -1,5 +1,6 @@
 const express = require("express");
-const { get_Due_deligence, update_Due_deligence,due_Deligence_Submit, allRecievedDocs, allSentDocs, createDocs, docDetail } = require("../../controller/Developer/developercontroller");
+const { get_Due_deligence, update_Due_deligence,due_Deligence_Submit,  createDocs, docDetail, userUploadedDocs } = require("../../controller/Developer/developercontroller");
+const { createProperty , isNew, isNotSubmmited, isOld, isSubmmited, getPropertyById, updateProperty, getUserProperties, isPropertyCurrent, isUser} = require("../../controller/Developer/properties");
 const route = express.Router();
 
 
@@ -11,10 +12,37 @@ route.patch("/due_deligence/draft/:userId", update_Due_deligence)
 
 
 route.get("/doc/:docId", docDetail)
-route.get("/docs/received/:userId", allRecievedDocs)
-route.get("/docs/send/:userId", allSentDocs)
+route.get("/docs/:userId", userUploadedDocs)  
 route.post("/docs/:userId", createDocs)
 
 
+
+/**
+ * properties
+ */
+
+route.get("/property/:prodId/", getPropertyById)
+
+route.get("/properties/new/:userId/",isUser, isNew, isSubmmited, getUserProperties)
+route.get("/properties/old/:userId/", isUser,  isOld, isSubmmited, getUserProperties)
+
+route.get("/properties/draft/:userId/",isUser,  isNotSubmmited, getUserProperties)
+route.get("/properties/:userId/", isUser, isSubmmited, getUserProperties)
+
+route.get("/current/properties/:userId",isUser, isSubmmited, isPropertyCurrent, getUserProperties)
+route.get("/current/properties/", isSubmmited, isPropertyCurrent, getUserProperties)
+
+// isPropertyCurrent,
+//  
+
+// isOld,isNotSubmmited,
+
+route.post("/property/old/", isOld, isSubmmited, createProperty)
+route.post("/property/new/", isNew, isSubmmited, createProperty)
+route.patch("/property/:prodId/", updateProperty)
+
+
+route.post("/property/draft/old/", isOld, isNotSubmmited, createProperty)
+route.post("/property/draft/new/", isNew, isNotSubmmited, createProperty)
+
 module.exports = route;
-// 

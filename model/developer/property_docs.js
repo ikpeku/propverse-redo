@@ -6,12 +6,7 @@ const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 const property_docs_Schema = new Schema(
   {
     investor_name: String,
-    sendBy: {
-      type: SchemaTypes.ObjectId,
-      ref: "user",
-      required: true,
-    },
-    recieveBy: {
+    user: {
       type: SchemaTypes.ObjectId,
       ref: "user",
       required: true,

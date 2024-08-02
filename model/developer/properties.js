@@ -19,15 +19,15 @@ const propertiesSchema = new Schema(
 
     isAdminAproved: {
         type: String,
-        default: "Non Verified",
-        enums: ["Non Verified", "Verified", "Rejected"]
+        default: "Not Approve",
+        enums: ["Not Approve", "Approved", "Rejected"]
     },
     investment_status: {
         type: String,
         default: "Pending",
         enums: ["Pending", "Completed"]
       },
-    property_type: {
+    property_state: {
         type: String,
         enums: ["new", "old"]
     },
@@ -88,11 +88,11 @@ const propertiesSchema = new Schema(
             date: {
               starting_date: {
                   type: Date,
-                  default: Date.now,
+                  default: () => Date.now(),
                 },
                 closing_date: {
                   type: Date,
-                  default: Date.now,
+                  default: () => Date.now() + 14*24*60*60*1000,
                 },
             },
             property_description:{
@@ -256,6 +256,10 @@ const propertiesSchema = new Schema(
 propertiesSchema.plugin(aggregatePaginate);
 
 
-
-
 module.exports =  mongoose.model("properties", propertiesSchema);
+
+
+// With `sanitizeProjection`, Mongoose forces all projection values to be numbers
+// doc = await UserModel.findOne().sanitizeProjection(true).select({ name: '$password' });
+// doc.name; // 'John'
+// doc.password; // undefined
