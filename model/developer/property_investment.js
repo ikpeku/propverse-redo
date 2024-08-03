@@ -11,8 +11,16 @@ const property_investment_Schema = new Schema(
         ref: "user",
         required: true,
       },
-    property: {
+      
+    company: {
         type: SchemaTypes.ObjectId,
+        ref: "due_deligence",
+        required: true,
+      },
+
+    property: {
+        // type: SchemaTypes.ObjectId,
+        type: String,
         ref: "properties",
         required: true,
       },
@@ -31,6 +39,13 @@ const property_investment_Schema = new Schema(
             default: "",
           },
       },
+      proof_of_payment: {
+        location: String,
+        originalname: String,
+        mimetype: String,
+        size: String,
+        key: String,
+      }
 
     },
     {

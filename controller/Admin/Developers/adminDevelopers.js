@@ -1,6 +1,6 @@
 const { GeneralMailOption } = require("../../../middleware/sendMail");
 const Due_Deligence = require("../../../model/developer/due_deligence");
-const Developers = require("../../../model/user");
+const User = require("../../../model/user");
 const Property = require("../../../model/developer/properties");
 const { errorHandler } = require("../../../utils/error");
 const { mailerController } = require("../../../utils/mailer");
@@ -20,17 +20,19 @@ exports.get_Developers = async (req, res, next) => {
     limit,
   };
 
-  try {
-    const myAggregate = Developers.aggregate([
-      {
-        $match: {
-          $and: [
-            { account_type: "Developer" },
-            { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
-          ],
-        },
-      },
-      {
+  let query =  [
+    {
+      $match: { account_type: "Developer" }
+    },
+    
+  ]
+
+  if(searchText){
+    query.push({ username: { $regex: ".*" + searchText + ".*", $options: "i" } })
+  }
+
+  query.push(
+    {
         $project: {
           username: 1,
           country: 1,
@@ -44,9 +46,12 @@ exports.get_Developers = async (req, res, next) => {
           createdAt: -1,
         },
       },
-    ]);
+  )
 
-    const paginationResult = await Developers.aggregatePaginate(
+  try {
+    const myAggregate = User.aggregate(query);
+
+    const paginationResult = await User.aggregatePaginate(
       myAggregate,
       options
     );
@@ -227,3 +232,5 @@ exports.statusProperty = async (req, res, next) => {
     next(errorHandler(500, "updated fail"));
   }
 };
+
+

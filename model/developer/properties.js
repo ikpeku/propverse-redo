@@ -12,6 +12,13 @@ const propertiesSchema = new Schema(
         ref: "user",
         required: true,
       },
+      activities: {
+        // type: SchemaTypes.ObjectId,
+        type: String,
+        ref: "property_activities",
+        required: true,
+      },
+
       isSubmitted: {
       type: Boolean,
       default: false,

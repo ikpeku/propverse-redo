@@ -4,18 +4,6 @@ const User = require("../model/user");
 exports.registrationValidator = [
   body("username").trim().notEmpty().withMessage("Username is required"),
 
-  body("account_type")
-    .trim()
-    .notEmpty()
-    .exists()
-    .withMessage("account_type is Requiered")
-    .isIn([
-      "Institutional Investor",
-      "Project manager",
-      "Non Institutional Investor",
-    ])
-    .withMessage("account_type does not contain invalid value"),
-
   body("email")
     .trim()
     .isEmail()

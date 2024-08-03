@@ -73,7 +73,7 @@ exports.googleAuth = async (req, res, next) => {
         .status(200)
         .json({
           message: "Login you successful",
-          data: userData,
+          data: userdata,
           token: token.token,
           expiresIn: token.expiredAt,
         });

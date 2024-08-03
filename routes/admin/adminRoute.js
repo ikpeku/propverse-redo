@@ -7,8 +7,12 @@ const {
   rejectDueDeligence,
   approveProperty,
   rejectProperty,
-  statusProperty
+  statusProperty,
+  
 } = require("../../controller/Admin/Developers/adminDevelopers");
+
+
+const {uploadActivities, get_All_Non_Institutional} = require("../../controller/Admin/Non_Institutional/non_institutional");
 const route = express.Router();
 
 /**
@@ -37,5 +41,13 @@ route.patch(
 route.post("/property/reject/:prodId", 
 rejectProperty,
 statusProperty);
+
+
+/**
+ * Non - Institutional Investor
+ */
+
+route.post("/create/activity/:prodId", uploadActivities)
+route.get("/non-institutional", get_All_Non_Institutional)
 
 module.exports = route;

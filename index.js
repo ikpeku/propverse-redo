@@ -8,6 +8,7 @@ const Authentication = require("./routes/auth/authentication")
 const Developer = require("./routes/developer/developerroute")
 const Admin = require("./routes/admin/adminRoute")
 const Institutional = require("./routes/institutional/fundRoute")
+const Non_Institutional = require("./routes/noninstitutional/noninstitutionalRoute")
 
 const { config } = require("dotenv");
 const { corsConfigs } = require("./utils/corsConfig");
@@ -43,6 +44,7 @@ app.use("/api/auth", Authentication)
 app.use("/api/developer", Developer)
 app.use("/api/admin", Admin)
 app.use("/api/institutional", Institutional )
+app.use("/api/non-Instititution", Non_Institutional )
 
 
 /**

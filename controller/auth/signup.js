@@ -14,7 +14,7 @@ exports.signUpUser = async (req, res, next) => {
 
   try {
     if (!errors.isEmpty()) {
-      const validationErrors = errors.array().map((error) => error.msg);
+      const validationErrors = errors.array().map((error) => error.msg)[0];
 
       return res.status(400).json({
         success: false,
@@ -70,19 +70,27 @@ exports.signUpAdmin = async (req, res, next) => {
 
   try {
   
+   
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
+
     const referralId = uuidv4().split("-")[1];
+
+    const user = await User.findOne({email})
+    console.log(user)
+    console.log(req.body)
+    if (user) {
+      throw new Error("User already register please login");
+    }
 
     const userResponse = await User.create({
       username: "Admin",
       password: hashedPassword,
       email,
       account_type: "Admin",
-      phone_number: "08 XXX XXXX",
-      verify_account: true,
-      country: "propsverse",
+      phone_number:  "08 XXX XXXX",
+      country: "Nigeria",
       referral: { referralId },
     });
 

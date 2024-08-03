@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { model , Schema} = mongoose;
 const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
-
+const { SchemaTypes } = require("mongoose");
 
 const userSchema = new Schema(
   {
@@ -46,6 +46,16 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    // transactions: {
+    //   type: Array,
+    //   // property_investment
+    // },
+    transactions: [{
+      type: SchemaTypes.ObjectId,
+      ref: "property_investment",
+      // required: true,
+    }
+    ],
 
     payout_account: {
       bank_name: {

@@ -105,6 +105,7 @@ exports.createProperty = async(req, res, next) => {
            await properties.create({
                _id,
                user: req.payload.userId,
+               activities: _id,
                isSubmitted,
                property_state,
                isDetail_lock,
