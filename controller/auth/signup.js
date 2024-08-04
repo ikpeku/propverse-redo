@@ -70,7 +70,7 @@ exports.signUpAdmin = async (req, res, next) => {
 
   try {
   
-   
+  
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -78,8 +78,7 @@ exports.signUpAdmin = async (req, res, next) => {
     const referralId = uuidv4().split("-")[1];
 
     const user = await User.findOne({email})
-    console.log(user)
-    console.log(req.body)
+  
     if (user) {
       throw new Error("User already register please login");
     }
@@ -91,6 +90,7 @@ exports.signUpAdmin = async (req, res, next) => {
       account_type: "Admin",
       phone_number:  "08 XXX XXXX",
       country: "Nigeria",
+      verify_account: true,
       referral: { referralId },
     });
 

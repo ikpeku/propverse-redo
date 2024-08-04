@@ -1,23 +1,17 @@
 const User = require("../../model/user");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
-const ResetPassword = require("../../model/passwordReset");
 // resend email
 const ValidationUser = require("../../model/verifyUser");
-const { sendSignUpVerifyEmail } = require("../../middleware/sendMail");
+const { sendSignUpVerifyEmail, loginAdminMail } = require("../../middleware/sendMail");
 const { errorHandler } = require("../../utils/error");
-
-const authToken  = require("../../middleware/refreshToken");
 
 require("dotenv").config();
 
-exports.loginUser = async (req, res, next) => {
+exports.AdminLogin = async (req, res, next) => {
   const errors = validationResult(req);
   const { email, password } = req?.body;
-
-  const authTokenInit = new authToken();
-  
 
   try {
     if (!errors.isEmpty()) {
@@ -37,7 +31,7 @@ exports.loginUser = async (req, res, next) => {
       return next(errorHandler(401, "User not be found"));
     } 
 
-    if(user.account_type === "Admin"){
+    if(user.account_type !== "Admin"){
       return next(errorHandler(401, "forbidden"));
     }
     
@@ -54,21 +48,10 @@ exports.loginUser = async (req, res, next) => {
         await ValidationUser.deleteMany({ userId: user._id.toString() });
         await sendSignUpVerifyEmail(user, res, next, (islogin = true));
       } else {
-        const token = await authTokenInit.createToken(user);
 
-        delete user["_doc"].password;
-        await ResetPassword.deleteMany({ userId: user._id })
 
-        
-      
-        res
-          .status(200)
-          .json({
-            message: "Login you successful",
-            data: user,
-            token: token.token,
-            expiresIn: token.expiredAt,
-          });
+       await loginAdminMail(user, res, next)
+
       }
     }
   } catch (err) {

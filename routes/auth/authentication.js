@@ -27,6 +27,9 @@ const route = express.Router();
 const { googleAuth } = require("../../controller/auth/oauth");
 const { tokenValidate } = require("../../controller/auth/refreshToken");
 const { validateotp } = require("../../controller/auth/validateotp");
+const { AdminLogin } = require("../../controller/auth/adminLogin");
+const { verifyAdminLoginToken } = require("../../controller/auth/verifyAdminLoginToken");
+
 
 
 // signup a admin
@@ -116,6 +119,9 @@ route.post("/token-validate",tokenValidate
 
 route.post("/otp-validate",validateotp
 );
+
+route.post("/login/admin", AdminLogin)
+route.post("/login/admin-verify", verifyAdminLoginToken)
 
 
 
