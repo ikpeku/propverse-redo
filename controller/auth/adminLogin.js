@@ -6,12 +6,15 @@ const { validationResult } = require("express-validator");
 const ValidationUser = require("../../model/verifyUser");
 const { sendSignUpVerifyEmail, loginAdminMail } = require("../../middleware/sendMail");
 const { errorHandler } = require("../../utils/error");
+const authToken = require("../../middleware/refreshToken");
 
 require("dotenv").config();
 
 exports.AdminLogin = async (req, res, next) => {
   const errors = validationResult(req);
   const { email, password } = req?.body;
+
+  const authTokenInit = new authToken();
 
   try {
     if (!errors.isEmpty()) {
@@ -50,7 +53,30 @@ exports.AdminLogin = async (req, res, next) => {
       } else {
 
 
-       await loginAdminMail(user, res, next)
+      //  await loginAdminMail(user, res, next)
+
+       const token = await authTokenInit.createToken(user);
+
+        // delete user["_doc"].password;
+        await LoginAdminValidateToken.deleteMany({ userId: user._id })
+
+        const adminInfo = {
+            _id: user._id,
+        avatar: user.avatar,
+        email: user.email,
+        username: user.username,
+        country: user.country,
+        phone_number: user.phone_number
+        }
+
+        res
+          .status(200)
+          .json({
+            message: "Login you successful",
+            data: adminInfo,
+            token: token.token,
+            expiresIn: token.expiredAt,
+          });
 
       }
     }
