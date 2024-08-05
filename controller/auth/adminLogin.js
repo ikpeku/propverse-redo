@@ -58,7 +58,7 @@ exports.AdminLogin = async (req, res, next) => {
        const token = await authTokenInit.createToken(user);
 
         // delete user["_doc"].password;
-        await LoginAdminValidateToken.deleteMany({ userId: user._id })
+        // await LoginAdminValidateToken.deleteMany({ userId: user._id })
 
         const adminInfo = {
             _id: user._id,
