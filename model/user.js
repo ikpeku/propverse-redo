@@ -46,7 +46,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-   
+    isSuspended: {
+      type: Boolean,
+      default: false,
+    },
     transactions: [{
       type: SchemaTypes.ObjectId,
       ref: "property_investment",

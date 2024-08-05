@@ -107,13 +107,13 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
   };
 
 
-exports.get_All_Non_Institutional = async (req, res, next) => {
+exports.get_Suspended_All_Non_Institutional = async (req, res, next) => {
     const page = parseInt(req?.query?.page) || 1;
   
     const limit = parseInt(req?.query?.limit) || 10;
     const searchText = req?.query?.searchText;
   
-    const { userId } = req.params;
+    // const { userId } = req.params;
   
     //   const { userId: payloadUserId, status } = req.payload;
   
@@ -126,7 +126,7 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
 
     let query =  [
         {
-          $match: { account_type: "Non-Institutional Investor" }
+          $match: { account_type: "Non-Institutional Investor" , isSuspended: true}
         },
         {
             $lookup: {
@@ -161,7 +161,7 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
               email: 1,
               createdAt: 1,
               _id: 1,
-    "accreditation.status": 1,
+              isSuspended: 1,
     ammount_invested: 1
             },
           },
@@ -194,6 +194,97 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
 
 
 
+
+
+
+
+// exports.get_All_Non_Institutional = async (req, res, next) => {
+//     const page = parseInt(req?.query?.page) || 1;
+  
+//     const limit = parseInt(req?.query?.limit) || 10;
+//     const searchText = req?.query?.searchText;
+  
+//     const { userId } = req.params;
+  
+//     //   const { userId: payloadUserId, status } = req.payload;
+  
+//     const options = {
+//       page,
+//       limit,
+//     };
+
+
+
+//     let query =  [
+//         {
+//           $match: { account_type: "Non-Institutional Investor" }
+//         },
+//         {
+//             $lookup: {
+//               from: "property_investments",
+//               localField: "transactions",
+//               foreignField: "investor",
+//               as: "transactions_lookup",
+//             },
+//           },
+//           {
+//             $addFields: {
+//               ammount_invested: {
+//                 $sum: "$transactions_lookup.paid.amount",
+//               },
+//             },
+//           },
+//       ]
+
+
+//       if(searchText){
+//         query.push({ username: { $regex: ".*" + searchText + ".*", $options: "i" } })
+//       }
+
+
+
+
+//       query.push(
+//         {
+//             $project: {
+//               username: 1,
+//               country: 1,
+//               email: 1,
+//               createdAt: 1,
+//               _id: 1,
+//     "accreditation.status": 1,
+//     ammount_invested: 1
+//             },
+//           },
+//           {
+//             $sort: {
+//               createdAt: -1,
+//             },
+//           },
+//       )
+
+
+  
+//     try {
+//       const myAggregate = User.aggregate(query);
+  
+//       const paginationResult = await User.aggregatePaginate(
+//         myAggregate,
+//         options
+//       );
+  
+//       return res.status(200).json({ status: "success", data: paginationResult });
+//     } catch (error) {
+//       next(errorHandler(500, "bad request"));
+//     }
+//   };
+
+
+
+
+
+
+
 // exports.get_Single_Non_Institutional = async(req,res,next) => {
 //   const {} = req.params
 //   try {
@@ -202,4 +293,7 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
     
 //   }
 // }
+
+
+
 
