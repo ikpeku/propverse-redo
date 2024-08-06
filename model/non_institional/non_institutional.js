@@ -23,7 +23,7 @@ const non_Institutional_Schema = new Schema({
       ],
       funds: [{
         type: SchemaTypes.ObjectId,
-        ref: "property_investment",
+        ref: "fund",
       }
       ],
     

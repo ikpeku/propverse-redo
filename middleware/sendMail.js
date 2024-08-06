@@ -5,6 +5,7 @@ const LoginAdmin = require("../model/loginAdmin");
 const nodemailer = require("nodemailer");
 const { v4: uuid4 } = require("uuid");
 require("dotenv").config();
+const ForgetPassword = require("../model/passwordReset")
 
 const transporter = nodemailer.createTransport({
   port: 465,
@@ -440,7 +441,7 @@ ul.social li{
 
     // const userResponse = await User.findOne({_id})
 
-    await new Promise((resolve, reject) => {
+    new Promise((resolve, reject) => {
       transporter.sendMail(mailOptions, (err, info) => {
         if (err) {
           console.error(err);
@@ -465,6 +466,7 @@ ul.social li{
           email,
         },
       });
+
     } else {
       return res.status(201).json({
         success: true,

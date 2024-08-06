@@ -32,6 +32,7 @@ exports.forgetPassword = async (req, res, next) => {
       error.statusCode = 401;
       throw error;
     } else {
+
       sendForgetPasswordMail(userResponse, res, next);
     }
   } catch (error) {
