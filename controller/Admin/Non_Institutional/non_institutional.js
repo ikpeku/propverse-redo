@@ -65,7 +65,9 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
 
 
       if(searchText){
-        query.push({ username: { $regex: ".*" + searchText + ".*", $options: "i" } })
+        query.push({
+          $match: { username: { $regex: ".*" + searchText + ".*", $options: "i" } }
+        })
       }
 
 
@@ -147,7 +149,9 @@ exports.get_Suspended_All_Non_Institutional = async (req, res, next) => {
 
 
       if(searchText){
-        query.push({ username: { $regex: ".*" + searchText + ".*", $options: "i" } })
+        query.push({
+          $match: { username: { $regex: ".*" + searchText + ".*", $options: "i" } }
+        })
       }
 
 
@@ -189,7 +193,23 @@ exports.get_Suspended_All_Non_Institutional = async (req, res, next) => {
   };
 
 
+exports.get_Non_Institutional = async (req, res, next) => {
+  const {userId} = req.params
 
+
+  try {
+
+    const user = await User.findById(userId)
+
+    res.status(200).json({
+      data: user
+    })
+    
+  } catch (error) {
+    next(errorHandler(500, "failed"))
+  }
+
+}
 
 
 

@@ -50,13 +50,7 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    transactions: [{
-      type: SchemaTypes.ObjectId,
-      ref: "property_investment",
-      // required: true,
-    }
-    ],
-
+    
     payout_account: {
       bank_name: {
         type: String,
