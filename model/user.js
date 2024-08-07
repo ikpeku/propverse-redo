@@ -50,6 +50,7 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    
 
     payout_account: {
       bank_name: {
@@ -129,13 +130,7 @@ const userSchema = new Schema(
       },
     },
 
-    // compliance: {
   
-     
-
-    // }
-
-
 
 
   },

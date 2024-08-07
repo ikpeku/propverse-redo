@@ -1,12 +1,17 @@
 const { validationResult } = require("express-validator");
 const ValidationUser = require("../../model/verifyUser");
 const User = require("../../model/user");
-const Developer_Due_Diligence = require("../../model/developer/due_deligence") 
+const Developer_Due_Diligence = require("../../model/developer/due_deligence")
+const Non_Institutional_Investment = require("../../model/non_institional/non_institutional")
+
+const Kyc = require("../../model/compliance/kyc")
+const Acreditation = require("../../model/compliance/accreditation")
+
 
 const bcrypt = require("bcryptjs");
 const { sendSignUpVerifyEmail } = require("../../middleware/sendMail");
 
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const { errorHandler } = require("../../utils/error");
 
 const authToken = require("../../middleware/refreshToken");
@@ -67,9 +72,21 @@ exports.verifyUser = async (req, res, next) => {
         }
 
 
-        const token = await authTokenInit.createToken(data);
+        if(data.account_type === "Non-Institutional Investor") {
+         
+          await Non_Institutional_Investment.create({_id: userId, user: userId});
+        }
 
-        
+        if(data.account_type === "Non-Institutional Investor" || data.account_type === "Institutional Investor") {
+          await Kyc.create({_id: userId, user: userId});
+          await Acreditation.create({_id: userId, user: userId});
+
+         }
+
+
+
+
+        const token = await authTokenInit.createToken(data);
 
         return (
           res

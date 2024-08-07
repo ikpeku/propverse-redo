@@ -5,8 +5,11 @@ const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 
 
 const non_Institutional_Schema = new Schema({
-
-    profile: {
+    _id: {
+        type: SchemaTypes.ObjectId,
+        required: true,
+      },
+    user: {
         type: SchemaTypes.ObjectId,
         ref: "user",
         required: true,
