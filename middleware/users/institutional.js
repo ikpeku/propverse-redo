@@ -1,13 +1,19 @@
 const { errorHandler } = require('../../utils/error');
 
 exports.checkInstitutionalUser = (req, res, next) => {
-  const { userId, status } = req.payload;
+  // const { userId, status } = req.payload;
+
+  console.log("payload: ",req.payload)
+
+  const status = req?.payload?.status
+  const userId = req?.payload?.userId
 
   try {
-    
-    if (!userId) {
+
+    if (!userId && !status) {
       return next(errorHandler(401, 'Login is required'));
     }
+    
 
     if (status === 'Institutional Investor') {
       req.userId = userId;
@@ -21,7 +27,7 @@ exports.checkInstitutionalUser = (req, res, next) => {
       );
     }
   } catch (error) {
-    console.error('Middleware Error:', error);
+    // console.error('Middleware Error:', error);
     return next(
       errorHandler(500, 'An error occurred while processing the request')
     );

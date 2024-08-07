@@ -11,6 +11,7 @@ const Institutional = require("./routes/institutional/fundRoute")
 const Non_Institutional = require("./routes/noninstitutional/noninstitutionalRoute")
 const FilesData = require("./routes/files/FilesData")
 const Sheet = require("./routes/googlesheet/sheet")
+const General = require("./routes/general/user")
 
 const { config } = require("dotenv");
 const { corsConfigs } = require("./utils/corsConfig");
@@ -49,6 +50,7 @@ app.use("/api/institutional", Institutional )
 app.use("/api/non-Instititution", Non_Institutional )
 app.use("/api/file", FilesData)
 app.use("/api/sheet", Sheet)
+app.use("/api/user", General)
 // suspend account
 
 /**
