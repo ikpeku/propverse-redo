@@ -1,9 +1,10 @@
 const { errorHandler } = require('../../utils/error');
 
 exports.checkInstitutionalUser = (req, res, next) => {
-  try {
-    const { userId, status } = req.payload;
+  const { userId, status } = req.payload;
 
+  try {
+    
     if (!userId) {
       return next(errorHandler(401, 'Login is required'));
     }

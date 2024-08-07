@@ -32,11 +32,11 @@ const non_Institutional_Schema = new Schema({
     
     kyc: {
         type: SchemaTypes.ObjectId,
-        ref: "non_institutional_kyc"
+        ref: "kyc"
       },
     accreditation: {
         type: SchemaTypes.ObjectId,
-        ref: "non_institutional_accreditation"
+        ref: "accreditation"
       },
 
     

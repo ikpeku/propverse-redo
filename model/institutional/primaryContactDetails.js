@@ -8,6 +8,10 @@ const institutionalUserSchema = new Schema({
     required: true,
   },
 
+  company_affiliation: { type: String, default: '' },
+
+  linkedin: { type: String, default: '' },
+
   fund_purpose_inquiry: {
     type: String,
     enum: [
@@ -20,8 +24,8 @@ const institutionalUserSchema = new Schema({
 
   investor_accreditation_status: {
     type: String,
-    enum: ['Yes', 'No'],
-    default: 'Yes',
+    enum: ['yes', 'no'],
+    default: 'nes',
   },
 
   location_of_investment_region: { type: String, default: '' },
@@ -38,9 +42,15 @@ const institutionalUserSchema = new Schema({
     ],
     default: 'A. Under $500k',
   },
+  isAccountComplete: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const InstitutionalUser = mongoose.model("InstitutionalUser", institutionalUserSchema);
-
+const InstitutionalUser = mongoose.model(
+  'InstitutionalUser',
+  institutionalUserSchema
+);
 
 module.exports = InstitutionalUser;

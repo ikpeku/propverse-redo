@@ -34,7 +34,7 @@ exports.loginUser = async (req, res, next) => {
    
 
     if (!user) {
-      return next(errorHandler(401, "User not be found"));
+      return next(errorHandler(401, "User not found"));
     } 
 
     if(user.account_type === "Admin"){
