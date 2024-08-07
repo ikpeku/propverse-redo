@@ -8,7 +8,7 @@ const { getCurrentUser } = require('../../utils/bearerToken');
 const {
   checkInstitutionalUser,
 } = require('../../middleware/users/institutional');
-const { fundPurposeInquiry } = require('../../controller/institutional/user');
+const { fundPurposeInquiry } = require('../../controller/institutional/primaryContactDetails');
 const route = express.Router();
 
 route.post('/fund', getCurrentUser, checkInstitutionalUser, createFund);

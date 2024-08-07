@@ -1,34 +1,19 @@
-const InstitutionalUser = require('../../model/institutional/user');
+const InstitutionalUser = require('../../model/institutional/primaryContactDetails');
 
 exports.fundPurposeInquiry = async (req, res) => {
   try {
-    console.log("req.payload", req.payload)
-
     const { userId } = req.payload;
-
-    const {
-      fund_purpose_inquiry,
-      investor_accreditation_status,
-      location_of_investment_region,
-      capital_already_secured,
-    } = req.body;
+    
+    const { body } = req;
 
     let institutionalUser = await InstitutionalUser.findOne({ user: userId });
 
-    if (institutionalUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'Funds purpose inquiry already exists',
-      });
-    }
-
     institutionalUser = new InstitutionalUser({
+      ...body,
       user: userId,
-      fund_purpose_inquiry,
-      investor_accreditation_status,
-      location_of_investment_region,
-      capital_already_secured,
+      isAccountComplete: true,
     });
+
     await institutionalUser.save();
 
     res.status(201).json({
