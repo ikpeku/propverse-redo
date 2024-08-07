@@ -22,7 +22,7 @@ exports.checkInstitutionalUser = (req, res, next) => {
       return next(
         errorHandler(
           403,
-          'Access denied. Only institutional investors can create funds'
+          'Access denied. Only institutional investors allowed.'
         )
       );
     }
