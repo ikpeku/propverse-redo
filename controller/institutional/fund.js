@@ -1,12 +1,24 @@
 const Fund = require('../../model/institutional/fund');
+const InstitutionalUser = require('../../model/institutional/primaryContactDetails')
 
 exports.createFund = async (req, res) => {
   try {
+
+    // Check if the user's primary contail details is complete
+    const institutionalUser = await InstitutionalUser.findOne({ user: userId });
+
+    if (!institutionalUser || !institutionalUser.isAccountComplete) {
+      return res.status(400).json({
+        success: false,
+        message: 'Institutional user account is not complete. Please complete your account to create a fund.',
+      });
+    }
+
      const newFund = new Fund({
       ...req.body,
       user: req.payload.userId
     });
-
+    
     // Save the fund
     const savedFund = await newFund.save();
 
