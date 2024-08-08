@@ -8,6 +8,7 @@ const {
   approveProperty,
   rejectProperty,
   statusProperty,
+  get_Properties,
   
 } = require("../../controller/Admin/Developers/adminDevelopers");
 
@@ -39,9 +40,12 @@ route.patch(
   approveProperty,
   statusProperty
 );
+
 route.post("/property/reject/:prodId", 
 rejectProperty,
 statusProperty);
+
+route.get("/properties", get_Properties)
 
 
 /**

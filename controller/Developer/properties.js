@@ -443,53 +443,6 @@ exports.getUserProperties = async(req, res, next) => {
 }
 
 
-// const myAggregate = properties.aggregate([
-//     {
-//       $match: { user: userId },
-//     },
-//     {
-//       $lookup: {
-//         from: "users",
-//         localField: "user",
-//         foreignField: "_id",
-//         as: "lookup_user",
-//       },
-//     },
-//     {
-//       $addFields: {
-//         user_detail: {
-//           $arrayElemAt: ["$lookup_user", 0],
-//         },
-//       },
-//     },
-//     {
-//       $project: {
-//         "user_detail.username": 1,
-//         "user_detail.country": 1,
-//         isAdminAproved: 1,
-//         createdAt: 1,
-//         "user_detail._id": 1,
-//       },
-//     },
-//     {
-//       $match: {
-//         $or: [
-//           {
-//             "user_detail.username": {
-//               $regex: ".*" + searchText + ".*",
-//               $options: "i",
-//             },
-//           },
-//         ],
-//       },
-//     },
-//     {
-//       $sort: {
-//         createdAt: -1,
-//       },
-//     },
-//   ]);
-
 
 
 

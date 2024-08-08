@@ -28,7 +28,7 @@ exports.get_Developers = async (req, res, next) => {
   ]
 
   if(searchText){
-    query.push({ username: { $regex: ".*" + searchText + ".*", $options: "i" } })
+    query.push({$match : { username: { $regex: ".*" + searchText + ".*", $options: "i" } }})
   }
 
   query.push(
@@ -232,5 +232,84 @@ exports.statusProperty = async (req, res, next) => {
     next(errorHandler(500, "updated fail"));
   }
 };
+
+
+/**
+ * get all properties
+ */
+
+exports.get_Properties = async (req, res, next) => {
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+
+  const { userId } = req.params;
+
+  //   const { userId: payloadUserId, status } = req.payload;
+
+  const options = {
+    page,
+    limit,
+  };
+
+  let query =  [
+    {
+      $lookup: {
+           from: "users",
+           localField: "user",
+           foreignField: "_id",
+           as: "user",
+         },
+       },
+       {
+        $addFields: {
+          user: {
+            $arrayElemAt: ["$user", 0],
+          },
+        },
+      },
+      {
+        $project: {
+          "user.username": 1,
+          "property_detail.property_location.country": 1,
+          "property_detail.property_overview.property_type" : 1,
+          "property_detail.property_overview.property_name" : 1,
+           isAdminAproved: 1,
+          // email: 1,
+          createdAt: 1,
+          _id: 1,
+        },
+      },
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    
+  ]
+
+  if(searchText){
+    query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
+  }
+
+  // query.push(
+    
+  // )
+
+  try {
+    const myAggregate = Property.aggregate(query);
+
+    const paginationResult = await Property.aggregatePaginate(
+      myAggregate,
+      options
+    );
+
+    return res.status(200).json({ status: "success", data: paginationResult });
+  } catch (error) {
+    next(errorHandler(500, "bad request"));
+  }
+};
+
 
 
