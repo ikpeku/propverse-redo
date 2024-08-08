@@ -1,6 +1,8 @@
 const Activities = require("../../../model/developer/property_activities")
 const { errorHandler } = require("../../../utils/error")
 const User = require("../../../model/user");
+const Non_Institiutional_Investor = require("../../../model/non_institional/non_institutional");
+const { ObjectId } = require("mongodb");
 
 exports.uploadActivities = async(req,res,next) => {
     const {title,activity, documents} = req.body
@@ -31,7 +33,7 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
     const limit = parseInt(req?.query?.limit) || 10;
     const searchText = req?.query?.searchText;
   
-    const { userId } = req.params;
+    // const { userId } = req.params;
   
     //   const { userId: payloadUserId, status } = req.payload;
   
@@ -43,46 +45,54 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
 
 
     let query =  [
+        // {
+        //   $match: { account_type: "Non-Institutional Investor" }
+        // },
         {
-          $match: { account_type: "Non-Institutional Investor" }
-        },
-        {
-            $lookup: {
-              from: "property_investments",
-              localField: "transactions",
-              foreignField: "investor",
-              as: "transactions_lookup",
-            },
-          },
-          {
-            $addFields: {
-              ammount_invested: {
-                $sum: "$transactions_lookup.paid.amount",
+           $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "user",
               },
             },
-          },
+        {
+           $lookup: {
+                from: "accreditations",
+                localField: "accreditation",
+                foreignField: "users",
+                as: "accreditation",
+              },
+            },
+            {
+              $addFields: {
+                user_detail: {
+                  $arrayElemAt: ["$user", 0],
+                },
+              },
+            },
+            {
+              $addFields: {
+                accreditation_status: {
+                  $arrayElemAt: ["$accreditation", 0],
+                },
+              },
+            },
+
+
       ]
-
-
-      if(searchText){
-        query.push({
-          $match: { username: { $regex: ".*" + searchText + ".*", $options: "i" } }
-        })
-      }
-
-
 
 
       query.push(
         {
             $project: {
-              username: 1,
-              country: 1,
-              email: 1,
-              createdAt: 1,
+              "user_detail.username": 1,
+              "user_detail.country": 1,
+              "user_detail.email": 1,
+              "user_detail.createdAt": 1,
+              "accreditation_status.status": 1,
               _id: 1,
-    "accreditation.status": 1,
-    ammount_invested: 1
+    // ammount_invested: 1
             },
           },
           {
@@ -93,11 +103,18 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
       )
 
 
-  
+      if(searchText){
+        query.push({
+          $match: { "user_detail.username": { $regex: ".*" + searchText + ".*", $options: "i" } }
+        })
+      }
+
+
+      // 
     try {
-      const myAggregate = User.aggregate(query);
+      const myAggregate = Non_Institiutional_Investor.aggregate(query);
   
-      const paginationResult = await User.aggregatePaginate(
+      const paginationResult = await Non_Institiutional_Investor.aggregatePaginate(
         myAggregate,
         options
       );
@@ -197,9 +214,105 @@ exports.get_Non_Institutional = async (req, res, next) => {
   const {userId} = req.params
 
 
+ 
+  let query =  [
+    {
+      $match: { _id:  new ObjectId(userId)}
+    },
+    {
+       $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+    {
+       $lookup: {
+            from: "accreditations",
+            localField: "accreditation",
+            foreignField: "users",
+            as: "accreditation",
+          },
+        },
+    {
+       $lookup: {
+            from: "funds",
+            localField: "fund",
+            foreignField: "_id",
+            as: "funds",
+          },
+        },
+    {
+       $lookup: {
+            from: "properties",
+            localField: "properties",
+            foreignField: "_id",
+            as: "properties",
+          },
+        },
+    {
+       $lookup: {
+            from: "property_investments",
+            localField: "transactions",
+            foreignField: "_id",
+            as: "transactions",
+          },
+        },
+
+        
+        {
+          $addFields: {
+            user_detail: {
+              $arrayElemAt: ["$user", 0],
+            },
+          },
+        },
+        {
+          $addFields: {
+            accreditation_status: {
+              $arrayElemAt: ["$accreditation", 0],
+            },
+          },
+        },
+
+
+  ]
+
+
+//   query.push(
+//     {
+//         $project: {
+//           "user_detail.username": 1,
+//           "user_detail.country": 1,
+//           "user_detail.email": 1,
+//           "user_detail.createdAt": 1,
+//           "user_detail.phone_number": 1,
+//           "accreditation_status.status": 1,
+//           transactions: 1,
+//           properties: 1,
+//           funds: 1,
+//           _id: 1,
+//           // user_detail: 1
+// // ammount_invested: 1
+//         },
+//       },
+//       {
+//         $sort: {
+//           createdAt: -1,
+//         },
+//       },
+//   )
+
+
+
+
   try {
 
-    const user = await User.findById(userId)
+
+    const user = await Non_Institiutional_Investor.aggregate(query);
+
+    // const user = await Non_Institiutional_Investor.findById(userId).populate("user transactions properties funds accreditation")
 
     res.status(200).json({
       data: user

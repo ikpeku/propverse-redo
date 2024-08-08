@@ -1,7 +1,7 @@
 
 const Investment = require("../../model/developer/property_investment")
 const Property = require("../../model/developer/properties");
-const User = require("../../model/user");
+const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const { errorHandler } = require("../../utils/error");
 
 
@@ -51,20 +51,16 @@ exports.makeInvestment = async(req,res,next) => {
 
         })
 
-        // await User.findByIdAndUpdate(userId, {
-        //     $push: {transactions: investment._id},
-        //     { new: true, useFindAndModify: false }
-        // })
-       await User.findByIdAndUpdate(
-        userId,
-            { $push: { transactions: investment.investor } },
+       
+
+        
+      const tran = await Non_Institutional_Investor.findByIdAndUpdate(
+           userId,
+            { $push: { transactions: investment._id } },
             { new: true, useFindAndModify: false }
           );
-      
-
-
-
-
+          
+    
     
      return res.status(200).json({status:"success", message: "congratulations record taken awaiting confirmation"});
        

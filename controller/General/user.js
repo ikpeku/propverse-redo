@@ -1,82 +1,50 @@
 const Kyc = require("../../model/compliance/kyc")
 const Accreditation = require("../../model/compliance/accreditation")
+const { errorHandler } = require("../../utils/error")
 
-exports.userKyc = (req, res, next) => {
+exports.userKyc = async(req, res, next) => {
+    const {
+            afirmation,
+            proof_of_identify,
+            proof_of_funds,
+            fund_manager
+    } = req.body
 
-    console.log("enter kyc")
-    console.log(req.payload)
 
     try {
-        // isSubmitted: {
-        //     type: Boolean,
-        //     default: false,
-        //   },
-        //   isApproved: {
-        //     type: Boolean,
-        //     default: false,
-        //   },
-      
-        //   kyc:{
-        //     afirmation: {
-        //       type: Boolean,
-        //       default: false
-        //     },
-        //     proof_of_identify: {
-        //       document_type: {
-        //         type: String,
-        //         default: "",
-        //       },
-        //       document: {
-        //         location: {
-        //           type: String,
-        //           default: "",
-        //         },
-        //         originalname: {
-        //           type: String,
-        //           // default: "",
-        //         },
-        //         mimetype: {
-        //           type: String,
-        //           // default: "",
-        //         },
-        //         size: {
-        //           type: String,
-        //           // default: "",
-        //         },
-        //         key: {
-        //           type: String,
-        //           // default: "",
-        //         },
-        //       },
-        //     },
-        //     proof_of_funds:{
-        //       document: {
-        //         location: {
-        //           type: String,
-        //           default: "",
-        //         },
-        //         originalname: {
-        //           type: String,
-        //           // default: "",
-        //         },
-        //         mimetype: {
-        //           type: String,
-        //           // default: "",
-        //         },
-        //         size: {
-        //           type: String,
-        //           // default: "",
-        //         },
-        //         key: {
-        //           type: String,
-        //           // default: "",
-        //         },
-        //       },
-        
-        //     }
-        //   }
+
+       await Kyc.findByIdAndUpdate(req.payload.userId, {
+        isSubmitted: true,
+        kyc:{
+            afirmation,
+            proof_of_identify,
+            proof_of_funds,
+            fund_manager
+          }
+       })
+
+       res.status(200).json({
+        message: "success"
+       })
+
     } catch (error) {
-        
+        next(errorHandler(500, "failed to update"))
+    }
+}
+
+exports.getUserKyc = async(req, res, next) => {
+    
+    try {
+
+     const data =   await Kyc.findById(req.payload.userId)
+
+       res.status(200).json({
+        message: "success",
+        data
+       })
+
+    } catch (error) {
+        next(errorHandler(500, "failed"))
     }
 }
 

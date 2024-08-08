@@ -5,7 +5,7 @@ exports.createFund = async (req, res) => {
   try {
 
     // Check if the user's primary contail details is complete
-    const institutionalUser = await InstitutionalUser.findOne({ user: userId });
+    const institutionalUser = await InstitutionalUser.findOne({ user: req.payload.userId });
 
     if (!institutionalUser || !institutionalUser.isAccountComplete) {
       return res.status(400).json({

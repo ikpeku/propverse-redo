@@ -18,13 +18,10 @@ const propertiesSchema = new Schema(
         ref: "property_activities",
         required: true,
       },
-      transactions: {
-        // type: SchemaTypes.ObjectId,
-        type: String,
-        ref: "property_activities",
-        required: true,
-      },
-
+      transactions: [{
+        type: SchemaTypes.ObjectId,
+        ref: "property_investment",
+      }],
       isSubmitted: {
       type: Boolean,
       default: false,
