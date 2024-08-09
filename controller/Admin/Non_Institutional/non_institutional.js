@@ -1,6 +1,7 @@
 const Activities = require("../../../model/developer/property_activities")
 const { errorHandler } = require("../../../utils/error")
 const User = require("../../../model/user");
+const Property = require("../../../model/developer/properties");
 const Non_Institiutional_Investor = require("../../../model/non_institional/non_institutional");
 const { ObjectId } = require("mongodb");
 
@@ -18,6 +19,10 @@ exports.uploadActivities = async(req,res,next) => {
             activity,
             documents_type: documents[0].mimetype || ""
         })
+        res.status(200).json({
+          message: "success"
+        })
+
     } catch (error) {
         next(errorHandler(400, "operation failed"))
         
@@ -25,7 +30,30 @@ exports.uploadActivities = async(req,res,next) => {
 
 }
 
+exports.uploadPropertyDoc = async(req, res, next) => {
+  const {prodId} = req.params
+  const {property_documents} = req.body
 
+  try {
+
+    property_documents.forEach(async(product) => {
+      await Property.findByIdAndUpdate(
+        prodId,
+         { $push: { "property_detail.property_documents": product } },
+         { new: true, useFindAndModify: false }
+       );
+    }) 
+     
+    res.status(200).json({
+      message: "success"
+    })
+
+} catch (error) {
+    next(errorHandler(400, "operation failed"))
+    
+}
+
+}
 
 exports.get_All_Non_Institutional = async (req, res, next) => {
     const page = parseInt(req?.query?.page) || 1;

@@ -14,7 +14,7 @@ const {
 } = require("../../controller/Admin/Developers/adminDevelopers");
 
 
-const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional} = require("../../controller/Admin/Non_Institutional/non_institutional");
+const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc} = require("../../controller/Admin/Non_Institutional/non_institutional");
 const { suspendUserAccount , kycVerification} = require("../../controller/Admin/GeneralAdmin");
 const route = express.Router();
 
@@ -49,7 +49,7 @@ statusProperty);
 route.get("/properties", get_Properties)
 route.get("/current-list", get_Current_Listed_Properties)
 
-
+route.post("/property/update/doc/:prodId", uploadPropertyDoc)
 /**
  * Non - Institutional Investor
  */

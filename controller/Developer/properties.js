@@ -298,7 +298,7 @@ exports.getPropertyById = async(req, res, next) => {
     const {prodId} = req.params
     try {
         
-       const data = await properties.findById(prodId)
+       const data = await properties.findById(prodId).populate("company")
 
        return res.status(200).json({status:"success", data})
     } catch (error) {

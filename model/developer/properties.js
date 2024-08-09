@@ -115,35 +115,19 @@ const propertiesSchema = new Schema(
                   type: String,
                   default: "",
                 },
-              amenities: [String],
+              amenities: Array,
             },
             
           },
           
-          property_images: [
-              {
-                location: String,
-                originalname: String,
-                mimetype: String,
-                size: String,
-                key: String
-              },
-            ],
+          property_images: Array,
           
          special_facility: [{
           facility_name: {
             type: String,
             default: ""
           },
-          facilty_photos: [
-              {
-                location: String,
-                originalname: String,
-                mimetype: String,
-                size: String,
-                key: String
-              },
-            ],
+          facilty_photos: Array,
       
          }],
           payment_plan: [
@@ -198,15 +182,7 @@ const propertiesSchema = new Schema(
                 },
               },
             ],
-          property_documents: [
-              {
-                location: String,
-                originalname: String,
-                mimetype: String,
-                size: String,
-                key: String,
-              },
-            ],
+          property_documents: Array,
           property_location: {
               country: {
                   type: String,
