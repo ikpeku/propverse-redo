@@ -9,6 +9,7 @@ const {
   rejectProperty,
   statusProperty,
   get_Properties,
+  get_Current_Listed_Properties
   
 } = require("../../controller/Admin/Developers/adminDevelopers");
 
@@ -46,6 +47,7 @@ rejectProperty,
 statusProperty);
 
 route.get("/properties", get_Properties)
+route.get("/current-list", get_Current_Listed_Properties)
 
 
 /**

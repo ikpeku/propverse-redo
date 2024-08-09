@@ -7,6 +7,11 @@ const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 const propertiesSchema = new Schema(
   {
     _id: String,
+    company: {
+      type: SchemaTypes.ObjectId,
+      ref: "due_deligence",
+      required: true,
+    },
     user: {
         type: SchemaTypes.ObjectId,
         ref: "user",

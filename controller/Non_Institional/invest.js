@@ -56,7 +56,7 @@ exports.makeInvestment = async(req,res,next) => {
         
       const tran = await Non_Institutional_Investor.findByIdAndUpdate(
            userId,
-            { $push: { transactions: investment._id } },
+            { $push: { transactions: investment._id, properties: prodId } },
             { new: true, useFindAndModify: false }
           );
           
@@ -65,8 +65,8 @@ exports.makeInvestment = async(req,res,next) => {
      return res.status(200).json({status:"success", message: "congratulations record taken awaiting confirmation"});
        
     } catch (error) {
-// next(error)
-        next(errorHandler(400,"confirm transaction failed"))
+next(error)
+        // next(errorHandler(400,"confirm transaction failed"))
     }
 
 }

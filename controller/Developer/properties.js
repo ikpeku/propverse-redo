@@ -1,27 +1,3 @@
-// user: {
-//     type: SchemaTypes.ObjectId,
-//     ref: "user",
-//     required: true,
-//   },
-// isSubmitted: {
-//   type: Boolean,
-//   default: false,
-// },
-
-// isAdminAproved: {
-//     type: String,
-//     default: "Non Verified",
-//     enums: ["Non Verified", "Verified", "Rejected"]
-// },
-// investment_status: {
-//     type: String,
-//     default: "Pending",
-//     enums: ["Pending", "Completed"]
-//   },
-// property_type: {
-//     type: String,
-//     enums: ["new", "old"]
-// },
 
 const { ObjectId } = require("mongodb");
 const properties = require("../../model/developer/properties");
@@ -105,8 +81,8 @@ exports.createProperty = async(req, res, next) => {
            await properties.create({
                _id,
                user: req.payload.userId,
+               company: req.payload.userId,
                activities: _id,
-               transactions: _id,
                isSubmitted,
                property_state,
                isDetail_lock,

@@ -11,9 +11,6 @@ exports.get_Developers = async (req, res, next) => {
   const limit = parseInt(req?.query?.limit) || 10;
   const searchText = req?.query?.searchText;
 
-  const { userId } = req.params;
-
-  //   const { userId: payloadUserId, status } = req.payload;
 
   const options = {
     page,
@@ -96,11 +93,11 @@ exports.get_Due_Deligence = async (req, res, next) => {
       },
       {
         $project: {
-          "user_detail.username": 1,
-          "user_detail.country": 1,
+          username:"user_detail.username",
+          country:"user_detail.country",
           isAdminAproved: 1,
           createdAt: 1,
-          "user_detail._id": 1,
+          _id:"user_detail._id",
         },
       },
       {
@@ -244,6 +241,81 @@ exports.get_Properties = async (req, res, next) => {
   const limit = parseInt(req?.query?.limit) || 10;
   const searchText = req?.query?.searchText;
 
+  // const { userId } = req.params;
+
+  //   const { userId: payloadUserId, status } = req.payload;
+
+  const options = {
+    page,
+    limit,
+  };
+
+  let query =  [
+    {
+      $lookup: {
+           from: "users",
+           localField: "user",
+           foreignField: "_id",
+           as: "user",
+         },
+       },
+       {
+        $addFields: {
+          user: {
+            $arrayElemAt: ["$user", 0],
+          },
+        },
+      },
+      {
+        $project: {
+          username: "user.username",
+          country: "property_detail.property_location.country",
+          property_type: "property_detail.property_overview.property_type" ,
+          property_name: "property_detail.property_overview.property_name" ,
+           isAdminAproved: 1,
+          // email: 1,
+          createdAt: 1,
+          _id: 1,
+        },
+      },
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    
+  ]
+
+  if(searchText){
+    query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
+  }
+
+  // query.push(
+    
+  // )
+
+  try {
+    const myAggregate = Property.aggregate(query);
+
+    const paginationResult = await Property.aggregatePaginate(
+      myAggregate,
+      options
+    );
+
+    return res.status(200).json({ status: "success", data: paginationResult });
+  } catch (error) {
+    next(errorHandler(500, "bad request"));
+  }
+};
+
+
+
+exports.get_Properties = async (req, res, next) => {
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+
   const { userId } = req.params;
 
   //   const { userId: payloadUserId, status } = req.payload;
@@ -271,10 +343,10 @@ exports.get_Properties = async (req, res, next) => {
       },
       {
         $project: {
-          "user.username": 1,
-          "property_detail.property_location.country": 1,
-          "property_detail.property_overview.property_type" : 1,
-          "property_detail.property_overview.property_name" : 1,
+          username: "user.username",
+          country: "property_detail.property_location.country",
+          property_type: "property_detail.property_overview.property_type",
+          property_name: "property_detail.property_overview.property_name",
            isAdminAproved: 1,
           // email: 1,
           createdAt: 1,
@@ -289,6 +361,101 @@ exports.get_Properties = async (req, res, next) => {
     
   ]
 
+  if(searchText){
+    query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
+  }
+
+  // query.push(
+    
+  // )
+
+  try {
+    const myAggregate = Property.aggregate(query);
+
+    const paginationResult = await Property.aggregatePaginate(
+      myAggregate,
+      options
+    );
+
+    return res.status(200).json({ status: "success", data: paginationResult });
+  } catch (error) {
+    next(errorHandler(500, "bad request"));
+  }
+};
+
+
+
+exports.get_Current_Listed_Properties = async (req, res, next) => {
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+
+
+  const options = {
+    page,
+    limit,
+  };
+
+  let query =  [
+    {
+      $match: {isAdminAproved: "Approved"}
+    },
+    {
+      $lookup: {
+           from: "due_deligences",
+           localField: "company",
+           foreignField: "user",
+           as: "company",
+         },
+       },
+       {
+        $addFields: {
+          company: {
+            $arrayElemAt: ["$company", 0],
+          },
+        },
+      },
+    {
+      $lookup: {
+           from: "users",
+           localField: "user",
+           foreignField: "_id",
+           as: "user",
+         },
+       },
+       {
+        $addFields: {
+          user: {
+            $arrayElemAt: ["$user", 0],
+          },
+        },
+      },
+      {
+        $project: {
+          name: "company.company_information.name",
+          country: "property_detail.property_location.country",
+          property_type: "property_detail.property_overview.property_type",
+          starting_date: "property_detail.property_overview.date.starting_date",
+          closing_date: "property_detail.property_overview.date.closing_date",
+           isAdminAproved: 1,
+          investment_status: 1,
+          _id: 1,
+        },
+      },
+{
+$match: { "property_detail.property_overview.date.closing_date" : {$lte:{$date: new Date()}}}
+},
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    
+  ]
+  // {$gte:{$date:'2012-09-01T04:00:00Z'}, 
+  //                   $lt:  {date:'2012-10-01T04:00:00Z'} 
+  //                   }}
   if(searchText){
     query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
   }

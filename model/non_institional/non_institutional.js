@@ -20,7 +20,8 @@ const non_Institutional_Schema = new Schema({
       }
       ],
       properties: [{
-        type: SchemaTypes.ObjectId,
+        // type: SchemaTypes.ObjectId,
+        type: String,
         ref: "properties",
       }
       ],

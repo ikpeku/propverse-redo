@@ -27,8 +27,9 @@ exports.AdminLogin = async (req, res, next) => {
       });
     }
   
+  
     const user = await User.findOne({email});
-   
+  
 
     if (!user) {
       return next(errorHandler(401, "User not found"));
