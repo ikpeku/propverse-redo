@@ -9,9 +9,6 @@ exports.uploadActivities = async(req,res,next) => {
     const {title,activity, documents} = req.body
     const {propId} = req.params
 
-    // console.log(req.params)
-    // console.log(req.body)
-
     try {
         await Activities.create({
             property:propId,
