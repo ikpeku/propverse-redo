@@ -93,8 +93,8 @@ exports.get_Due_Deligence = async (req, res, next) => {
       },
       {
         $project: {
-          username:"user_detail.username",
-          country:"user_detail.country",
+          username:"$user_detail.username",
+          country:"$user_detail.country",
           isAdminAproved: 1,
           createdAt: 1,
           _id:"user_detail._id",
@@ -268,10 +268,10 @@ exports.get_Properties = async (req, res, next) => {
       },
       {
         $project: {
-          username: "user.username",
-          country: "property_detail.property_location.country",
-          property_type: "property_detail.property_overview.property_type" ,
-          property_name: "property_detail.property_overview.property_name" ,
+          username: "$user.username",
+          country: "$property_detail.property_location.country",
+          property_type: "$property_detail.property_overview.property_type" ,
+          property_name: "$property_detail.property_overview.property_name" ,
            isAdminAproved: 1,
           // email: 1,
           createdAt: 1,
@@ -287,7 +287,7 @@ exports.get_Properties = async (req, res, next) => {
   ]
 
   if(searchText){
-    query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
+    query.push({$match : { "$property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
   }
 
   // query.push(
@@ -310,78 +310,78 @@ exports.get_Properties = async (req, res, next) => {
 
 
 
-exports.get_Properties = async (req, res, next) => {
-  const page = parseInt(req?.query?.page) || 1;
+// exports.get_Properties = async (req, res, next) => {
+//   const page = parseInt(req?.query?.page) || 1;
 
-  const limit = parseInt(req?.query?.limit) || 10;
-  const searchText = req?.query?.searchText;
+//   const limit = parseInt(req?.query?.limit) || 10;
+//   const searchText = req?.query?.searchText;
 
-  const { userId } = req.params;
+//   const { userId } = req.params;
 
-  //   const { userId: payloadUserId, status } = req.payload;
+//   //   const { userId: payloadUserId, status } = req.payload;
 
-  const options = {
-    page,
-    limit,
-  };
+//   const options = {
+//     page,
+//     limit,
+//   };
 
-  let query =  [
-    {
-      $lookup: {
-           from: "users",
-           localField: "user",
-           foreignField: "_id",
-           as: "user",
-         },
-       },
-       {
-        $addFields: {
-          user: {
-            $arrayElemAt: ["$user", 0],
-          },
-        },
-      },
-      {
-        $project: {
-          username: "user.username",
-          country: "property_detail.property_location.country",
-          property_type: "property_detail.property_overview.property_type",
-          property_name: "property_detail.property_overview.property_name",
-           isAdminAproved: 1,
-          // email: 1,
-          createdAt: 1,
-          _id: 1,
-        },
-      },
-    {
-      $sort: {
-        createdAt: -1,
-      },
-    },
+//   let query =  [
+//     {
+//       $lookup: {
+//            from: "users",
+//            localField: "user",
+//            foreignField: "_id",
+//            as: "user",
+//          },
+//        },
+//        {
+//         $addFields: {
+//           user: {
+//             $arrayElemAt: ["$user", 0],
+//           },
+//         },
+//       },
+//       {
+//         $project: {
+//           username: "user.username",
+//           country: "property_detail.property_location.country",
+//           property_type: "property_detail.property_overview.property_type",
+//           property_name: "property_detail.property_overview.property_name",
+//            isAdminAproved: 1,
+//           // email: 1,
+//           createdAt: 1,
+//           _id: 1,
+//         },
+//       },
+//     {
+//       $sort: {
+//         createdAt: -1,
+//       },
+//     },
     
-  ]
+//   ]
 
-  if(searchText){
-    query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
-  }
+//   if(searchText){
+//     query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
+//   }
 
-  // query.push(
+//   // query.push(
     
-  // )
+//   // )
 
-  try {
-    const myAggregate = Property.aggregate(query);
+//   try {
+//     const myAggregate = Property.aggregate(query);
 
-    const paginationResult = await Property.aggregatePaginate(
-      myAggregate,
-      options
-    );
+//     const paginationResult = await Property.aggregatePaginate(
+//       myAggregate,
+//       options
+//     );
 
-    return res.status(200).json({ status: "success", data: paginationResult });
-  } catch (error) {
-    next(errorHandler(500, "bad request"));
-  }
-};
+//     return res.status(200).json({ status: "success", data: paginationResult });
+//   } catch (error) {
+//     next(errorHandler(500, "bad request"));
+//   }
+// };
 
 
 
@@ -433,18 +433,18 @@ exports.get_Current_Listed_Properties = async (req, res, next) => {
       },
       {
         $project: {
-          name: "company.company_information.name",
-          country: "property_detail.property_location.country",
-          property_type: "property_detail.property_overview.property_type",
-          starting_date: "property_detail.property_overview.date.starting_date",
-          closing_date: "property_detail.property_overview.date.closing_date",
+          name: "$company.company_information.name",
+          country: "$property_detail.property_location.country",
+          property_type: "$property_detail.property_overview.property_type",
+          starting_date: "$property_detail.property_overview.date.starting_date",
+          closing_date: "$property_detail.property_overview.date.closing_date",
            isAdminAproved: 1,
           investment_status: 1,
           _id: 1,
         },
       },
 {
-$match: { "property_detail.property_overview.date.closing_date" : {$lte:{$date: new Date()}}}
+$match: { "$property_detail.property_overview.date.closing_date" : {$lte:{$date: new Date()}}}
 },
     {
       $sort: {
@@ -457,7 +457,7 @@ $match: { "property_detail.property_overview.date.closing_date" : {$lte:{$date: 
   //                   $lt:  {date:'2012-10-01T04:00:00Z'} 
   //                   }}
   if(searchText){
-    query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
+    query.push({$match : { "$property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
   }
 
   // query.push(

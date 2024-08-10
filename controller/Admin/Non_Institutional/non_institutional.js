@@ -58,10 +58,6 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
     const limit = parseInt(req?.query?.limit) || 10;
     const searchText = req?.query?.searchText;
   
-    // const { userId } = req.params;
-  
-    //   const { userId: payloadUserId, status } = req.payload;
-  
     const options = {
       page,
       limit,
@@ -70,9 +66,6 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
 
 
     let query =  [
-        // {
-        //   $match: { account_type: "Non-Institutional Investor" }
-        // },
         {
            $lookup: {
                 from: "users",
@@ -119,10 +112,7 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
                 },
               },
             },
-
-
       ]
-
 
       query.push(
         {
@@ -172,10 +162,6 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
     const limit = parseInt(req?.query?.limit) || 10;
     const searchText = req?.query?.searchText;
   
-    // const { userId } = req.params;
-  
-    //   const { userId: payloadUserId, status } = req.payload;
-  
     const options = {
       page,
       limit,
@@ -184,9 +170,6 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
 
 
     let query =  [
-        // {
-        //   $match: { account_type: "Non-Institutional Investor" }
-        // },
         {
            $lookup: {
                 from: "users",
