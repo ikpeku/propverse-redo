@@ -117,10 +117,10 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
       query.push(
         {
             $project: {
-              username: "user_detail.username",
-              country:"user_detail.country",
-              email:"user_detail.email",
-              createdAt:"user_detail.createdAt",
+              username: "$user_detail.username",
+              country:"$user_detail.country",
+              email:"$user_detail.email",
+              createdAt:"$user_detail.createdAt",
               status: "$accreditation_status.status",
               _id: 1,
                amount_invested: 1
@@ -136,7 +136,7 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
 
       if(searchText){
         query.push({
-          $match: { "user_detail.username": { $regex: ".*" + searchText + ".*", $options: "i" } }
+          $match: { "$user_detail.username": { $regex: ".*" + searchText + ".*", $options: "i" } }
         })
       }
 
@@ -217,7 +217,7 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
               },
             },
             {
-              $match : {"user_detail.isSuspended": true}
+              $match : {"$user_detail.isSuspended": true}
             }
 
 
@@ -227,11 +227,11 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
       query.push(
         {
             $project: {
-              username :"user_detail.username",
-              country:"user_detail.country",
-              email:"user_detail.email",
-              createdAt :"user_detail.createdAt",
-              isSuspended:"user_detail.isSuspended",
+              username :"$user_detail.username",
+              country:"$user_detail.country",
+              email:"$user_detail.email",
+              createdAt :"$user_detail.createdAt",
+              isSuspended:"$user_detail.isSuspended",
               _id: 1,
                amount_invested: 1
             },
@@ -246,7 +246,7 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
 
       if(searchText){
         query.push({
-          $match: { "user_detail.username": { $regex: ".*" + searchText + ".*", $options: "i" } }
+          $match: { "$user_detail.username": { $regex: ".*" + searchText + ".*", $options: "i" } }
         })
       }
 
@@ -349,12 +349,12 @@ exports.get_Non_Institutional = async (req, res, next) => {
   query.push(
     {
         $project: {
-          username:"user_detail.username",
-          isSuspended:"user_detail.isSuspended",
-          country:"user_detail.country",
-          email: "user_detail.email",
-          createdAt:"user_detail.createdAt",
-          phone_number:"user_detail.phone_number",
+          username:"$user_detail.username",
+          isSuspended:"$user_detail.isSuspended",
+          country:"$user_detail.country",
+          email: "$user_detail.email",
+          createdAt:"$user_detail.createdAt",
+          phone_number:"$user_detail.phone_number",
           status: "$accreditation_status.status",
           amount_invested: 1,
           properties: 1,
