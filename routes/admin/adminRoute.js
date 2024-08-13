@@ -14,7 +14,7 @@ const {
 } = require("../../controller/Admin/Developers/adminDevelopers");
 
 
-const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc} = require("../../controller/Admin/Non_Institutional/non_institutional");
+const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance} = require("../../controller/Admin/Non_Institutional/non_institutional");
 const { suspendUserAccount , kycVerification} = require("../../controller/Admin/GeneralAdmin");
 const route = express.Router();
 
@@ -58,6 +58,9 @@ route.post("/create/activity/:prodId", uploadActivities)
 route.get("/non-institutional", get_All_Non_Institutional)
 route.get("/suspend/non-institutional", get_Suspended_All_Non_Institutional)
 route.get("/profile/:userId", get_Non_Institutional)
+route.get("/compliance", get_All_Non_Institutional_Compliance)
+
+route.get("/compliance/:userId", get_All_Non_Institutional_Compliance)
 
 
 /**

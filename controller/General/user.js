@@ -49,8 +49,26 @@ exports.getUserKyc = async(req, res, next) => {
 }
 
 
-exports.userAccreditation = (req, res, next) => {
 
-    console.log("enter accreditation")
+
+exports.userUpdateAccreditation = async(req, res, next) => {
+
+}
+
+
+exports.userAccreditation = async(req, res, next) => {
+
+    try {
+
+        const data =   await Accreditation.findById(req.payload.userId)
+   
+          res.status(200).json({
+           message: "success",
+           data
+          })
+   
+       } catch (error) {
+           next(errorHandler(500, "failed"))
+       }
 
 }

@@ -5,10 +5,11 @@ const { userAccreditation , userKyc, getUserKyc} = require("../../controller/Gen
 
 const route = express.Router();
 
-route.post("/accreditation/", userAccreditation)
 route.post("/kyc/", userKyc)
 route.get("/kyc/", getUserKyc)
 route.post("/institutional/kyc/", userKyc)
+route.post("/accreditation/", userAccreditation)
+route.get("/accreditation/", userAccreditation)
 
 
 
