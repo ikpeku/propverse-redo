@@ -12,12 +12,15 @@ exports.uploadActivities = async(req,res,next) => {
     const {propId} = req.params
 
     try {
+
         await Activities.create({
             property:propId,
             title,
             activity,
             documents_type: documents[0].mimetype || ""
         })
+
+
         res.status(200).json({
           message: "success"
         })
@@ -444,16 +447,12 @@ exports.get_Non_Institutional = async (req, res, next) => {
 
 
 
-
   try {
-
 
     const user = await Non_Institiutional_Investor.aggregate(query);
 
-    // const user = await Non_Institiutional_Investor.findById(userId).populate("user transactions properties funds accreditation")
-
     res.status(200).json({
-      data: user
+      data: user[0]
     })
     
   } catch (error) {

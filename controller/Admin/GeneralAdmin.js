@@ -49,6 +49,7 @@ exports.kycVerification = async(req,res,next) => {
     }
   
   }
+  
 exports.complianceVerification = async(req,res,next) => {
     const {userId} = req.params
     
