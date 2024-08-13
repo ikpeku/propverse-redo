@@ -4,7 +4,8 @@ const User = require("../../../model/user");
 const Property = require("../../../model/developer/properties");
 const Non_Institiutional_Investor = require("../../../model/non_institional/non_institutional");
 const { ObjectId } = require("mongodb");
-const { pipeline } = require("nodemailer/lib/xoauth2");
+
+
 
 exports.uploadActivities = async(req,res,next) => {
     const {title,activity, documents} = req.body
@@ -594,6 +595,162 @@ exports.get_All_Non_Institutional_Compliance = async (req, res, next) => {
     
   }
 }
+
+exports.get_user_Compliance = async (req, res, next) => {
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+  const country = req?.query?.country;
+  const status = req?.query?.status;
+  const name = req?.query?.name;
+
+
+  const options = {
+    page,
+    limit,
+  };
+
+
+
+  let query =  [
+      {
+         $lookup: {
+              from: "users",
+              localField: "user",
+              foreignField: "_id",
+              as: "user",
+            },
+          },
+      {
+         $lookup: {
+              from: "property_investments",
+              localField: "transactions",
+              foreignField: "_id",
+              as: "transaction_invested",
+            },
+          },
+          {
+            $addFields: {
+              amount_invested: {
+              "$sum": { $sum: "$transaction_invested.paid.amount"}
+              }
+
+            },
+          },
+      {
+         $lookup: {
+              from: "accreditations",
+              localField: "accreditation",
+              foreignField: "users",
+              as: "accreditation",
+            },
+          },
+      {
+        // kyc: {
+        //   type: SchemaTypes.ObjectId,
+        //   ref: "kyc"
+         $lookup: {
+              from: "kycs",
+              localField: "kyc",
+              foreignField: "users",
+              as: "kyc_detail",
+            },
+          },
+          {
+            $addFields: {
+              user_detail: {
+                $arrayElemAt: ["$user", 0],
+              },
+            },
+          },
+          {
+            $addFields: {
+              accreditation_status: {
+                $arrayElemAt: ["$accreditation", 0],
+              },
+            },
+          },
+          {
+            $addFields: {
+              kyc: {
+                $arrayElemAt: ["$kyc_detail", 0],
+              },
+            },
+          },
+    ]
+
+    query.push(
+      {
+          $project: {
+            user_detail: 1,
+            compliance: "$accreditation_status",
+            kyc_info: "$kyc",
+            // username: "$user_detail.username",
+            // country:"$user_detail.country",
+            // verify_type: "$accreditation_status.verify_method",
+            // submission_date:"$user_detail.updatedAt",
+            // status: "$accreditation_status.status",
+            // _id: 1
+          },
+        },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+    )
+
+
+    if(searchText){
+
+      query.push({
+        $match: {
+          $or: [
+            { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { verify_type: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { status: searchText}
+          ]
+        }
+      })
+
+      
+    }
+    
+    if(country){
+      query.push({
+        $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
+      })
+    }
+    if(status){
+      query.push({
+        $match: {status}
+      })
+    }
+    if(name){
+      query.push({
+        $match: {username: { $regex: name, $options: "i" } }
+      })
+    }
+
+
+  try {
+    const myAggregate = await Non_Institiutional_Investor.aggregate(query);
+
+    // const paginationResult = await Non_Institiutional_Investor.aggregatePaginate(
+    //   myAggregate,
+    //   options
+    // );
+
+    return res.status(200).json({ status: "success", data: myAggregate[0] });
+  } catch (error) {
+    next(errorHandler(500, "network error"));
+    
+  }
+}
+
+
 
 
 
