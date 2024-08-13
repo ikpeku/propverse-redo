@@ -4,6 +4,7 @@ const User = require("../../../model/user");
 const Property = require("../../../model/developer/properties");
 const Non_Institiutional_Investor = require("../../../model/non_institional/non_institutional");
 const { ObjectId } = require("mongodb");
+const { pipeline } = require("nodemailer/lib/xoauth2");
 
 exports.uploadActivities = async(req,res,next) => {
     const {title,activity, documents} = req.body
@@ -57,6 +58,10 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
   
     const limit = parseInt(req?.query?.limit) || 10;
     const searchText = req?.query?.searchText;
+    const country = req?.query?.country;
+    const status = req?.query?.status;
+    const name = req?.query?.name;
+
   
     const options = {
       page,
@@ -135,13 +140,39 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
 
 
       if(searchText){
+
         query.push({
-          $match: { "$user_detail.username": { $regex: ".*" + searchText + ".*", $options: "i" } }
+          $match: {
+            $or: [
+              { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+              { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
+              { email: { $regex: ".*" + searchText + ".*", $options: "i" } },
+              { status: searchText},
+              { amount_invested: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            ]
+          }
+        })
+
+        
+      }
+      
+      if(country){
+        query.push({
+          $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
+        })
+      }
+      if(status){
+        query.push({
+          $match: {status}
+        })
+      }
+      if(name){
+        query.push({
+          $match: {username: { $regex: name, $options: "i" } }
         })
       }
 
 
-      // 
     try {
       const myAggregate = Non_Institiutional_Investor.aggregate(query);
   
@@ -152,16 +183,24 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
   
       return res.status(200).json({ status: "success", data: paginationResult });
     } catch (error) {
-      next(errorHandler(500, "bad request"));
+      next(errorHandler(500, "network error"));
+      
     }
   }
 
+
+
+
 exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
-    const page = parseInt(req?.query?.page) || 1;
+  const page = parseInt(req?.query?.page) || 1;
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+  const country = req?.query?.country;
+  const name = req?.query?.name;
   
-    const limit = parseInt(req?.query?.limit) || 10;
-    const searchText = req?.query?.searchText;
-  
+
+
+
     const options = {
       page,
       limit,
@@ -216,9 +255,7 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
                 },
               },
             },
-            {
-              $match : {"$user_detail.isSuspended": true}
-            }
+           
 
 
       ]
@@ -227,15 +264,18 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
       query.push(
         {
             $project: {
-              username :"$user_detail.username",
-              country:"$user_detail.country",
-              email:"$user_detail.email",
-              createdAt :"$user_detail.createdAt",
-              isSuspended:"$user_detail.isSuspended",
+              username : "$user_detail.username",
+              country: "$user_detail.country",
+              email: "$user_detail.email",
+              createdAt : "$user_detail.createdAt",
+              isSuspended: "$user_detail.isSuspended",
               _id: 1,
                amount_invested: 1
             },
           },
+           {
+              $match : {isSuspended: true}
+            },
           {
             $sort: {
               createdAt: -1,
@@ -245,13 +285,34 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
 
 
       if(searchText){
+
         query.push({
-          $match: { "$user_detail.username": { $regex: ".*" + searchText + ".*", $options: "i" } }
+          $match: {
+            $or: [
+              { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+              { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
+              { email: { $regex: ".*" + searchText + ".*", $options: "i" } },
+              { amount_invested: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            ]
+          }
+        })
+
+        
+      }
+      
+      if(country){
+        query.push({
+          $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
+        })
+      }
+     
+      if(name){
+        query.push({
+          $match: {username: { $regex: name, $options: "i" } }
         })
       }
 
 
-      // 
     try {
       const myAggregate = Non_Institiutional_Investor.aggregate(query);
   
@@ -262,7 +323,8 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
   
       return res.status(200).json({ status: "success", data: paginationResult });
     } catch (error) {
-      next(errorHandler(500, "bad request"));
+      next(errorHandler(500, error));
+      // next(errorHandler(500, "bad request"));
     }
   }
 
@@ -305,6 +367,14 @@ exports.get_Non_Institutional = async (req, res, next) => {
             from: "properties",
             localField: "properties",
             foreignField: "_id",
+            pipeline: [{
+              $lookup: {
+                from: "due_deligences",
+                localField: "company",
+                foreignField: "_id",
+                as: "company",
+              }}
+            ],
             as: "properties",
           },
           

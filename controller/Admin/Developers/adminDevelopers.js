@@ -391,6 +391,7 @@ exports.get_Current_Listed_Properties = async (req, res, next) => {
   const limit = parseInt(req?.query?.limit) || 10;
   const searchText = req?.query?.searchText;
 
+  const current_time = new Date()
 
   const options = {
     page,
@@ -444,7 +445,7 @@ exports.get_Current_Listed_Properties = async (req, res, next) => {
         },
       },
 {
-$match: { "$property_detail.property_overview.date.closing_date" : {$lte:{$date: new Date()}}}
+$match: { closing_date : {$gte:current_time}}
 },
     {
       $sort: {
@@ -457,12 +458,10 @@ $match: { "$property_detail.property_overview.date.closing_date" : {$lte:{$date:
   //                   $lt:  {date:'2012-10-01T04:00:00Z'} 
   //                   }}
   if(searchText){
-    query.push({$match : { "$property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
+    query.push({$match : { name: { $regex: ".*" + searchText + ".*", $options: "i" } }})
   }
 
-  // query.push(
-    
-  // )
+ 
 
   try {
     const myAggregate = Property.aggregate(query);

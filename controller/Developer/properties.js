@@ -314,7 +314,7 @@ exports.getPropertyById = async(req, res, next) => {
 //                   }}
 exports.isPropertyCurrent = (req, res, next) => {
     req.body = {
-        "property_detail.property_overview.date.closing_date" : {$gte:{$date: new Date()}},
+        "property_detail.property_overview.date.closing_date" : {$gte: new Date()},
         isAdminAproved : "Approved"
     }
     next()
