@@ -15,7 +15,7 @@ const {
 
 
 const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance} = require("../../controller/Admin/Non_Institutional/non_institutional");
-const { suspendUserAccount , kycVerification} = require("../../controller/Admin/GeneralAdmin");
+const { suspendUserAccount , kycVerification, complianceVerification} = require("../../controller/Admin/GeneralAdmin");
 const route = express.Router();
 
 /**
@@ -71,7 +71,8 @@ route.post("/suspend/:userId", suspendUserAccount)
 /**
  * kyv
  */
-route.post("/kyc/verify/:userId", kycVerification)
+route.patch("/kyc/verify/:userId", kycVerification)
+route.patch("/compliance/verify/:userId", complianceVerification)
 
 
 module.exports = route;
