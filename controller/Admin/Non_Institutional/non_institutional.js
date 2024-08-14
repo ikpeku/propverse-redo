@@ -663,6 +663,7 @@ exports.get_user_Compliance = async (req, res, next) => {
               },
             },
           },
+          { $unset: [  "user_detail.password",  ] },
           {
             $addFields: {
               accreditation_status: {
@@ -685,6 +686,7 @@ exports.get_user_Compliance = async (req, res, next) => {
             user_detail: 1,
             compliance: "$accreditation_status",
             kyc_info: "$kyc",
+         
             // username: "$user_detail.username",
             // country:"$user_detail.country",
             // verify_type: "$accreditation_status.verify_method",

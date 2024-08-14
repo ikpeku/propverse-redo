@@ -28,6 +28,7 @@ exports.suspendUserAccount = async(req,res,next) => {
   
 exports.kycVerification = async(req,res,next) => {
     const {userId} = req.params
+    const {rejectreason} = req.body
   
     try {
      const response = await Kyc.findById(userId);
@@ -40,7 +41,8 @@ exports.kycVerification = async(req,res,next) => {
      response.save()
 
      res.status(200).json({
-        message: "success"
+        message: "success",
+        response: response.isApproved
      })
       
     } catch (error) {
@@ -52,6 +54,7 @@ exports.kycVerification = async(req,res,next) => {
   
 exports.complianceVerification = async(req,res,next) => {
     const {userId} = req.params
+    const {rejectreason} = req.body
     
     try {
       const response = await Compliance.findById(userId);
@@ -65,7 +68,8 @@ exports.complianceVerification = async(req,res,next) => {
      response.save()
     
      res.status(200).json({
-        message: "success"
+        message: "success",
+        response:response.isApproved
      })
       
     } catch (error) {
