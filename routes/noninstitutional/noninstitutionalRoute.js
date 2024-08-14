@@ -6,8 +6,15 @@ const route = express.Router();
 
 route.post("/request-doc", userRequestDocs)
 route.post("/contact-support", contactSupport)
-route.post("/property/invest/:userId", makeInvestmentOnproperty)
-route.post("/fund/invest/:userId", makeInvestmentFunds)
+route.post("/property/invest/:userId", (req, res,next) =>{
+    req.body.investmentType = "property"
+     next()
+ }, makeInvestmentOnproperty)
+route.post("/fund/invest/:userId", (req, res,next) =>{
+   req.body.investmentType = "funds"
+    next()
+},
+ makeInvestmentFunds)
 
 route.get("/invests/:userId", getUserInvestment)
 route.get("/invest/:prodId", getInvestmentById)

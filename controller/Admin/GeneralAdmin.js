@@ -28,7 +28,7 @@ exports.suspendUserAccount = async(req,res,next) => {
   
 exports.kycVerification = async(req,res,next) => {
     const {userId} = req.params
-    const {rejectreason} = req.body
+    const {rejectreason, isRejected} = req.body
   
     try {
      const response = await Kyc.findById(userId);
@@ -37,12 +37,17 @@ exports.kycVerification = async(req,res,next) => {
       return next(errorHandler(401,"user not found"))
     }
   
-     response.isApproved = !response.isApproved
+    if(isRejected) {
+      response.isApproved = false
+    } else {
+      response.isApproved = true
+    }
+
      response.save()
 
      res.status(200).json({
         message: "success",
-        response: response.isApproved
+        response: isRejected ? "kyc rejected successfully" : "kyv approved successfully"
      })
       
     } catch (error) {

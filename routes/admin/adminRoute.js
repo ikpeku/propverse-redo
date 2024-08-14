@@ -71,8 +71,15 @@ route.post("/suspend/:userId", suspendUserAccount)
 /**
  * kyv
  */
-route.patch("/kyc/verify/:userId", kycVerification)
-route.patch("/compliance/verify/:userId", complianceVerification)
+route.patch("/kyc/approve/:userId", kycVerification)
+route.patch("/kyc/reject/:userId", (req,res,next) => {
+  req.body.isRejected = true;
+  next()
+
+}, kycVerification)
+
+route.patch("/compliance/approve/:userId", complianceVerification)
+route.patch("/compliance/reject/:userId", complianceVerification)
 
 
 module.exports = route;

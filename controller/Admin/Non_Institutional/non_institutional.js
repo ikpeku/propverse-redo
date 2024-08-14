@@ -86,15 +86,31 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
         {
            $lookup: {
                 from: "property_investments",
-                localField: "transactions",
+                localField: "property_transactions",
                 foreignField: "_id",
-                as: "transaction_invested",
+                as: "property_invested",
               },
             },
             {
               $addFields: {
                 amount_invested: {
-                "$sum": { $sum: "$transaction_invested.paid.amount"}
+                "$sum": { $sum: "$property_invested.paid.amount"}
+                }
+  
+              },
+            },
+        {
+           $lookup: {
+                from: "fund_investments",
+                localField: "funds_transactions",
+                foreignField: "_id",
+                as: "funds_invested",
+              },
+            },
+            {
+              $addFields: {
+                amount_invested: {
+                "$sum": { $sum: "$funds_invested.paid.amount"}
                 }
   
               },
@@ -685,14 +701,7 @@ exports.get_user_Compliance = async (req, res, next) => {
           $project: {
             user_detail: 1,
             compliance: "$accreditation_status",
-            kyc_info: "$kyc",
-         
-            // username: "$user_detail.username",
-            // country:"$user_detail.country",
-            // verify_type: "$accreditation_status.verify_method",
-            // submission_date:"$user_detail.updatedAt",
-            // status: "$accreditation_status.status",
-            // _id: 1
+            kyc_info: "$kyc"
           },
         },
         {
@@ -738,11 +747,6 @@ exports.get_user_Compliance = async (req, res, next) => {
 
   try {
     const myAggregate = await Non_Institiutional_Investor.aggregate(query);
-
-    // const paginationResult = await Non_Institiutional_Investor.aggregatePaginate(
-    //   myAggregate,
-    //   options
-    // );
 
     return res.status(200).json({ status: "success", data: myAggregate[0] });
   } catch (error) {

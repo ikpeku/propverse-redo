@@ -86,7 +86,8 @@ exports.makeInvestmentFunds = async(req,res,next) => {
       mimetype,
       size,
       key
-      }
+      },
+      investmentType 
     } = req.body;
 
 
@@ -119,14 +120,25 @@ exports.makeInvestmentFunds = async(req,res,next) => {
         })
 
        
+if(investmentType === "funds") {
+ await Non_Institutional_Investor.findByIdAndUpdate(
+    userId,
+     { $push: { property_transactions: investment._id, properties: prodId } },
+     { new: true, useFindAndModify: false }
+   );
+
+} 
+if(investmentType === "property") {
+
+   await Non_Institutional_Investor.findByIdAndUpdate(
+       userId,
+        { $push: { funds_transactions: investment._id, funds: prodId } },
+        { new: true, useFindAndModify: false }
+      );
+      
+}
 
         
-      const tran = await Non_Institutional_Investor.findByIdAndUpdate(
-           userId,
-            { $push: { transactions: investment._id, properties: prodId } },
-            { new: true, useFindAndModify: false }
-          );
-          
     
     
      return res.status(200).json({status:"success", message: "congratulations record taken awaiting confirmation"});
