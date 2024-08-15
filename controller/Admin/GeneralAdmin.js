@@ -47,7 +47,7 @@ exports.kycVerification = async(req,res,next) => {
 
      res.status(200).json({
         message: "success",
-        response: isRejected ? "kyc rejected successfully" : "kyv approved successfully"
+        data: isRejected ? "kyc rejected successfully" : "kyv approved successfully"
      })
       
     } catch (error) {
@@ -59,7 +59,7 @@ exports.kycVerification = async(req,res,next) => {
   
 exports.complianceVerification = async(req,res,next) => {
     const {userId} = req.params
-    const {rejectreason} = req.body
+    const {rejectreason,isRejected} = req.body
     
     try {
       const response = await Compliance.findById(userId);
@@ -67,15 +67,22 @@ exports.complianceVerification = async(req,res,next) => {
       if(!response) {
         return next(errorHandler(401,"user not found"))
       }
-      
-     response.isApproved = !response.isApproved
-     response.status =  response.status == 'not verified' ? "verified" : "not verified",
-     response.save()
-    
+  
+    // if(isRejected) {
+    //   response.status = "rejected"
+    // } else {
+    //   response.status = "verified"
+    // }
+
+    //  response.save()
+  const update =  await Compliance.findByIdAndUpdate(userId, {$set: {status: isRejected ? "rejected" : "verified" }})
+
      res.status(200).json({
         message: "success",
-        response:response.isApproved
+        data: isRejected ? "compliance rejected successfully" : "compliance approved successfully",
+        update
      })
+      
       
     } catch (error) {
       next(errorHandler("operation failed"))

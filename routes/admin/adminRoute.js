@@ -79,7 +79,11 @@ route.patch("/kyc/reject/:userId", (req,res,next) => {
 }, kycVerification)
 
 route.patch("/compliance/approve/:userId", complianceVerification)
-route.patch("/compliance/reject/:userId", complianceVerification)
+route.patch("/compliance/reject/:userId", (req,res,next) => {
+  req.body.isRejected = true;
+  next()
+
+},complianceVerification)
 
 
 module.exports = route;

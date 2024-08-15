@@ -21,7 +21,7 @@ const accreditation_Schema = new Schema(
     status: {
       type: String,
       default: "not verified",
-      enum: ["not verified", "processing", "verified"],
+      enum: ["not verified", "processing", "verified", "rejected"],
     },
     verify_method: {
       type: String,
