@@ -29,13 +29,6 @@ transporter.verify((error, success) => {
 
 
 
-
-// exports.mailerController = async(mailOptions, next) => {
-    
-// } 
-
-
-
 exports.adminmailoption = async ({ email, username , message, from, phone}) => {
 
    
@@ -439,11 +432,4 @@ try {
 
 
 
-
-
-{/* <tr>
-<td valign="middle" class="hero bg_white" style="padding: 3em 0 2em 0;">
-  <img src="https://imaginethatcreative.net/blog/wp-content/uploads/2023/06/2250206.png" alt="email" style="width: 300px; max-width: 600px; height: auto; margin: auto; display: block;">
-</td>
-</tr><!-- end tr --> */}
 
