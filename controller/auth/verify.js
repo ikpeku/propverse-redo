@@ -74,7 +74,7 @@ exports.verifyUser = async (req, res, next) => {
 
         if(data.account_type === "Non-Institutional Investor") {
          
-          await Non_Institutional_Investment.create({_id: userId, user: userId});
+          await Non_Institutional_Investment.create({_id: userId, user: userId, kyc:userId, accreditation:userId});
         }
 
         if(data.account_type === "Non-Institutional Investor" || data.account_type === "Institutional Investor") {
@@ -83,8 +83,7 @@ exports.verifyUser = async (req, res, next) => {
 
          }
 
-
-
+  
 
         const token = await authTokenInit.createToken(data);
 

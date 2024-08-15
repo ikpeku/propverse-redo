@@ -524,7 +524,7 @@ exports.get_All_Non_Institutional_Compliance = async (req, res, next) => {
          $lookup: {
               from: "accreditations",
               localField: "accreditation",
-              foreignField: "users",
+              foreignField: "_id",
               as: "accreditation",
             },
           },
@@ -657,7 +657,7 @@ exports.get_user_Compliance = async (req, res, next) => {
          $lookup: {
               from: "accreditations",
               localField: "accreditation",
-              foreignField: "users",
+              foreignField: "_id",
               as: "accreditation",
             },
           },
@@ -668,7 +668,7 @@ exports.get_user_Compliance = async (req, res, next) => {
          $lookup: {
               from: "kycs",
               localField: "kyc",
-              foreignField: "users",
+              foreignField: "_id",
               as: "kyc_detail",
             },
           },
