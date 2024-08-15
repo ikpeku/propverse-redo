@@ -119,7 +119,7 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
            $lookup: {
                 from: "accreditations",
                 localField: "accreditation",
-                foreignField: "users",
+                foreignField: "_id",
                 as: "accreditation",
               },
             },
@@ -257,7 +257,7 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
            $lookup: {
                 from: "accreditations",
                 localField: "accreditation",
-                foreignField: "users",
+                foreignField: "_id",
                 as: "accreditation",
               },
             },
@@ -557,7 +557,7 @@ exports.get_All_Non_Institutional_Compliance = async (req, res, next) => {
         },
         {
           $sort: {
-            createdAt: -1,
+            updatedAt: -1,
           },
         },
     )
