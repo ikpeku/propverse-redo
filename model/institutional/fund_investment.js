@@ -39,13 +39,23 @@ const funds_investment_Schema = new Schema(
             default: "",
           },
       },
+
       proof_of_payment: {
         location: String,
         originalname: String,
         mimetype: String,
         size: String,
         key: String,
-      }
+      },
+      transaction_type: {
+        type: String,
+      },
+      payment_method: {
+        type: String,
+      },
+      payment_status: {
+        type: String,
+      },
 
     },
     {

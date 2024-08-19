@@ -487,7 +487,7 @@ ul.social li{
 
 
 exports.sendForgetPasswordMail = async (
-  { _id, email, username, status },
+  { _id, email, username, account_type },
   res,
   next
 ) => {
@@ -496,7 +496,8 @@ exports.sendForgetPasswordMail = async (
     return Math.floor(1000 + randomNum).toString();
   }
 
-  const uniqueString = status === "Admin" ? generateToken() : uuid4() + _id;
+
+  const uniqueString = account_type === "Admin" ? generateToken() : uuid4() + _id;
   const capitalizedRecipientName =
     username.charAt(0).toUpperCase() + username.slice(1);
   const mailOptions = {
@@ -855,9 +856,9 @@ exports.sendForgetPasswordMail = async (
                             <td>
                             <div class="text" style="padding: 0 2.5em; text-align: center;">
                                     <h4>Reset your propverse account password</h4>
-                                    <p>Reset password and have access into your propverse account. This ${status !== "Admin" ? "otp" : "link"} <b>expires in 3 hours </b></p>
+                                    <p>Reset password and have access into your propverse account. This ${account_type !== "Admin" ? "otp" : "link"} <b>expires in 3 hours </b></p>
                                    ${
-                                     status !== "Admin"
+                                    account_type !== "Admin"
                                        ? `<p><a class="btn btn-primary" href=${
                                            process.env.HOST_URL_FRONTEND +
                                            "api/auth/verify?userId=" +
@@ -889,7 +890,7 @@ exports.sendForgetPasswordMail = async (
     await ForgetPassword.deleteMany({ userId: _id });
 
 
-    const hashedUniqueString =  status === "Admin" ? uniqueString :   await bcrypt.hash(uniqueString, 12);
+    const hashedUniqueString =  account_type === "Admin" ? uniqueString :   await bcrypt.hash(uniqueString, 12);
 
 
 
@@ -920,7 +921,7 @@ exports.sendForgetPasswordMail = async (
       success: true,
       message: "Password reset mail sent successfully",
       status: "Pending",
-      data: status !== "Admin" ? null :{
+      data: account_type !== "Admin" ? null :{
         _id,
         email
       },

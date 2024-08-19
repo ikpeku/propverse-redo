@@ -1,6 +1,7 @@
 
 const Investment = require("../../model/developer/property_investment")
 const Property = require("../../model/developer/properties");
+
 const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const { errorHandler } = require("../../utils/error");
 
@@ -177,3 +178,7 @@ exports.getInvestmentById = async(req,res,next) => {
     }
 
 }
+
+
+
+

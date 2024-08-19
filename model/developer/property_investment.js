@@ -26,9 +26,10 @@ const property_investment_Schema = new Schema(
       },
       status: {
         type: String,
-        enum: ["Success", "Failed"],
+        enum: ["Success", "Failed", "Pending"],
         required: true,
       },
+
       paid: {
         amount: {
             type: Number,
@@ -45,7 +46,16 @@ const property_investment_Schema = new Schema(
         mimetype: String,
         size: String,
         key: String,
-      }
+      },
+      transaction_type: {
+        type: String,
+      },
+      payment_method: {
+        type: String,
+      },
+      payment_status: {
+        type: String,
+      },
 
     },
     {
