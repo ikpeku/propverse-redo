@@ -193,8 +193,6 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
   }
 
 
-
-
 exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
   const page = parseInt(req?.query?.page) || 1;
   const limit = parseInt(req?.query?.limit) || 10;
@@ -361,8 +359,16 @@ exports.get_Non_Institutional = async (req, res, next) => {
         },
     {
        $lookup: {
+            from: "kycs",
+            localField: "kyc",
+            foreignField: "_id",
+            as: "kyc",
+          },
+        },
+    {
+       $lookup: {
             from: "funds",
-            localField: "fund",
+            localField: "funds",
             foreignField: "_id",
             as: "funds",
           },
@@ -376,31 +382,51 @@ exports.get_Non_Institutional = async (req, res, next) => {
               $lookup: {
                 from: "due_deligences",
                 localField: "company",
-                foreignField: "_id",
+                foreignField: "user",
                 as: "company",
-              }}
+              }},
+              {
+                "$unwind": "$company"
+              },
+              
+
+              // {$project: {
+              //         project_name: "$company.company_information.name",
+              //         properties: 1
+              //         // project_location: "$company.company_information.name",
+              //         // project_type: "$company.company_information.name",
+              //         // project_group: "$company.company_information.name",
+              //         // project_amount: "$company.company_information.name",
+              //         // project_open_date: "$company.company_information.name",
+              //         // project_close_date: "$company.company_information.name",
+              //         // project_progress: "$company.company_information.name",
+              //       }}
+
             ],
             as: "properties",
           },
           
+          
+          
         },
-    {
-       $lookup: {
-            from: "property_investments",
-            localField: "transactions",
-            foreignField: "_id",
-            as: "transactions",
-          },
-        
-        },
+       
+       
         {
-          $addFields: {
-            amount_invested: {
-            "$sum": { $sum: "$transactions.paid.amount"}
-            }
-
-          },
-        },
+          $lookup: {
+               from: "transactions",
+               localField: "transactions",
+               foreignField: "_id",
+               as: "property_invested",
+             },
+           },
+           {
+             $addFields: {
+               amount_invested: {
+               "$sum": { $sum: "$property_invested.paid.amount"}
+               }
+ 
+             },
+           },
         
         {
           $addFields: {
@@ -416,6 +442,13 @@ exports.get_Non_Institutional = async (req, res, next) => {
             },
           },
         },
+        {
+          $addFields: {
+            kyc_status: {
+              $arrayElemAt: ["$kyc", 0],
+            },
+          },
+        },
 
 
   ]
@@ -425,18 +458,20 @@ exports.get_Non_Institutional = async (req, res, next) => {
     {
         $project: {
           username:"$user_detail.username",
+          avatar:"$user_detail.avatar",
           isSuspended:"$user_detail.isSuspended",
           country:"$user_detail.country",
           email: "$user_detail.email",
-          createdAt:"$user_detail.createdAt",
-          phone_number:"$user_detail.phone_number",
-          status: "$accreditation_status.status",
+          date_joined:"$user_detail.createdAt",
+          contact:"$user_detail.phone_number",
+          status: "$accreditation_status.status" == "verified" ? "Accredited" : "Non Accredited",
           amount_invested: 1,
           properties: 1,
           funds: 1,
           _id: 1,
           funds_Invested: {$size: "$funds"},
-          property_Purchased: {$size: "$properties"}
+          property_Purchased: {$size: "$properties"},
+          kyc_status: "$kyc_status.isApproved"
         },
       },
       {
