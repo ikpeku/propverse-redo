@@ -25,8 +25,8 @@ const accreditation_Schema = new Schema(
     },
     verify_method: {
       type: String,
-      enum: ["individual", "entity"],
-      default: "individual",
+      enum: ["individual", "entity", ""],
+      default: "",
     },
 
     accreditation: {
@@ -54,8 +54,9 @@ const accreditation_Schema = new Schema(
         accredited_verify_method: {
           type: String,
           default:
-            "I possess an official letter attesting to my income or accredited status, issued by either my lawyer, CPA, or investment advisor.",
+            "",
           enum: [
+            "",
             "I possess an official letter attesting to my income or accredited status, issued by either my lawyer, CPA, or investment advisor.",
             "I possess a net worth exceeding $1 million.",
             "I have earned an annual income exceeding $200,000 in the past two years, and when combined with my spouse's income, it surpasses $300,000.",

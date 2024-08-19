@@ -85,8 +85,8 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
             },
         {
            $lookup: {
-                from: "property_investments",
-                localField: "property_transactions",
+                from: "transactions",
+                localField: "transactions",
                 foreignField: "_id",
                 as: "property_invested",
               },
@@ -95,22 +95,6 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
               $addFields: {
                 amount_invested: {
                 "$sum": { $sum: "$property_invested.paid.amount"}
-                }
-  
-              },
-            },
-        {
-           $lookup: {
-                from: "fund_investments",
-                localField: "funds_transactions",
-                foreignField: "_id",
-                as: "funds_invested",
-              },
-            },
-            {
-              $addFields: {
-                amount_invested: {
-                "$sum": { $sum: "$funds_invested.paid.amount"}
                 }
   
               },
@@ -146,7 +130,7 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
               country:"$user_detail.country",
               email:"$user_detail.email",
               createdAt:"$user_detail.createdAt",
-              status: "$accreditation_status.status",
+              status: "$accreditation_status.status" == "verified" ? "Accredited" : "Non Accredited",
               _id: 1,
                amount_invested: 1
             },
@@ -237,22 +221,22 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
                 as: "user",
               },
             },
-        {
-           $lookup: {
-                from: "property_investments",
-                localField: "transactions",
-                foreignField: "_id",
-                as: "transaction_invested",
-              },
-            },
             {
-              $addFields: {
-                amount_invested: {
-                "$sum": { $sum: "$transaction_invested.paid.amount"}
-                }
-  
-              },
-            },
+              $lookup: {
+                   from: "transactions",
+                   localField: "transactions",
+                   foreignField: "_id",
+                   as: "property_invested",
+                 },
+               },
+               {
+                 $addFields: {
+                   amount_invested: {
+                   "$sum": { $sum: "$property_invested.paid.amount"}
+                   }
+     
+                 },
+               },
         {
            $lookup: {
                 from: "accreditations",
@@ -289,6 +273,7 @@ exports.get_Suspended_All_Non_Institutional= async (req, res, next) => {
               email: "$user_detail.email",
               createdAt : "$user_detail.createdAt",
               isSuspended: "$user_detail.isSuspended",
+              status: "$accreditation_status.status" == "verified" ? "Accredited" : "Non Accredited",
               _id: 1,
                amount_invested: 1
             },

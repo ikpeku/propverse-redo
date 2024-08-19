@@ -14,14 +14,9 @@ const non_Institutional_Schema = new Schema({
         ref: "user",
         required: true,
       },
-      property_transactions: [{
+     transactions: [{
         type: SchemaTypes.ObjectId,
-        ref: "property_investment",
-      }
-      ],
-      funds_transactions: [{
-        type: SchemaTypes.ObjectId,
-        ref: "fund_investment",
+        ref: "transaction",
       }
       ],
       properties: [{

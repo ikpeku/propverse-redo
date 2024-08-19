@@ -1,184 +1,233 @@
-
-const Investment = require("../../model/developer/property_investment")
+// const Investment = require("../../model/developer/property_investment")
+const Transactions = require("../../model/transaction/transactions");
 const Property = require("../../model/developer/properties");
+const Funds = require("../../model/institutional/fund");
 
 const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const { errorHandler } = require("../../utils/error");
 
+// {
+//   investor: {
+//       type: SchemaTypes.ObjectId,
+//       ref: "user",
+//       required: true,
+//     },
 
-exports.makeInvestmentOnproperty = async(req,res,next) => {
-    const {userId} = req.params;
-    const {
-      prodId,
-   paid: {
-      amount,
-      currency
-      },
-    proof_of_payment: {
-      location,
-      originalname,
-      mimetype,
-      size,
-      key
-      }
-    } = req.body;
+//     transaction_type: {
+//       type: String,
+//       enum: ["property", "fund"],
+//     },
 
+//   company: {
+//       type: SchemaTypes.ObjectId,
+//       ref: "due_deligence",
+//       // required: true,
+//     },
 
-    try {
-      
-        const response = await Property.findById(prodId)
+//   property: {
+//       // type: SchemaTypes.ObjectId,
+//       type: String,
+//       ref: "properties",
+//       // required: true,
+//     },
+//   funds: {
+//       // type: SchemaTypes.ObjectId,
+//       type: String,
+//       ref: "fund",
+//       // required: true,
+//     },
+//     status: {
+//       type: String,
+//       enum: ["Success", "Failed", "Pending"],
+//       required: true,
+//     },
+//     paid: {
+//       amount: {
+//           type: Number,
+//           default: 0,
+//       },
+//       currency: {
+//           type: String,
+//           default: "",
+//         },
+//     },
+//     proof_of_payment: {
+//       location: String,
+//       originalname: String,
+//       mimetype: String,
+//       size: String,
+//       key: String,
+//     },
+//     transaction_type: {
+//       type: String,
+//     },
+//     payment_method: {
+//       type: String,
+//     },
+//     payment_status: {
+//       type: String,
+//     },
 
-        if(!response){
-            return next(errorHandler(400,"confirm transact failed"))
-        }
+//   },
 
+exports.makeInvestmentOnproperty = async (req, res, next) => {
+  const { userId } = req.params;
+  const {
+    prodId,
+    paid: { amount, currency },
+    proof_of_payment: { location, originalname, mimetype, size, key },
+    payment_status,
+    description,
+    investmentType,
+  } = req.body;
 
-       const investment = await Investment.create({
-            investor:userId,
-            company: response.user,
-            property: prodId,
-            status: "Success",
-            paid: {
-                    amount,
-                    currency
-                  },
-                  proof_of_payment: {
-                    location,
-                    originalname,
-                    mimetype,
-                    size,
-                    key
-                  }
+  try {
+    const response = await Property.findById(prodId);
 
-        })
-
-       
-
-        
-      const tran = await Non_Institutional_Investor.findByIdAndUpdate(
-           userId,
-            { $push: { transactions: investment._id, properties: prodId } },
-            { new: true, useFindAndModify: false }
-          );
-          
-    
-    
-     return res.status(200).json({status:"success", message: "congratulations record taken awaiting confirmation"});
-       
-    } catch (error) {
-next(error)
-        // next(errorHandler(400,"confirm transaction failed"))
+    if (!response) {
+      return next(errorHandler(400, "confirm transact failed"));
     }
 
-}
-
-
-exports.makeInvestmentFunds = async(req,res,next) => {
-    const {userId} = req.params;
-    const {
-      prodId,
-   paid: {
-      amount,
-      currency
+    const investment = await Transactions.create({
+      investor: userId,
+      company: response.user,
+      transaction_type: "property purchase",
+      property: prodId,
+      name: response.property_detail.property_overview.property_name,
+      status: "Success",
+      paid: {
+        amount,
+        currency,
       },
-    proof_of_payment: {
-      location,
-      originalname,
-      mimetype,
-      size,
-      key
+      property_amount: {
+        amount: response.property_detail.property_overview.price.amount,
+        currency: response.property_detail.property_overview.price.currency,
       },
-      investmentType 
-    } = req.body;
+      proof_of_payment: {
+        location,
+        originalname,
+        mimetype,
+        size,
+        key,
+      },
+      payment_method: "bank  transfer",
+      payment_status,
+      description
+    });
 
+    // const tran = await Non_Institutional_Investor.findByIdAndUpdate(
+    //   userId,
+    //   { $push: { transactions: investment._id, properties: prodId } },
+    //   { new: true, useFindAndModify: false }
+    // );
 
-    try {
-      
-        const response = await Property.findById(prodId)
-
-        if(!response){
-            return next(errorHandler(400,"confirm transact failed"))
-        }
-
-
-       const investment = await Investment.create({
-            investor:userId,
-            company: response.user,
-            property: prodId,
-            status: "Success",
-            paid: {
-                    amount,
-                    currency
-                  },
-                  proof_of_payment: {
-                    location,
-                    originalname,
-                    mimetype,
-                    size,
-                    key
-                  }
-
-        })
-
-       
-if(investmentType === "funds") {
- await Non_Institutional_Investor.findByIdAndUpdate(
-    userId,
-     { $push: { property_transactions: investment._id, properties: prodId } },
-     { new: true, useFindAndModify: false }
-   );
-
-} 
-if(investmentType === "property") {
-
-   await Non_Institutional_Investor.findByIdAndUpdate(
-       userId,
-        { $push: { funds_transactions: investment._id, funds: prodId } },
+    if (investmentType === "property") {
+      await Non_Institutional_Investor.findByIdAndUpdate(
+        userId,
+        { $push: { transactions: investment._id, properties: prodId } },
         { new: true, useFindAndModify: false }
       );
-      
-}
-
-        
-    
-    
-     return res.status(200).json({status:"success", message: "congratulations record taken awaiting confirmation"});
-       
-    } catch (error) {
-next(error)
-        // next(errorHandler(400,"confirm transaction failed"))
     }
 
-}
+    return res
+      .status(200)
+      .json({
+        status: "success",
+        message: "congratulations record taken awaiting confirmation",
+        // response,
+      });
+  } catch (error) {
+    next(error);
+    // next(errorHandler(400,"confirm transaction failed"))
+  }
+};
 
+exports.makeInvestmentFunds = async (req, res, next) => {
+  const { userId } = req.params;
+  const {
+    prodId,
+    paid: { amount, currency },
+    proof_of_payment: { location, originalname, mimetype, size, key },
+    investmentType,
+    description
+  } = req.body;
 
+  // console.log(req.body)
+  // console.log(req.params)
 
+  try {
+    const response = await Funds.findById(prodId);
 
-exports.getUserInvestment = async(req,res,next) => {
-    const {userId} = req.params;
-    try {
-        
-        const data = await Investment.find({investor:userId}).populate("property")
-        return res.status(200).json({status:"success", data});
-    } catch (error) {
-        next(errorHandler(400,"failed"))
+    if (!response) {
+      return next(errorHandler(400, "confirm transact failed"));
     }
 
-}
+    const investment = await Transactions.create({
+      investor: userId,
+      transaction_type: "funds",
+      funds: prodId,
+      name: response.name,
+      status: "Success",
+      paid: {
+        amount,
+        currency,
+      },
+      property_amount: {
+        amount: response.raise_goal.amount,
+        currency: response.raise_goal.currency,
+      },
+      proof_of_payment: {
+        location,
+        originalname,
+        mimetype,
+        size,
+        key,
+      },
 
+      payment_method: "bank  transfer",
+      description
+    });
 
-exports.getInvestmentById = async(req,res,next) => {
-    const {prodId} = req.params;
-    try {
-        // populate("property")
-        const data = await Investment.findById(prodId)
-        return res.status(200).json({status:"success", data});
-    } catch (error) {
-        next(errorHandler(400,"failed"))
+    if (investmentType === "funds") {
+      await Non_Institutional_Investor.findByIdAndUpdate(
+        userId,
+        { $push: { transactions: investment._id, funds: prodId } },
+        { new: true, useFindAndModify: false }
+      );
     }
 
-}
+    return res
+      .status(200)
+      .json({
+        status: "success",
+        message: "congratulations record taken awaiting confirmation",
+        // response,
+      });
+  } catch (error) {
+    next(error);
+    // next(errorHandler(400,"confirm transaction failed"))
+  }
+};
 
+exports.getUserInvestment = async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const data = await Transactions.find({ investor: userId }).populate(
+      "property fund"
+    );
+    return res.status(200).json({ status: "success", data });
+  } catch (error) {
+    next(errorHandler(400, "failed"));
+  }
+};
 
-
-
+exports.getInvestmentById = async (req, res, next) => {
+  const { prodId } = req.params;
+  try {
+    // populate("property")
+    const data = await Transactions.findById(prodId);
+    return res.status(200).json({ status: "success", data });
+  } catch (error) {
+    next(errorHandler(400, "failed"));
+  }
+};

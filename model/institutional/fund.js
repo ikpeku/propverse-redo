@@ -72,14 +72,26 @@ const fundSchema = new Schema(
       required: true,
     },
 
-    raise_goal: {
-      type: Number,
-      required: true,
+    raise_goal:  {
+      amount: {
+          type: Number,
+          default: 0,
+      },
+      currency: {
+          type: String,
+          default: "",
+        },
     },
 
-    minimum_investment: {
-      type: Number,
-      required: true,
+    minimum_investment:  {
+      amount: {
+          type: Number,
+          default: 0,
+      },
+      currency: {
+          type: String,
+          default: "",
+        },
     },
 
     mininmum_hold_period: {
