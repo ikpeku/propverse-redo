@@ -6,69 +6,6 @@ const Funds = require("../../model/institutional/fund");
 const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const { errorHandler } = require("../../utils/error");
 
-// {
-//   investor: {
-//       type: SchemaTypes.ObjectId,
-//       ref: "user",
-//       required: true,
-//     },
-
-//     transaction_type: {
-//       type: String,
-//       enum: ["property", "fund"],
-//     },
-
-//   company: {
-//       type: SchemaTypes.ObjectId,
-//       ref: "due_deligence",
-//       // required: true,
-//     },
-
-//   property: {
-//       // type: SchemaTypes.ObjectId,
-//       type: String,
-//       ref: "properties",
-//       // required: true,
-//     },
-//   funds: {
-//       // type: SchemaTypes.ObjectId,
-//       type: String,
-//       ref: "fund",
-//       // required: true,
-//     },
-//     status: {
-//       type: String,
-//       enum: ["Success", "Failed", "Pending"],
-//       required: true,
-//     },
-//     paid: {
-//       amount: {
-//           type: Number,
-//           default: 0,
-//       },
-//       currency: {
-//           type: String,
-//           default: "",
-//         },
-//     },
-//     proof_of_payment: {
-//       location: String,
-//       originalname: String,
-//       mimetype: String,
-//       size: String,
-//       key: String,
-//     },
-//     transaction_type: {
-//       type: String,
-//     },
-//     payment_method: {
-//       type: String,
-//     },
-//     payment_status: {
-//       type: String,
-//     },
-
-//   },
 
 exports.makeInvestmentOnproperty = async (req, res, next) => {
   const { userId } = req.params;
@@ -115,18 +52,22 @@ exports.makeInvestmentOnproperty = async (req, res, next) => {
       description
     });
 
-    // const tran = await Non_Institutional_Investor.findByIdAndUpdate(
-    //   userId,
-    //   { $push: { transactions: investment._id, properties: prodId } },
-    //   { new: true, useFindAndModify: false }
-    // );
 
     if (investmentType === "property") {
+
       await Non_Institutional_Investor.findByIdAndUpdate(
         userId,
         { $push: { transactions: investment._id, properties: prodId } },
         { new: true, useFindAndModify: false }
       );
+      await Property.findByIdAndUpdate(
+        userId,
+        { $push: { transactions: investment._id } },
+        { new: true, useFindAndModify: false }
+      );
+
+
+
     }
 
     return res
@@ -194,6 +135,13 @@ exports.makeInvestmentFunds = async (req, res, next) => {
         { $push: { transactions: investment._id, funds: prodId } },
         { new: true, useFindAndModify: false }
       );
+      
+      await Funds.findByIdAndUpdate(
+        userId,
+        { $push: { investments: investment._id } },
+        { new: true, useFindAndModify: false }
+      );
+
     }
 
     return res

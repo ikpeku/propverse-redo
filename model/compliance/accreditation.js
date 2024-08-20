@@ -172,6 +172,10 @@ const accreditation_Schema = new Schema(
               type: String,
               default: "",
             },
+            currency: {
+              type: String,
+              default: "$",
+            },
             amount: {
               type: Number,
               default: 0,
@@ -181,6 +185,10 @@ const accreditation_Schema = new Schema(
             year: {
               type: String,
               default: "",
+            },
+            currency: {
+              type: String,
+              default: "$",
             },
             amount: {
               type: Number,

@@ -413,6 +413,325 @@ exports.userUpdateAccreditation = async(req, res, next) => {
 
 }
 
+exports.Accreditation1 = async(req, res, next) => {
+
+  const {
+    is_accredited_investor_qualify,
+    accredited_method,
+    accredited_verify_method,
+    letter_of_verification,
+
+        title,
+        name,
+        email
+  } = req.body
+
+  try {
+    const response =   await Accreditation.findById(req.payload.userId)
+  
+  
+    if(!response) {
+        return next(errorHandler(401,"user not found"))
+      }
+
+      await Accreditation.findByIdAndUpdate(req.payload.userId, {
+        isSubmitted: true,
+        status: "processing",
+        verify_method: "individual",
+
+        accreditation:{
+          is_accredited_investor_qualify,
+          accredited_method,
+          individual: {
+            accredited_verify_method,
+            verify_method_1: {
+              letter_of_verification,
+              verifier_detail: {
+                title,
+                name,
+                email
+              },
+              added: new Date().toISOString()
+            }
+          }
+
+        }
+      })
+    
+      res.status(200).json({
+        message: "success"
+       })
+
+    } catch (error) {
+        next(errorHandler(500, "failed to update"))
+    }
+
+  }
+
+exports.Accreditation2 = async(req, res, next) => {
+
+  const {
+    is_accredited_investor_qualify,
+    accredited_method,
+    accredited_verify_method,
+    proof1,
+    proof2,
+ 
+  } = req.body
+
+  try {
+    const response =   await Accreditation.findById(req.payload.userId)
+  
+  
+    if(!response) {
+        return next(errorHandler(401,"user not found"))
+      }
+
+      await Accreditation.findByIdAndUpdate(req.payload.userId, {
+        isSubmitted: true,
+        status: "processing",
+        verify_method: "individual",
+
+        accreditation:{
+          is_accredited_investor_qualify,
+          accredited_method,
+          individual: {
+            accredited_verify_method,
+            verify_method_2: {
+              networth_estimate: {
+                proof1,
+                proof2,
+              },
+              added: new Date().toISOString()
+            
+          }
+
+        }
+      }
+      })
+    
+      res.status(200).json({
+        message: "success"
+       })
+
+    } catch (error) {
+        next(errorHandler(500, "failed to update"))
+    }
+
+  }
+
+
+exports.Accreditation3 = async(req, res, next) => {
+
+  const {
+    is_accredited_investor_qualify,
+    accredited_method,
+    accredited_verify_method,
+   account_type,
+          gross_income1,
+          gross_income2,
+          document1,
+    document2
+ 
+  } = req.body
+
+  try {
+    const response =   await Accreditation.findById(req.payload.userId)
+  
+  
+    if(!response) {
+        return next(errorHandler(401,"user not found"))
+      }
+
+      await Accreditation.findByIdAndUpdate(req.payload.userId, {
+        isSubmitted: true,
+        status: "processing",
+        verify_method: "individual",
+
+        accreditation:{
+          is_accredited_investor_qualify,
+          accredited_method,
+          individual: {
+            accredited_verify_method,
+            verify_method_3: {
+              account_type,
+              gross_income1,
+              gross_income2,
+              proof_of_income: {
+                document1,
+                document2,
+              },
+              added: new Date().toISOString()
+            
+          }
+
+        }
+      }
+      })
+    
+      res.status(200).json({
+        message: "success"
+       })
+
+    } catch (error) {
+        next(errorHandler(500, "failed to update"))
+    }
+
+  }
+
+
+
+
+  
+  exports.Accreditation4 = async(req, res, next) => {
+
+    const {
+      is_accredited_investor_qualify,
+      accredited_method,
+      accredited_verify_method,
+      proof_of_finra_lincence,
+  
+    } = req.body
+  
+    try {
+      const response =   await Accreditation.findById(req.payload.userId)
+    
+    
+      if(!response) {
+          return next(errorHandler(401,"user not found"))
+        }
+  
+        await Accreditation.findByIdAndUpdate(req.payload.userId, {
+         
+          isSubmitted: true,
+          status: "processing",
+          verify_method: "individual",
+  
+          accreditation:{
+            is_accredited_investor_qualify,
+            accredited_method,
+            individual: {
+              accredited_verify_method,
+              verify_method_4: {
+                proof_of_finra_lincence,
+                added: new Date().toISOString()
+              }
+            }
+          }
+        })
+      
+        res.status(200).json({
+          message: "success"
+         })
+  
+      } catch (error) {
+          next(errorHandler(500, "failed to update"))
+      }
+  
+    }
+
+
+  exports.AccreditationEntity = async(req, res, next) => {
+
+    const {
+      is_accredited_investor_qualify,
+      accredited_method,
+      investment_entity,
+      isOwner,
+      entity_legal_name,
+      day,
+     month,
+      year,
+
+      country, 
+         city,  
+         address, 
+         mobile, 
+         social,  
+         tax_id,  
+         signatory
+  
+    } = req.body;
+  
+  
+    try {
+      const response =   await Accreditation.findById(req.payload.userId)
+    
+    
+      if(!response) {
+          return next(errorHandler(401,"user not found"))
+        }
+  
+        await Accreditation.findByIdAndUpdate(req.payload.userId, {
+         
+          isSubmitted: true,
+          status: "processing",
+          verify_method: "entity",
+  
+          accreditation:{
+            is_accredited_investor_qualify,
+            accredited_method,
+
+            entity: {
+              added: new Date().toISOString(),
+              investment_entity,
+              details: {
+                isOwner,
+                entity_legal_name,
+                date: {
+                  day,
+                  month,
+                  year,
+                },
+               country, 
+         city,  
+         address, 
+         mobile, 
+         social,  
+         tax_id,  
+         signatory
+              }
+
+            }
+
+          }
+        },{ new: true, useFindAndModify: false })
+      
+        res.status(200).json({
+          message: "success", response
+         })
+  
+      } catch (error) {
+          next(errorHandler(500, "failed to update"))
+        
+      }
+  
+    }
+
+
+
+
+exports.AccreditationEntityDocument = async(req, res, next) => {
+  const {entity_document} = req.body;
+
+    try {
+
+        const data =   await Accreditation.findByIdAndUpdate(req.payload.userId,  
+          { $push: { "accreditation.isDocumentSubmitted ": true,},
+        $set: {"accreditation.entity.entity_document":  entity_document}
+        },
+          { new: true, useFindAndModify: false })
+   
+          res.status(200).json({
+           message: "success",
+           data
+          })
+   
+       } catch (error) {
+           next(errorHandler(500, "failed"))
+       }
+
+}
 
 exports.userAccreditation = async(req, res, next) => {
 
@@ -430,6 +749,10 @@ exports.userAccreditation = async(req, res, next) => {
        }
 
 }
+
+
+
+
 
 exports.propertyInvestmentInfo = async(req,res,next) => {
   const {prodId} = req.params

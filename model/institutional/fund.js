@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { model, Schema } = mongoose;
+const { model, Schema, SchemaTypes } = mongoose;
 
 const fundSchema = new Schema(
   {
@@ -7,7 +7,10 @@ const fundSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-
+    investments: [{
+      type: SchemaTypes.ObjectId,
+      ref: "transaction",
+    }],
     name: {
       type: String,
       required: [true, 'Please enter the name of the fund'],

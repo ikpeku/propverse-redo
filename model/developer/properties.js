@@ -25,7 +25,7 @@ const propertiesSchema = new Schema(
       },
       transactions: [{
         type: SchemaTypes.ObjectId,
-        ref: "property_investment",
+        ref: "transaction",
       }],
       isSubmitted: {
       type: Boolean,
