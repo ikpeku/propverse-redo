@@ -63,17 +63,17 @@ const accreditation_Schema = new Schema(
             "I am a reputable professional, licensed by FINRA, with an impeccable standing. I hold valid licenses for Series 7, 82, and 65.",
           ],
         },
-        // method: {
-        //   type: String,
-        //   default: '',
-        //   enum: [
-        //     'verify_method_1',
-        //     'verify_method_2',
-        //     'verify_method_3',
-        //     'verify_method_4',
-        //     '',
-        //   ],
-        // },
+        method: {
+          type: String,
+          default: '',
+          enum: [
+            'verify_method_1',
+            'verify_method_2',
+            'verify_method_3',
+            'verify_method_4',
+            '',
+          ],
+        },
         verify_method_1: {
           letter_of_verification: {
             location: {

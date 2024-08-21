@@ -444,6 +444,7 @@ exports.Accreditation1 = async(req, res, next) => {
           accredited_method,
           individual: {
             accredited_verify_method,
+            method: "verify_method_1",
             verify_method_1: {
               letter_of_verification,
               verifier_detail: {
@@ -497,6 +498,7 @@ exports.Accreditation2 = async(req, res, next) => {
           accredited_method,
           individual: {
             accredited_verify_method,
+            method: "verify_method_2",
             verify_method_2: {
               networth_estimate: {
                 proof1,
@@ -553,6 +555,7 @@ exports.Accreditation3 = async(req, res, next) => {
           accredited_method,
           individual: {
             accredited_verify_method,
+            method: "verify_method_3",
             verify_method_3: {
               account_type,
               gross_income1,
@@ -578,9 +581,6 @@ exports.Accreditation3 = async(req, res, next) => {
     }
 
   }
-
-
-
 
   
   exports.Accreditation4 = async(req, res, next) => {
@@ -612,6 +612,7 @@ exports.Accreditation3 = async(req, res, next) => {
             accredited_method,
             individual: {
               accredited_verify_method,
+              method: "verify_method_4",
               verify_method_4: {
                 proof_of_finra_lincence,
                 added: new Date().toISOString()
