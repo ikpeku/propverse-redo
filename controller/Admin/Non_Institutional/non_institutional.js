@@ -632,89 +632,90 @@ exports.get_All_Non_Institutional_Compliance = async (req, res, next) => {
 }
 
 exports.get_user_Compliance = async (req, res, next) => {
-  const page = parseInt(req?.query?.page) || 1;
+  // const page = parseInt(req?.query?.page) || 1;
 
-  const limit = parseInt(req?.query?.limit) || 10;
-  const searchText = req?.query?.searchText;
-  const country = req?.query?.country;
-  const status = req?.query?.status;
-  const name = req?.query?.name;
-
-
-  const options = {
-    page,
-    limit,
-  };
+  // const limit = parseInt(req?.query?.limit) || 10;
+  // const searchText = req?.query?.searchText;
+  // const country = req?.query?.country;
+  // const status = req?.query?.status;
+  // const name = req?.query?.name;
 
 
+  // const options = {
+  //   page,
+  //   limit,
+  // };
 
-  let query =  [
-      {
-         $lookup: {
-              from: "users",
-              localField: "user",
-              foreignField: "_id",
-              as: "user",
-            },
-          },
-      {
-         $lookup: {
-              from: "property_investments",
-              localField: "transactions",
-              foreignField: "_id",
-              as: "transaction_invested",
-            },
-          },
-          {
-            $addFields: {
-              amount_invested: {
-              "$sum": { $sum: "$transaction_invested.paid.amount"}
-              }
+  const {userId} = req.params
 
+
+ 
+  let query = [
+    {
+      $match: { _id: new ObjectId(userId) },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $lookup: {
+        from: "transactions",
+        localField: "transactions",
+        foreignField: "_id",
+        as: "transaction_invested",
+      },
+    },
+    {
+      $addFields: {
+        amount_invested: {
+          $sum: { $sum: "$transaction_invested.paid.amount" },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "accreditations",
+        localField: "accreditation",
+        foreignField: "_id",
+        as: "accreditation",
+      },
+    },
+    {
+      $lookup: {
+        from: "kycs",
+        localField: "kyc",
+        foreignField: "_id",
+        as: "kyc_detail",
+      },
+    },
+        {
+          $addFields: {
+            user_detail: {
+              $arrayElemAt: ["$user", 0],
             },
           },
-      {
-         $lookup: {
-              from: "accreditations",
-              localField: "accreditation",
-              foreignField: "_id",
-              as: "accreditation",
+        },
+        { $unset: [  "user_detail.password",  ] },
+        {
+          $addFields: {
+            accreditation_status: {
+              $arrayElemAt: ["$accreditation", 0],
             },
           },
-      {
-        // kyc: {
-        //   type: SchemaTypes.ObjectId,
-        //   ref: "kyc"
-         $lookup: {
-              from: "kycs",
-              localField: "kyc",
-              foreignField: "_id",
-              as: "kyc_detail",
+        },
+        {
+          $addFields: {
+            kyc: {
+              $arrayElemAt: ["$kyc_detail", 0],
             },
           },
-          {
-            $addFields: {
-              user_detail: {
-                $arrayElemAt: ["$user", 0],
-              },
-            },
-          },
-          { $unset: [  "user_detail.password",  ] },
-          {
-            $addFields: {
-              accreditation_status: {
-                $arrayElemAt: ["$accreditation", 0],
-              },
-            },
-          },
-          {
-            $addFields: {
-              kyc: {
-                $arrayElemAt: ["$kyc_detail", 0],
-              },
-            },
-          },
-    ]
+        },
+  ];
 
     query.push(
       {
@@ -732,37 +733,37 @@ exports.get_user_Compliance = async (req, res, next) => {
     )
 
 
-    if(searchText){
+    // if(searchText){
 
-      query.push({
-        $match: {
-          $or: [
-            { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
-            { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
-            { verify_type: { $regex: ".*" + searchText + ".*", $options: "i" } },
-            { status: searchText}
-          ]
-        }
-      })
+    //   query.push({
+    //     $match: {
+    //       $or: [
+    //         { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+    //         { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
+    //         { verify_type: { $regex: ".*" + searchText + ".*", $options: "i" } },
+    //         { status: searchText}
+    //       ]
+    //     }
+    //   })
 
       
-    }
+    // }
     
-    if(country){
-      query.push({
-        $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
-      })
-    }
-    if(status){
-      query.push({
-        $match: {status}
-      })
-    }
-    if(name){
-      query.push({
-        $match: {username: { $regex: name, $options: "i" } }
-      })
-    }
+    // if(country){
+    //   query.push({
+    //     $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
+    //   })
+    // }
+    // if(status){
+    //   query.push({
+    //     $match: {status}
+    //   })
+    // }
+    // if(name){
+    //   query.push({
+    //     $match: {username: { $regex: name, $options: "i" } }
+    //   })
+    // }
 
 
   try {

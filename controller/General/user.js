@@ -442,6 +442,7 @@ exports.Accreditation1 = async(req, res, next) => {
         accreditation:{
           is_accredited_investor_qualify,
           accredited_method,
+          isDocumentSubmitted: true,
           individual: {
             accredited_verify_method,
             method: "verify_method_1",
@@ -496,6 +497,7 @@ exports.Accreditation2 = async(req, res, next) => {
         accreditation:{
           is_accredited_investor_qualify,
           accredited_method,
+          isDocumentSubmitted: true,
           individual: {
             accredited_verify_method,
             method: "verify_method_2",
@@ -553,6 +555,7 @@ exports.Accreditation3 = async(req, res, next) => {
         accreditation:{
           is_accredited_investor_qualify,
           accredited_method,
+          isDocumentSubmitted: true,
           individual: {
             accredited_verify_method,
             method: "verify_method_3",
@@ -610,6 +613,7 @@ exports.Accreditation3 = async(req, res, next) => {
           accreditation:{
             is_accredited_investor_qualify,
             accredited_method,
+            isDocumentSubmitted: true,
             individual: {
               accredited_verify_method,
               method: "verify_method_4",
@@ -672,7 +676,7 @@ exports.Accreditation3 = async(req, res, next) => {
           accreditation:{
             is_accredited_investor_qualify,
             accredited_method,
-
+            isDocumentSubmitted: false,
             entity: {
               added: new Date().toISOString(),
               investment_entity,
@@ -699,7 +703,7 @@ exports.Accreditation3 = async(req, res, next) => {
         },{ new: true, useFindAndModify: false })
       
         res.status(200).json({
-          message: "success", response
+          message: "success",
          })
   
       } catch (error) {
@@ -718,14 +722,13 @@ exports.AccreditationEntityDocument = async(req, res, next) => {
     try {
 
         const data =   await Accreditation.findByIdAndUpdate(req.payload.userId,  
-          { $push: { "accreditation.isDocumentSubmitted ": true,},
-        $set: {"accreditation.entity.entity_document":  entity_document}
+          { "accreditation.isDocumentSubmitted ": true,
+        $push: {"accreditation.entity.entity_document":  entity_document}
         },
           { new: true, useFindAndModify: false })
    
           res.status(200).json({
-           message: "success",
-           data
+           message: "success"
           })
    
        } catch (error) {
