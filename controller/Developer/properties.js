@@ -346,13 +346,7 @@ exports.getPropertyById = async(req, res, next) => {
              {
               $unwind: "$company"
              },
-            //  {
-            //   $addFields: {
-            //     company: {
-            //       $arrayElemAt: ["$company", 0],
-            //     },
-            //   },
-            // },
+            
       ]
 
       const myAggregate = await properties.aggregate(query);

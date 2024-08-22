@@ -67,62 +67,6 @@ const userSchema = new Schema(
       },
     },
 
-    company_profile: {
-      title: {
-        type: String,
-        default: '',
-      },
-      logo: {
-        location: {
-          type: String,
-          default: '',
-        },
-        originalname: {
-          type: String,
-          default: '',
-        },
-        mimetype: {
-          type: String,
-          default: '',
-        },
-        size: {
-          type: String,
-          default: '',
-        },
-        key: {
-          type: String,
-          default: '',
-        },
-      },
-      about: {
-        type: String,
-        default: '',
-      },
-      cover_image: {
-        location: {
-          type: String,
-          default: '',
-        },
-        originalname: {
-          type: String,
-          default: '',
-        },
-        mimetype: {
-          type: String,
-          default: '',
-        },
-        size: {
-          type: String,
-          default: '',
-        },
-        key: {
-          type: String,
-          default: '',
-        },
-      },
-    },
-
-
     referral: {
       referralId: {
         type: String,

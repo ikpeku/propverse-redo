@@ -41,6 +41,16 @@ const developer_due_deligence_Schema = new Schema(
       phone_number: {
         type: String,
         default: "",
+      },
+      logo: {
+        type: Object
+      },
+      about: {
+            type: String,
+            default: '',
+          },
+          cover_image: {
+            type: Object
       }
   },
  
@@ -320,6 +330,7 @@ const developer_due_deligence_Schema = new Schema(
         default: "",
       },
     },
+
   },
   {
     timestamps: true,
