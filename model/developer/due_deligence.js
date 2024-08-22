@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 
-
 const developer_due_deligence_Schema = new Schema(
   {
     _id: {
@@ -15,18 +14,18 @@ const developer_due_deligence_Schema = new Schema(
       ref: "user",
       required: true,
     },
-     isAdminAproved: {
+    isAdminAproved: {
       type: String,
       default: "Non Verified",
-      enums: ["Non Verified", "Verified", "Rejected"]
+      enums: ["Non Verified", "Verified", "Rejected"],
     },
     isSubmited: {
-        type: Boolean,
-        default: false,
-      },
+      type: Boolean,
+      default: false,
+    },
 
-  company_information: {
-    name: {
+    company_information: {
+      name: {
         type: String,
         default: "",
       },
@@ -43,204 +42,201 @@ const developer_due_deligence_Schema = new Schema(
         default: "",
       },
       logo: {
-        type: Object
+        type: Object,
       },
       about: {
+        type: String,
+        default: "",
+      },
+      cover_image: {
+        type: Object,
+      },
+    },
+
+    projects: {
+      previous_project_1: {
+        name: {
+          type: String,
+          default: "",
+        },
+        location: {
+          type: String,
+          default: "",
+        },
+        type: {
+          type: String,
+          default: "",
+        },
+        cost: {
+          amount: {
             type: String,
-            default: '',
+            default: "",
           },
-          cover_image: {
-            type: Object
-      }
-  },
- 
-    projects : {
-        previous_project_1: {
+          currency: {
+            type: String,
+            default: "",
+          },
+        },
+
+        documents: [
+          {
+            location: String,
+            originalname: String,
+            mimetype: String,
+            size: String,
+            key: String,
+          },
+        ],
+        // partner: partnerSchema
+        project_partners: {
+          partner_1: {
             name: {
               type: String,
               default: "",
             },
-            location: {
+            contact: {
               type: String,
               default: "",
             },
-            type: {
-              type: String,
-              default: "",
-            },
-            cost: {
-                amount: {
-                    type: String,
-                    default: "",
-                },
-                currency: {
-                    type: String,
-                    default: "",
-                  },
-            },
-            
-            documents: [
-              {
-                location: String,
-                originalname: String,
-                mimetype: String,
-                size: String,
-                key: String,
-              },
-            ],
-            // partner: partnerSchema
-            project_partners: {
-              partner_1: {
-                  name: {
-                    type: String,
-                    default: "",
-                  },
-                  contact: {
-                    type: String,
-                    default: "",
-                  },
-                },
-                partner_2: {
-                  name: {
-                    type: String,
-                    default: "",
-                  },
-                  contact: {
-                    type: String,
-                    default: "",
-                  },
-                },
-            }
-           
           },
-          previous_project_2: {
+          partner_2: {
             name: {
               type: String,
               default: "",
             },
-            location: {
+            contact: {
               type: String,
               default: "",
             },
-            type: {
-              type: String,
-              default: "",
-            },
-            cost: {
-                amount: {
-                    type: String,
-                    default: "",
-                },
-                currency: {
-                    type: String,
-                    default: "",
-                  },
-            },
-            documents: [
-              {
-                location: String,
-                originalname: String,
-                mimetype: String,
-                size: String,
-                key: String,
-              },
-            ],
-            // partner: partnerSchema
-            project_partners: {
-              partner_1: {
-                  name: {
-                    type: String,
-                    default: "",
-                  },
-                  contact: {
-                    type: String,
-                    default: "",
-                  },
-                },
-                partner_2: {
-                  name: {
-                    type: String,
-                    default: "",
-                  },
-                  contact: {
-                    type: String,
-                    default: "",
-                  },
-                },
-            }
-           
           },
-          previous_project_3: {
+        },
+      },
+      previous_project_2: {
+        name: {
+          type: String,
+          default: "",
+        },
+        location: {
+          type: String,
+          default: "",
+        },
+        type: {
+          type: String,
+          default: "",
+        },
+        cost: {
+          amount: {
+            type: String,
+            default: "",
+          },
+          currency: {
+            type: String,
+            default: "",
+          },
+        },
+        documents: [
+          {
+            location: String,
+            originalname: String,
+            mimetype: String,
+            size: String,
+            key: String,
+          },
+        ],
+        // partner: partnerSchema
+        project_partners: {
+          partner_1: {
             name: {
               type: String,
               default: "",
             },
-            location: {
+            contact: {
               type: String,
               default: "",
             },
-            type: {
-              type: String,
-              default: "",
-            },
-            cost: {
-                amount: {
-                    type: String,
-                    default: "",
-                },
-                currency: {
-                    type: String,
-                    default: "",
-                  },
-            },
-            documents: [
-              {
-                location: String,
-                originalname: String,
-                mimetype: String,
-                size: String,
-                key: String,
-              },
-            ],
-            // partner: partnerSchema
-            project_partners: {
-              partner_1: {
-                  name: {
-                    type: String,
-                    default: "",
-                  },
-                  contact: {
-                    type: String,
-                    default: "",
-                  },
-                },
-                partner_2: {
-                  name: {
-                    type: String,
-                    default: "",
-                  },
-                  contact: {
-                    type: String,
-                    default: "",
-                  },
-                },
-            }
-           
           },
+          partner_2: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+        },
+      },
+      previous_project_3: {
+        name: {
+          type: String,
+          default: "",
+        },
+        location: {
+          type: String,
+          default: "",
+        },
+        type: {
+          type: String,
+          default: "",
+        },
+        cost: {
+          amount: {
+            type: String,
+            default: "",
+          },
+          currency: {
+            type: String,
+            default: "",
+          },
+        },
+        documents: [
+          {
+            location: String,
+            originalname: String,
+            mimetype: String,
+            size: String,
+            key: String,
+          },
+        ],
+        // partner: partnerSchema
+        project_partners: {
+          partner_1: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+          partner_2: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+        },
+      },
     },
 
     financials: {
       Current_Company_Valuation: {
         amount: {
-            type: String,
-        default: "",
+          type: String,
+          default: "",
         },
         currency: {
-            type: String,
-            default: "",
-          },
+          type: String,
+          default: "",
+        },
       },
-      
+
       Valuation_Method_Used: {
         type: String,
         default: "",
@@ -330,19 +326,15 @@ const developer_due_deligence_Schema = new Schema(
         default: "",
       },
     },
-
   },
   {
     timestamps: true,
   }
 );
 
-
 developer_due_deligence_Schema.plugin(aggregatePaginate);
 
-module.exports = mongoose.model("due_deligence", developer_due_deligence_Schema);
-
-
-
-
- 
+module.exports = mongoose.model(
+  "due_deligence",
+  developer_due_deligence_Schema
+);
