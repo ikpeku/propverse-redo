@@ -298,11 +298,70 @@ exports.getPropertyById = async(req, res, next) => {
     const {prodId} = req.params
     try {
         
-       const data = await properties.findById(prodId).populate("company")
+      //  const data = await properties.findById(prodId).populate("company user transactions")
 
-       return res.status(200).json({status:"success", data})
+      //  delete data.user.password;
+
+      //  return res.status(200).json({status:"success", data})
+
+      let query = [
+        {
+          $match: {_id: prodId}
+        },
+        {
+          $lookup: {
+               from: "users",
+               localField: "user",
+               foreignField: "_id",
+               as: "user",
+             },
+           },
+           { $unset: [  "user.password",  ] },
+           {
+            $unwind: "$user"
+           },
+           {
+            $lookup: {
+              from: "transactions",
+              localField: "transactions",
+              foreignField: "_id",
+              as: "transaction_invested",
+            },
+          },
+          {
+            $addFields: {
+              amount_invested: {
+                $sum: { $sum: "$transaction_invested.paid.amount" },
+              },
+            },
+          },
+          {
+            $lookup: {
+                 from: "due_deligences",
+                 localField: "company",
+                 foreignField: "user",
+                 as: "company",
+               },
+             },
+             {
+              $unwind: "$company"
+             },
+            //  {
+            //   $addFields: {
+            //     company: {
+            //       $arrayElemAt: ["$company", 0],
+            //     },
+            //   },
+            // },
+      ]
+
+      const myAggregate = await properties.aggregate(query);
+
+      return res.status(200).json({status:"success", data: myAggregate[0]})
+
     } catch (error) {
-        next("failed to return data")
+      next(error)
+        // next("failed to return data")
     }
 
 }

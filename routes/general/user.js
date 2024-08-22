@@ -6,7 +6,6 @@ const {
   propertyInvestmentInfo,
   fundInvestmentInfo,
 
-//   userUpdateAccreditation,
 Accreditation1,
 Accreditation2,
 Accreditation3,
