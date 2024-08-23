@@ -632,20 +632,7 @@ exports.get_All_Non_Institutional_Compliance = async (req, res, next) => {
 }
 
 exports.get_user_Compliance = async (req, res, next) => {
-  // const page = parseInt(req?.query?.page) || 1;
-
-  // const limit = parseInt(req?.query?.limit) || 10;
-  // const searchText = req?.query?.searchText;
-  // const country = req?.query?.country;
-  // const status = req?.query?.status;
-  // const name = req?.query?.name;
-
-
-  // const options = {
-  //   page,
-  //   limit,
-  // };
-
+  
   const {userId} = req.params
 
 
@@ -733,39 +720,6 @@ exports.get_user_Compliance = async (req, res, next) => {
     )
 
 
-    // if(searchText){
-
-    //   query.push({
-    //     $match: {
-    //       $or: [
-    //         { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
-    //         { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
-    //         { verify_type: { $regex: ".*" + searchText + ".*", $options: "i" } },
-    //         { status: searchText}
-    //       ]
-    //     }
-    //   })
-
-      
-    // }
-    
-    // if(country){
-    //   query.push({
-    //     $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
-    //   })
-    // }
-    // if(status){
-    //   query.push({
-    //     $match: {status}
-    //   })
-    // }
-    // if(name){
-    //   query.push({
-    //     $match: {username: { $regex: name, $options: "i" } }
-    //   })
-    // }
-
-
   try {
     const myAggregate = await Non_Institiutional_Investor.aggregate(query);
 
@@ -775,6 +729,8 @@ exports.get_user_Compliance = async (req, res, next) => {
     
   }
 }
+
+
 
 
 

@@ -15,7 +15,7 @@ const {
 
 
 const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance} = require("../../controller/Admin/Non_Institutional/non_institutional");
-const { suspendUserAccount , kycVerification, complianceVerification} = require("../../controller/Admin/GeneralAdmin");
+const { suspendUserAccount , kycVerification, complianceVerification, get_Transactions} = require("../../controller/Admin/GeneralAdmin");
 const route = express.Router();
 
 /**
@@ -84,6 +84,10 @@ route.patch("/compliance/reject/:userId", (req,res,next) => {
   next()
 
 },complianceVerification)
+
+
+
+route.get("/transactions/payin", get_Transactions)
 
 
 module.exports = route;

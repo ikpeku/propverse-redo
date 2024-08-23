@@ -22,15 +22,19 @@ exports.userKyc = async(req, res, next) => {
           }
       
 
-       await Kyc.findByIdAndUpdate(req.payload.userId, {
-        isSubmitted: true,
-        kyc:{
-            afirmation,
-            proof_of_identify,
-            proof_of_funds,
-            fund_manager
-          }
-       })
+       await Kyc.findByIdAndUpdate(req.payload.userId, {$set:{
+        "isSubmitted": true,
+        "kyc.afirmation": afirmation,
+        "kyc.proof_of_identify": proof_of_identify,
+        "kyc.proof_of_funds": proof_of_funds,
+        "kyc.fund_manager": fund_manager,
+        // kyc:{
+        //     afirmation,
+        //     proof_of_identify,
+        //     proof_of_funds,
+        //     fund_manager
+        //   }
+       }}).exec()
 
        return res.status(200).json({
         message: "success"

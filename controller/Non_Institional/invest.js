@@ -31,7 +31,7 @@ exports.makeInvestmentOnproperty = async (req, res, next) => {
       transaction_type: "property purchase",
       property: prodId,
       name: response.property_detail.property_overview.property_name,
-      status: "Success",
+      status: "Pending",
       paid: {
         amount,
         currency,
@@ -111,7 +111,7 @@ exports.makeInvestmentFunds = async (req, res, next) => {
       transaction_type: "funds",
       funds: prodId,
       name: response.name,
-      status: "Success",
+      status: "Pending",
       paid: {
         amount,
         currency,
@@ -163,12 +163,18 @@ exports.makeInvestmentFunds = async (req, res, next) => {
 exports.getUserInvestment = async (req, res, next) => {
   const { userId } = req.params;
   try {
-    const data = await Transactions.find({ investor: userId }).populate(
-      "property fund"
-    );
+
+    const data = await Transactions.find({ investor: userId })
+
+
+    // .populate(
+    //   "property funds  "
+    // );
+
     return res.status(200).json({ status: "success", data });
   } catch (error) {
-    next(errorHandler(400, "failed"));
+    next(errorHandler(400, error));
+    // next(errorHandler(400, "failed"));
   }
 };
 
@@ -182,3 +188,6 @@ exports.getInvestmentById = async (req, res, next) => {
     next(errorHandler(400, "failed"));
   }
 };
+
+
+
