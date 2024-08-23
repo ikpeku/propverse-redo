@@ -60,11 +60,14 @@ exports.makeInvestmentOnproperty = async (req, res, next) => {
         { $push: { transactions: investment._id, properties: prodId } },
         { new: true, useFindAndModify: false }
       );
+    
       await Property.findByIdAndUpdate(
-        userId,
+      prodId,
         { $push: { transactions: investment._id } },
         { new: true, useFindAndModify: false }
       );
+
+   
 
 
 
@@ -137,7 +140,7 @@ exports.makeInvestmentFunds = async (req, res, next) => {
       );
       
       await Funds.findByIdAndUpdate(
-        userId,
+        prodId,
         { $push: { investments: investment._id } },
         { new: true, useFindAndModify: false }
       );

@@ -80,36 +80,55 @@ exports.Accreditation1 = async(req, res, next) => {
         return next(errorHandler(401,"user not found"))
       }
 
-      await Accreditation.findByIdAndUpdate(req.payload.userId, {
-
-        $set:
+      await Accreditation.findByIdAndUpdate(req.payload.userId, { $set:
         {
-        ...{isSubmitted: true},
-        ...{status: "processing"},
-        ...{verify_method: "individual"},
+        // ...{isSubmitted: true},
+        // ...{status: "processing"},
+        // ...{verify_method: "individual"},
+        // ...{added: new Date().toISOString()},
+        // accreditation:{
+        //   ...is_accredited_investor_qualify && {$set: {is_accredited_investor_qualify}},
+        //  ...accredited_method && {accredited_method},
+        //   ...{isDocumentSubmitted: true},
+        //   ...{individual: {
+        //     ...accredited_verify_method && {accredited_verify_method},
 
-        ...{accreditation:{
-          ...is_accredited_investor_qualify && {is_accredited_investor_qualify},
-         ...accredited_method && {accredited_method},
-          ...{isDocumentSubmitted: true},
-          ...{individual: {
-            ...accredited_verify_method && {accredited_verify_method},
-            ...{method: "verify_method_1"},
-            ...{verify_method_1: {
-              ...letter_of_verification && {letter_of_verification},
-             ...{verifier_detail: {
-                ...title && {title},
-                ...name && {name},
-                ...email && {email}
-              }},
-              ...{added: new Date().toISOString()}
-            }}
-          }}
+        "isSubmitted": true,
+        "status": "processing",
+        "verify_method": "individual",
+        "added": new Date().toISOString(),
+  
+  
+        "accreditation.is_accredited_investor_qualify": is_accredited_investor_qualify,
+        "accreditation.accredited_method": accredited_method,
+        "accreditation.isDocumentSubmitted": true,
+  
+  
+        "accreditation.individual.accredited_verify_method": accredited_verify_method,
+        "accreditation.individual.method": "verify_method_1",
+        "accreditation.individual.verify_method_1.letter_of_verification": letter_of_verification,
+        "accreditation.individual.verify_method_1.verifier_detail.title": title,
+        "accreditation.individual.verify_method_1.verifier_detail.name": name,
+        "accreditation.individual.verify_method_1.verifier_detail.email": email,
 
-        }}
-      }
-    }
-    )
+            // ...{method: "verify_method_1"},
+            // ...{verify_method_1: {
+            //   ...letter_of_verification && {letter_of_verification},
+            //  ...{verifier_detail: {
+            //     ...title && {title},
+            //     ...name && {name},
+            //     ...email && {email}
+            //   }},
+            
+            // }}
+          }
+        
+        }
+
+    //     }
+    //   }
+    // }
+    ).exec()
     
      return res.status(200).json({
         message: "success"
@@ -140,43 +159,31 @@ exports.Accreditation2 = async(req, res, next) => {
         return next(errorHandler(401,"user not found"))
       }
 
-    const resp =  await Accreditation.findByIdAndUpdate(req.payload.userId, {
-        ...{$set:{isSubmitted: true}},
-      ...{$set: { status: "processing"}},
-        ...{$set:{verify_method: "individual"}},
-        ...{$set:{"accreditation.is_accredited_investor_qualify": is_accredited_investor_qualify}},
-        ...{$set:{"accreditation.accredited_method": accredited_method}},
-        ...{$set:{"accreditation.isDocumentSubmitted": true}},
-        ...{$set:{"accreditation.individual.accredited_verify_method": accredited_verify_method}},
-        ...{$set:{"accreditation.individual.method": "verify_method_2"}},
-        ...{$set:{"accreditation.individual.verify_method_2.networth_estimate.proof1": proof1}},
-        ...{$set:{"accreditation.individual.verify_method_2.networth_estimate.proof1": proof2}},
-        ...{$set:{"accreditation.individual.verify_method_2.added": new Date().toISOString()}},
-        
-      //   accreditation:{
-      //     is_accredited_investor_qualify,
-      //     accredited_method,
-      //     isDocumentSubmitted: true,
+    const resp =  await Accreditation.findByIdAndUpdate(req.payload.userId, {$set:{
+    
+      "isSubmitted": true,
+      "status": "processing",
+      "verify_method": "individual",
+      "added": new Date().toISOString(),
 
-      //     individual: {
-      //       accredited_verify_method,
-      //       method: "verify_method_2",
 
-      //       verify_method_2: {
-      //         networth_estimate: {
-      //           proof1,
-      //           proof2,
-      //         },
-      //         added: new Date().toISOString()
-            
-      //     }
+      "accreditation.is_accredited_investor_qualify": is_accredited_investor_qualify,
+      "accreditation.accredited_method": accredited_method,
+      "accreditation.isDocumentSubmitted": true,
 
-      //   }
-      // }
-      }, {new: true})
+
+      "accreditation.individual.accredited_verify_method": accredited_verify_method,
+      "accreditation.individual.method": "verify_method_2",
+
+"accreditation.individual.verify_method_2.networth_estimate.proof1": proof1,
+"accreditation.individual.verify_method_2.networth_estimate.proof1": proof2
+
+       
+      }}
+    ).exec()
     
       return  res.status(200).json({
-        message: "success",resp
+        message: "success"
        })
 
     } catch (error) {
@@ -208,33 +215,56 @@ exports.Accreditation3 = async(req, res, next) => {
         return next(errorHandler(401,"user not found"))
       }
 
-      await Accreditation.findByIdAndUpdate(req.payload.userId, {
-        isSubmitted: true,
-        status: "processing",
-        verify_method: "individual",
+      await Accreditation.findByIdAndUpdate(req.payload.userId, {$set:{
+        // isSubmitted: true,
+        // status: "processing",
+        // verify_method: "individual",
+        // added: new Date().toISOString(),
 
-        accreditation:{
-          is_accredited_investor_qualify,
-          accredited_method,
-          isDocumentSubmitted: true,
-          individual: {
-            accredited_verify_method,
-            method: "verify_method_3",
-            verify_method_3: {
-              account_type,
-              gross_income1,
-              gross_income2,
-              proof_of_income: {
-                document1,
-                document2,
-              },
-              added: new Date().toISOString()
+        "isSubmitted": true,
+        "status": "processing",
+        "verify_method": "individual",
+        "added": new Date().toISOString(),
+
+
+        "accreditation.is_accredited_investor_qualify": is_accredited_investor_qualify,
+        "accreditation.accredited_method": accredited_method,
+        "accreditation.isDocumentSubmitted": true,
+
+
+        "accreditation.individual.accredited_verify_method": accredited_verify_method,
+        "accreditation.individual.method": "verify_method_3",
+
+        "accreditation.individual.verify_method_3.account_type": account_type,
+        "accreditation.individual.verify_method_3.gross_income1": gross_income1,
+        "accreditation.individual.verify_method_3.gross_income2": gross_income2,
+        "accreditation.individual.verify_method_3.proof_of_income.document1": document1,
+        "accreditation.individual.verify_method_3.proof_of_income.document2": document2,
+
+
+      //   accreditation:{
+      //     is_accredited_investor_qualify,
+      //     accredited_method,
+      //     isDocumentSubmitted: true,
+
+      //     individual: {
+      //       accredited_verify_method,
+      //       method: "verify_method_3",
+
+      //       verify_method_3: {
+      //         account_type,
+      //         gross_income1,
+      //         gross_income2,
+      //         proof_of_income: {
+      //           document1,
+      //           document2,
+      //         }
             
-          }
+      //     }
 
-        }
-      }
-      })
+      //   }
+      // }
+      }}).exec()
     
       return  res.status(200).json({
         message: "success"
@@ -265,26 +295,37 @@ exports.Accreditation3 = async(req, res, next) => {
           return next(errorHandler(401,"user not found"))
         }
   
-        await Accreditation.findByIdAndUpdate(req.payload.userId, {
+        await Accreditation.findByIdAndUpdate(req.payload.userId, {$set:{
          
-          isSubmitted: true,
-          status: "processing",
-          verify_method: "individual",
-  
-          accreditation:{
-            is_accredited_investor_qualify,
-            accredited_method,
-            isDocumentSubmitted: true,
-            individual: {
-              accredited_verify_method,
-              method: "verify_method_4",
-              verify_method_4: {
-                proof_of_finra_lincence,
-                added: new Date().toISOString()
-              }
-            }
-          }
-        })
+          "isSubmitted": true,
+          "status": "processing",
+          "verify_method": "individual",
+          "added": new Date().toISOString(),
+
+          "accreditation.is_accredited_investor_qualify": is_accredited_investor_qualify,
+          "accreditation.accredited_method": accredited_method,
+          "accreditation.isDocumentSubmitted": true,
+
+          "accreditation.individual.accredited_verify_method": accredited_verify_method,
+          "accreditation.individual.method": "verify_method_4",
+          "accreditation.individual.verify_method_4.proof_of_finra_lincence": proof_of_finra_lincence,
+
+          // accreditation:{
+          //   is_accredited_investor_qualify,
+          //   accredited_method,
+          //   isDocumentSubmitted: true,
+
+          //   individual: {
+          //     accredited_verify_method,
+          //     method: "verify_method_4",
+          //     verify_method_4: {
+          //       proof_of_finra_lincence
+               
+          //     }
+          //   }
+          // }
+
+        }}).exec()
       
         return res.status(200).json({
           message: "success"
@@ -328,47 +369,57 @@ exports.Accreditation3 = async(req, res, next) => {
           return next(errorHandler(401,"user not found"))
         }
   
-        await Accreditation.findByIdAndUpdate(req.payload.userId, {
+       const entityResponse = await Accreditation.findOneAndUpdate({_id:req.payload.userId}, {$set:{
          
-          isSubmitted: true,
-          status: "processing",
-          verify_method: "entity",
-  
-          accreditation:{
-            is_accredited_investor_qualify,
-            accredited_method,
-            isDocumentSubmitted: false,
-            entity: {
-              added: new Date().toISOString(),
-              investment_entity,
-              details: {
-                isOwner,
-                entity_legal_name,
-                date: {
-                  day,
-                  month,
-                  year,
-                },
-               country, 
-         city,  
-         address, 
-         mobile, 
-         social,  
-         tax_id,  
-         signatory
-              }
+          "isSubmitted": true,
+          "status": "processing",
+          "verify_method": "entity",
+          "added": new Date().toISOString(),
 
-            }
+          "accreditation.is_accredited_investor_qualify": is_accredited_investor_qualify,
+          "accreditation.accredited_method": accredited_method,
+          "accreditation.entity.investment_entity": investment_entity,
+          "accreditation.entity.details.isOwner": isOwner,
+          "accreditation.entity.details.entity_legal_name": entity_legal_name,
+          "accreditation.entity.details.date.day": day,
+          "accreditation.entity.details.date.month": month,
+          "accreditation.entity.details.date.year": year,
+          "accreditation.entity.details.country": country,
+          "accreditation.entity.details.city": city,
+          "accreditation.entity.details.address": address,
+          "accreditation.entity.details.mobile": mobile,
+          "accreditation.entity.details.social": social,
+          "accreditation.entity.details.tax_id": tax_id,
+          "accreditation.entity.details.signatory": signatory,
 
-          }
-        },{ new: true, useFindAndModify: false })
+        }}).exec()
+
+
+
+        if(entityResponse.accreditation.entity.entity_document.length === 0) {
+          await Accreditation.findOneAndUpdate({_id:req.payload.userId}, {$set: {
+            "accreditation.isDocumentSubmitted": false
+            // accreditation:{
+            //   isDocumentSubmitted: false,
+            // }
+          }}).exec()
+        } else {
+          await Accreditation.findOneAndUpdate({_id:req.payload.userId}, {$set: {
+            "accreditation.isDocumentSubmitted": true
+            // accreditation:{
+            //   isDocumentSubmitted: true,
+            // }
+          }}).exec()
+        }
+
       
         return res.status(200).json({
-          message: "success",
+          message: "success", entityResponse: entityResponse.accreditation.entity.entity_document.length
          })
   
       } catch (error) {
-          next(errorHandler(500, "failed to update"))
+          next(errorHandler(500, error))
+          // next(errorHandler(500, "failed to update"))
         
       }
   
@@ -383,10 +434,15 @@ exports.AccreditationEntityDocument = async(req, res, next) => {
     try {
 
         const data =   await Accreditation.findByIdAndUpdate(req.payload.userId,  
-          { "accreditation.isDocumentSubmitted ": true,
-        $push: {"accreditation.entity.entity_document":  entity_document}
+          { 
+        $push: {"accreditation.entity.entity_document":  {$each: entity_document}},
+
         },
-          { new: true, useFindAndModify: false })
+          // { new: true, useFindAndModify: false }
+        )
+        await Accreditation.findOneAndUpdate({_id:req.payload.userId}, {$set: {
+          "accreditation.isDocumentSubmitted": true
+        }}).exec()
    
           return  res.status(200).json({
            message: "success"

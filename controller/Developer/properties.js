@@ -298,13 +298,8 @@ exports.getPropertyById = async(req, res, next) => {
     const {prodId} = req.params
     try {
         
-      //  const data = await properties.findById(prodId).populate("company user transactions")
-
-      //  delete data.user.password;
-
-      //  return res.status(200).json({status:"success", data})
-
       let query = [
+
         {
           $match: {_id: prodId}
         },
@@ -346,12 +341,62 @@ exports.getPropertyById = async(req, res, next) => {
              {
               $unwind: "$company"
              },
+
+             {
+              $lookup: {
+                   from: "property_activities",
+                   localField: "activities",
+                   foreignField: "property",
+                   as: "activities",
+                 },
+               },
+            
             
       ]
 
       const myAggregate = await properties.aggregate(query);
 
-      return res.status(200).json({status:"success", data: myAggregate[0]})
+      let transactionQeury = [
+        {
+          $match: {_id: prodId}
+        },
+        {
+          $lookup: {
+            from: "transactions",
+            localField: "transactions",
+            foreignField: "_id",
+            as: "transaction",
+          },
+        },
+        {
+$unwind: "$transaction"
+        },
+           {
+                $group: {
+                  _id:  "$transaction.payment_status",
+                  status: {$first: "$transaction.payment_status"},
+                  amount:{$sum: "$transaction.paid.amount"},
+                  created: { $last:"$transaction.createdAt"},
+                  data: { $push: "$$ROOT" },
+                }
+               },
+               {
+                $unwind: "$data",
+              },
+              {
+                $replaceRoot: { newRoot: "$data" },
+              },
+              
+      ]
+
+
+     const txn = await properties.aggregate(transactionQeury);
+
+    //  myAggregate[0].
+      // return res.status(200).json({status:"success", data: myAggregate[0]})
+
+
+      return res.status(200).json({status:"success", data: txn})
 
     } catch (error) {
       next(error)

@@ -28,7 +28,7 @@ const accreditation_Schema = new Schema(
       enum: ["individual", "entity", ""],
       default: "",
     },
-
+    added: Date,
     accreditation: {
       is_accredited_investor_qualify: {
         type: Boolean,
@@ -111,7 +111,6 @@ const accreditation_Schema = new Schema(
               default: "",
             },
           },
-          added: Date,
         },
         verify_method_2: {
           networth_estimate: {
@@ -160,7 +159,6 @@ const accreditation_Schema = new Schema(
               },
             },
           },
-          added: Date,
         },
         verify_method_3: {
           account_type: {
@@ -261,7 +259,7 @@ const accreditation_Schema = new Schema(
               },
             },
           },
-          added: Date,
+          
         },
 
         verify_method_4: {
@@ -287,7 +285,6 @@ const accreditation_Schema = new Schema(
               default: "",
             },
           },
-          added: Date,
         },
       },
 
@@ -297,7 +294,7 @@ const accreditation_Schema = new Schema(
       },
 
       entity: {
-        added: Date,
+        
         investment_entity: {
           type: String,
           default: "LLC",

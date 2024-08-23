@@ -190,6 +190,51 @@ exports.update_Due_deligence = async (req, res, next) => {
     }
 }
 
+exports.update_Due_deligence_company_profile = async (req, res, next) => {
+    const { userId } = req.params
+
+    const {userId: payloadUserId, status} = req.payload
+
+    const     {
+        cover_image,
+        about,
+        logo
+       } = req.body
+    
+    try {
+       
+        if((userId === payloadUserId || status === "Admin") ) {
+           
+            const data = await Due_Deligence.findByIdAndUpdate(userId, 
+                {
+             company_information: {
+                 ...(logo && {logo}),
+                 ...(about && {about}),
+                 ...(cover_image && {cover_image})
+                },
+            }, {
+
+                new: true
+            }
+            )
+
+       
+           return res.status(200).json({status:"success", data})
+            
+        } 
+
+      
+
+       return next(errorHandler(400, "Unauthorise"))
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+
+
 /**
  * handle developer docs
  */
