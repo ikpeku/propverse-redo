@@ -11,7 +11,8 @@ Accreditation2,
 Accreditation3,
 Accreditation4,
 AccreditationEntity,
-AccreditationEntityDocument
+AccreditationEntityDocument,
+get_Transactions
 } = require("../../controller/General/user");
 
 const route = express.Router();
@@ -33,5 +34,8 @@ route.get("/accreditation/", userAccreditation);
  */
 route.get("/property/:prodId", propertyInvestmentInfo);
 route.get("/fund/:prodId", propertyInvestmentInfo);
+
+
+route.get("/transactions/payin", get_Transactions)
 
 module.exports = route;

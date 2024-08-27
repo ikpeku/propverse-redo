@@ -3,6 +3,7 @@ const Accreditation = require("../../model/compliance/accreditation")
 const { errorHandler } = require("../../utils/error")
 const Property = require("../../model/developer/properties");
 const Fund = require("../../model/institutional/fund");
+const PayInTransaction = require("../../model/transaction/transactions");
 
 exports.userKyc = async(req, res, next) => {
     const {
@@ -511,4 +512,161 @@ exports.fundInvestmentInfo = async(req,res,next) => {
     
   // }
 }
+
+
+
+exports.get_Transactions = async (req, res, next) => {
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+  const country = req?.query?.country;
+  const status = req?.query?.status;
+  const name = req?.query?.name;
+
+
+
+
+  const options = {
+    page,
+    limit,
+  };
+
+
+
+  let query =  [
+          {
+      $lookup: {
+           from: "users",
+           localField: "investor",
+           foreignField: "_id",
+           as: "user",
+         },
+       },
+       {
+        $unwind: "$user"
+       },
+
+  ]
+  // 'Institutional Investor',
+  // 'Developer',
+  // 'Non-Institutional Investor',
+  // 'Admin',
+
+   
+    // if(req.payload.status == 'Non-Institutional Investor'){
+    //    query.push(
+    //   {
+    //       $project: {
+    //         name: 1,
+    //         description: 1,
+    //         paid: 1,
+    //         transaction_type: 1,
+    //         createdAt: 1,
+    //         status: 1,
+    //         _id: 1
+    //       },
+    //     }
+    // )
+    // }
+
+//  if(req.payload.status == 'Developer'){  
+//    query.push(
+
+//         {
+//             $project: {
+//               investorname: "$user.username",
+//               projectname:  "$name",
+//               transaction_type: 1,
+//               paid: 1,
+//               createdAt: 1,
+//               status: 1,
+//               _id: 1
+//             },
+//           }
+//       )
+//     }
+
+
+
+
+  query.push(
+      {
+                    $project: {
+                      investorname: "$user.username",
+                      country: "$user.country",
+                      projectname:  "$name",
+                      transaction_type: 1,
+                      paid: 1,
+                      createdAt: 1,
+                      status: 1,
+                      _id: 1
+                    },
+                  }
+    )
+
+
+
+
+
+
+    if(searchText){
+
+      query.push({
+        $match: {
+          $or: [
+            { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { verify_type: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { status: searchText}
+          ]
+        }
+      })
+
+      
+    }
+    
+    if(country){
+      query.push({
+        $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
+      })
+    }
+    if(status){
+      query.push({
+        $match: {status}
+      })
+    }
+    if(name){
+      query.push({
+        $match: {username: { $regex: name, $options: "i" } }
+      })
+    }
+
+    // console.log(req.payload)
+
+     query.push(
+     
+        {
+          $sort: {
+            updatedAt: -1,
+          },
+        },
+    )
+
+  try {
+    const myAggregate =  PayInTransaction.aggregate(query);
+
+    const paginationResult = await PayInTransaction.aggregatePaginate(
+      myAggregate,
+      options
+    );
+
+    return res.status(200).json({ status: "success", data: paginationResult });
+  } catch (error) {
+    // next(errorHandler(500, "network error"));
+    next(errorHandler(500, error));
+    
+  }
+}
+
 
