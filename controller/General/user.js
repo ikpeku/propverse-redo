@@ -554,42 +554,42 @@ exports.get_Transactions = async (req, res, next) => {
   // 'Admin',
 
    
-    // if(req.payload.status == 'Non-Institutional Investor'){
-    //    query.push(
-    //   {
-    //       $project: {
-    //         name: 1,
-    //         description: 1,
-    //         paid: 1,
-    //         transaction_type: 1,
-    //         createdAt: 1,
-    //         status: 1,
-    //         _id: 1
-    //       },
-    //     }
-    // )
-    // }
+    if(req.payload.status == 'Non-Institutional Investor'){
+       query.push(
+      {
+          $project: {
+            name: 1,
+            description: 1,
+            paid: 1,
+            transaction_type: 1,
+            createdAt: 1,
+            status: 1,
+            _id: 1
+          },
+        }
+    )
+    }
 
-//  if(req.payload.status == 'Developer'){  
-//    query.push(
+ if(req.payload.status == 'Developer'){  
+   query.push(
 
-//         {
-//             $project: {
-//               investorname: "$user.username",
-//               projectname:  "$name",
-//               transaction_type: 1,
-//               paid: 1,
-//               createdAt: 1,
-//               status: 1,
-//               _id: 1
-//             },
-//           }
-//       )
-//     }
-
-
+        {
+            $project: {
+              investorname: "$user.username",
+              projectname:  "$name",
+              transaction_type: 1,
+              paid: 1,
+              createdAt: 1,
+              status: 1,
+              _id: 1
+            },
+          }
+      )
+    }
 
 
+
+  if(req.payload.status == 'Admin'){
   query.push(
       {
                     $project: {
@@ -604,7 +604,7 @@ exports.get_Transactions = async (req, res, next) => {
                     },
                   }
     )
-
+  }
 
 
 
