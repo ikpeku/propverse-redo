@@ -5,6 +5,7 @@ const Property = require("../../../model/developer/properties");
 const { errorHandler } = require("../../../utils/error");
 const { mailerController } = require("../../../utils/mailer");
 
+
 exports.get_Developers = async (req, res, next) => {
   const page = parseInt(req?.query?.page) || 1;
 
@@ -72,52 +73,71 @@ exports.get_Due_Deligence = async (req, res, next) => {
   };
 
   try {
-    const myAggregate = Due_Deligence.aggregate([
-      {
-        $match: { isSubmited: true },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "lookup_user",
-        },
-      },
-      {
-        $addFields: {
-          user_detail: {
-            $arrayElemAt: ["$lookup_user", 0],
-          },
-        },
-      },
-      {
-        $project: {
-          username:"$user_detail.username",
-          country:"$user_detail.country",
-          isAdminAproved: 1,
-          createdAt: 1,
-          _id:"user_detail._id",
-        },
-      },
-      {
-        $match: {
-          $or: [
-            {
-              "user_detail.username": {
-                $regex: ".*" + searchText + ".*",
-                $options: "i",
-              },
-            },
-          ],
-        },
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        },
-      },
-    ]);
+
+
+
+let queryparams = [
+  {
+    $match: { isSubmited: true },
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "user",
+      foreignField: "_id",
+      as: "user",
+    },
+  },
+  {
+$unwind: "$user"
+  },
+  {
+    $project: {
+      username:"$user.username",
+      country:"$user.country",
+      registrationDate: "$createdAt",
+      status: "$isAdminAproved",
+      _id:"$_id",
+    },
+  },
+  {
+    $sort: {
+      createdAt: -1,
+    },
+  },
+]
+
+if(searchText){
+  queryparams.push(
+    {
+         $match: {
+           $or: [
+             {
+               "$username": {
+                 $regex: ".*" + searchText + ".*",
+                 $options: "i",
+               },
+             },
+             {
+               "$country": {
+                 $regex: ".*" + searchText + ".*",
+                 $options: "i",
+               },
+             },
+           ],
+         },
+       },
+
+  )
+
+}
+
+ 
+
+
+    const myAggregate = Due_Deligence.aggregate(queryparams);
+
+
 
     const paginationResult = await Due_Deligence.aggregatePaginate(
       myAggregate,
