@@ -287,12 +287,17 @@ exports.get_Properties = async (req, res, next) => {
   ]
 
   if(searchText){
-    query.push({$match : { "$property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
+    query.push({
+      $match: {
+        $or: [
+          { property_name: { $regex: ".*" + searchText + ".*", $options: "i" } },
+          { property_type: { $regex: ".*" + searchText + ".*", $options: "i" } },
+          { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
+          { username: { $regex: ".*" + searchText + ".*", $options: "i" } }, 
+        ]
+      }})
   }
 
-  // query.push(
-    
-  // )
 
   try {
     const myAggregate = Property.aggregate(query);
@@ -307,81 +312,6 @@ exports.get_Properties = async (req, res, next) => {
     next(errorHandler(500, "bad request"));
   }
 };
-
-
-
-// exports.get_Properties = async (req, res, next) => {
-//   const page = parseInt(req?.query?.page) || 1;
-
-//   const limit = parseInt(req?.query?.limit) || 10;
-//   const searchText = req?.query?.searchText;
-
-//   const { userId } = req.params;
-
-//   //   const { userId: payloadUserId, status } = req.payload;
-
-//   const options = {
-//     page,
-//     limit,
-//   };
-
-//   let query =  [
-//     {
-//       $lookup: {
-//            from: "users",
-//            localField: "user",
-//            foreignField: "_id",
-//            as: "user",
-//          },
-//        },
-//        {
-//         $addFields: {
-//           user: {
-//             $arrayElemAt: ["$user", 0],
-//           },
-//         },
-//       },
-//       {
-//         $project: {
-//           username: "user.username",
-//           country: "property_detail.property_location.country",
-//           property_type: "property_detail.property_overview.property_type",
-//           property_name: "property_detail.property_overview.property_name",
-//            isAdminAproved: 1,
-//           // email: 1,
-//           createdAt: 1,
-//           _id: 1,
-//         },
-//       },
-//     {
-//       $sort: {
-//         createdAt: -1,
-//       },
-//     },
-    
-//   ]
-
-//   if(searchText){
-//     query.push({$match : { "property_detail.property_overview.property_name": { $regex: ".*" + searchText + ".*", $options: "i" } }})
-//   }
-
-//   // query.push(
-    
-//   // )
-
-//   try {
-//     const myAggregate = Property.aggregate(query);
-
-//     const paginationResult = await Property.aggregatePaginate(
-//       myAggregate,
-//       options
-//     );
-
-//     return res.status(200).json({ status: "success", data: paginationResult });
-//   } catch (error) {
-//     next(errorHandler(500, "bad request"));
-//   }
-// };
 
 
 
