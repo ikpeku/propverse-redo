@@ -1,4 +1,4 @@
-// const User = require("../../model/user")
+const User = require("../../model/user")
 const { ObjectId } = require("mongodb");
 const Due_Deligence = require("../../model/developer/due_deligence");
 const Docs = require("../../model/developer/property_docs");
@@ -64,9 +64,15 @@ exports.update_Due_deligence = async (req, res, next) => {
     
     try {
 
-        if((userId === payloadUserId || status === "Admin") ) {
+       const userData = await User.findById(payloadUserId)
+
+
+
+
+
+        if(userData) {
            
-            const data = await Due_Deligence.findByIdAndUpdate(userId, 
+            const data = await Due_Deligence.findByIdAndUpdate(payloadUserId, 
                 {
              company_information: {
                  ...(company_information.name && {name: company_information.name}),
