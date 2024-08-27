@@ -179,11 +179,13 @@ exports.update_Due_deligence = async (req, res, next) => {
        
            return res.status(200).json({status:"success", data})
             
-        } 
+        } else {
+
+            return next(errorHandler(400, "Unauthorise"))
+        }
 
       
 
-       return next(errorHandler(400, "Unauthorise"))
 
     } catch (error) {
         next(error)
