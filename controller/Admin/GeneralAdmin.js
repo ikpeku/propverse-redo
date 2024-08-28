@@ -218,7 +218,7 @@ exports.VerifyPayIn = async(req,res,next) => {
   
 
      res.status(200).json({
-        message: type !== "approve" ? "Rejected successfully" : "Approved successfully",response
+        message: type !== "approve" ? "Rejected successfully" : "Approved successfully"
      })
       
     } catch (error) {

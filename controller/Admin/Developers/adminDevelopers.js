@@ -75,10 +75,9 @@ exports.get_Due_Deligence = async (req, res, next) => {
   try {
 
 
-
 let queryparams = [
   {
-    $match: { isSubmited: true },
+    $match: { isSubmited: false },
   },
   {
     $lookup: {
@@ -107,32 +106,16 @@ $unwind: "$user"
   },
 ]
 
+
 if(searchText){
-  queryparams.push(
-    {
-         $match: {
-           $or: [
-             {
-               "$username": {
-                 $regex: ".*" + searchText + ".*",
-                 $options: "i",
-               },
-             },
-             {
-               "$country": {
-                 $regex: ".*" + searchText + ".*",
-                 $options: "i",
-               },
-             },
-           ],
-         },
-       },
-
-  )
-
+  queryparams.push({
+    $match: {
+      $or: [
+        { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+        { country: { $regex: ".*" + searchText + ".*", $options: "i" } }
+      ]
+    }})
 }
-
- 
 
 
     const myAggregate = Due_Deligence.aggregate(queryparams);
