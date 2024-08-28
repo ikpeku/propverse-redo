@@ -4,6 +4,7 @@ const { errorHandler } = require("../../utils/error")
 const Property = require("../../model/developer/properties");
 const Fund = require("../../model/institutional/fund");
 const PayInTransaction = require("../../model/transaction/transactions");
+const { ObjectId } = require("mongodb");
 
 exports.userKyc = async(req, res, next) => {
     const {
@@ -535,7 +536,28 @@ exports.get_Transactions = async (req, res, next) => {
 
 
   let query =  [
-          {
+    {
+      $sort: {
+        updatedAt: -1,
+      },
+    },
+  ]
+  // 'Institutional Investor',
+  // 'Developer',
+  // 'Non-Institutional Investor',
+  // 'Admin',
+
+
+  if(req.payload.status !== 'Admin'){
+  query.push(
+    {
+      $match: { _id:  new ObjectId(req.payload.userId)}
+    }
+  )
+  }
+
+  query.push(
+    {
       $lookup: {
            from: "users",
            localField: "investor",
@@ -545,13 +567,11 @@ exports.get_Transactions = async (req, res, next) => {
        },
        {
         $unwind: "$user"
-       },
+       }
+  )
 
-  ]
-  // 'Institutional Investor',
-  // 'Developer',
-  // 'Non-Institutional Investor',
-  // 'Admin',
+
+
 
    
     if(req.payload.status == 'Non-Institutional Investor'){

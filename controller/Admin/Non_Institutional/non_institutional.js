@@ -91,13 +91,13 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
                 as: "property_invested",
               },
             },
+
             {
-              $addFields: {
+              $addFields:{
                 amount_invested: {
-                "$sum": { $sum: "$property_invested.paid.amount"}
+                 "$sum": { $sum: "$property_invested.paid.amount"}
                 }
-  
-              },
+              }
             },
         {
            $lookup: {
@@ -124,15 +124,30 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
       ]
 
       query.push(
+
+        // { $unwind: "$property_invested" },
+        // { $match: { "property_invested.status": "Failed" } },
+
+        // {
+        //   $group: {
+        //     _id: "$_id",  // Group by the document's unique identifier
+        //     property_invested: { $push: "$property_invested" },  // Rebuild the property_invested array
+        //     amount_invested: { $sum: "$property_invested.paid.amount" } , // Calculate the total sum
+        //     user_detail: { $push: "$user_detail" } , // Calculate the total sum
+        //     accreditation_status: { $push: "$accreditation_status" }  // Calculate the total sum
+        //   }
+        // },
         {
             $project: {
               username: "$user_detail.username",
               country:"$user_detail.country",
               email:"$user_detail.email",
               createdAt:"$user_detail.createdAt",
-              status: "$accreditation_status.status" == "verified" ? "Accredited" : "Non Accredited",
+              status: "$accreditation_status.status" == "verified" ? "Accredited" : "$accreditation_status.status",
               _id: 1,
-               amount_invested: 1
+               amount_invested: 1,
+              test:"$property_invested.status"
+              
             },
           },
           {
@@ -187,7 +202,8 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
   
       return res.status(200).json({ status: "success", data: paginationResult });
     } catch (error) {
-      next(errorHandler(500, "network error"));
+      // next(errorHandler(500, "network error"));
+      next(errorHandler(500,error));
       
     }
   }
