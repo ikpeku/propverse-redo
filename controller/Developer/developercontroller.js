@@ -4,6 +4,29 @@ const Due_Deligence = require("../../model/developer/due_deligence");
 const Docs = require("../../model/developer/property_docs");
 const { errorHandler } = require("../../utils/error");
 
+
+
+
+exports.get_Developer_Info = async (req, res, next) => {
+    const { userId } = req.params
+    
+    try {
+
+            let data = {}; 
+            
+            data.user_info = await User.findById(userId).select("-password")
+
+            data.company_information = await Due_Deligence.findById(userId)
+       
+           return res.status(200).json({status:"success user", data})
+            
+      
+
+    } catch (error) {
+        next(error)
+    }
+}
+
 exports.get_Due_deligence = async (req, res, next) => {
     const { userId } = req.params
 
