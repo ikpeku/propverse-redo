@@ -77,7 +77,7 @@ exports.get_Due_Deligence = async (req, res, next) => {
 
 let queryparams = [
   {
-    $match: { isSubmited: false },
+    $match: {isSubmited: true },
   },
   {
     $lookup: {

@@ -32,6 +32,10 @@ exports.due_Deligence_Submit = (req, res, next) => {
     req.body.isSubmited = true
     next()
 }
+exports.due_Deligence_Draft = (req, res, next) => {
+    req.body.isSubmited = false
+    next()
+}
 
 
 exports.update_Due_deligence = async (req, res, next) => {
@@ -40,6 +44,7 @@ exports.update_Due_deligence = async (req, res, next) => {
     const {userId: payloadUserId, status} = req.payload
 
     const     {
+        isSubmited,
         company_information,
        
             previous_project_1,
@@ -66,14 +71,11 @@ exports.update_Due_deligence = async (req, res, next) => {
 
        const userData = await User.findById(payloadUserId)
 
-
-
-
-
         if(userData) {
            
             const data = await Due_Deligence.findByIdAndUpdate(payloadUserId, 
                 {
+                    isSubmited,
              company_information: {
                  ...(company_information.name && {name: company_information.name}),
                  ...(company_information.address && {address: company_information.address}),
@@ -184,7 +186,7 @@ exports.update_Due_deligence = async (req, res, next) => {
 
        
            return res.status(200).json({status:"success", data})
-            
+      
         } else {
 
             return next(errorHandler(400, "Unauthorise"))
