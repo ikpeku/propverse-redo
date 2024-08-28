@@ -18,7 +18,7 @@ exports.get_Developer_Info = async (req, res, next) => {
 
             data.company_information = await Due_Deligence.findById(userId)
        
-           return res.status(200).json({status:"success user", data})
+           return res.status(200).json({status:"success", data})
             
       
 

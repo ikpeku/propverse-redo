@@ -12,7 +12,8 @@ Accreditation3,
 Accreditation4,
 AccreditationEntity,
 AccreditationEntityDocument,
-get_Transactions
+get_Transactions,
+get_Transaction_by_Id
 } = require("../../controller/General/user");
 
 const route = express.Router();
@@ -36,6 +37,8 @@ route.get("/property/:prodId", propertyInvestmentInfo);
 route.get("/fund/:prodId", propertyInvestmentInfo);
 
 
+route.get("/transaction/:txnId", get_Transaction_by_Id)
 route.get("/transactions/payin", get_Transactions)
+
 
 module.exports = route;

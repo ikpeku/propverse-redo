@@ -296,6 +296,8 @@ isAdminAproved:"Not Approve",
 
 exports.getPropertyById = async(req, res, next) => {
     const {prodId} = req.params
+
+    console.log(prodId)
     try {
         
       let query = [

@@ -551,7 +551,7 @@ exports.get_Transactions = async (req, res, next) => {
   if(req.payload.status !== 'Admin'){
   query.push(
     {
-      $match: { _id:  new ObjectId(req.payload.userId)}
+      $match: { investor:  new ObjectId(req.payload.userId)}
     }
   )
   }
@@ -683,10 +683,55 @@ exports.get_Transactions = async (req, res, next) => {
 
     return res.status(200).json({ status: "success", data: paginationResult });
   } catch (error) {
-    // next(errorHandler(500, "network error"));
-    next(errorHandler(500, error));
+    next(errorHandler(500, "network error"));
     
   }
 }
+
+
+
+
+exports.get_Transaction_by_Id = async (req, res, next) => {
+ 
+
+  let query =  [
+    {
+      $match: { _id:  new ObjectId(req.params.txnId)}
+    },
+    {
+      $project: {
+        name: 1,
+        description: 1,
+        date: "$createdAt",
+        amount_paid: "$paid.amount",
+        total_amount : "$property_amount.amount",
+        payment_status: "$status",
+        transaction_type: 1,
+        transaction_method: "$payment_method",
+        transaction_status: "$payment_status",
+      },
+    }
+   
+  ]
+ 
+
+  try {
+    const myAggregate = await PayInTransaction.aggregate(query);
+
+  
+
+    return res.status(200).json({ status: "success", data: myAggregate[0] });
+  } catch (error) {
+    next(errorHandler(500, "network error"));
+    
+  }
+}
+
+
+
+
+
+
+
 
 
