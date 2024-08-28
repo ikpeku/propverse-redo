@@ -3,7 +3,7 @@ const Transactions = require("../../model/transaction/transactions");
 const Property = require("../../model/developer/properties");
 const Funds = require("../../model/institutional/fund");
 
-const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
+// const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const { errorHandler } = require("../../utils/error");
 
 
@@ -53,25 +53,21 @@ exports.makeInvestmentOnproperty = async (req, res, next) => {
     });
 
 
-    if (investmentType === "property") {
+    // if (investmentType === "property") {
 
-      await Non_Institutional_Investor.findByIdAndUpdate(
-        userId,
-        { $push: { transactions: investment._id, properties: prodId } },
-        { new: true, useFindAndModify: false }
-      );
+    //   await Non_Institutional_Investor.findByIdAndUpdate(
+    //     userId,
+    //     { $push: { transactions: investment._id, properties: prodId } },
+    //     { new: true, useFindAndModify: false }
+    //   );
     
-      await Property.findByIdAndUpdate(
-      prodId,
-        { $push: { transactions: investment._id } },
-        { new: true, useFindAndModify: false }
-      );
+    //   await Property.findByIdAndUpdate(
+    //   prodId,
+    //     { $push: { transactions: investment._id } },
+    //     { new: true, useFindAndModify: false }
+    //   );
 
-   
-
-
-
-    }
+    // }
 
     return res
       .status(200)
@@ -96,8 +92,6 @@ exports.makeInvestmentFunds = async (req, res, next) => {
     description
   } = req.body;
 
-  // console.log(req.body)
-  // console.log(req.params)
 
   try {
     const response = await Funds.findById(prodId);
@@ -132,20 +126,20 @@ exports.makeInvestmentFunds = async (req, res, next) => {
       description
     });
 
-    if (investmentType === "funds") {
-      await Non_Institutional_Investor.findByIdAndUpdate(
-        userId,
-        { $push: { transactions: investment._id, funds: prodId } },
-        { new: true, useFindAndModify: false }
-      );
+    // if (investmentType === "funds") {
+    //   await Non_Institutional_Investor.findByIdAndUpdate(
+    //     userId,
+    //     { $push: { transactions: investment._id, funds: prodId } },
+    //     { new: true, useFindAndModify: false }
+    //   );
       
-      await Funds.findByIdAndUpdate(
-        prodId,
-        { $push: { investments: investment._id } },
-        { new: true, useFindAndModify: false }
-      );
+    //   await Funds.findByIdAndUpdate(
+    //     prodId,
+    //     { $push: { investments: investment._id } },
+    //     { new: true, useFindAndModify: false }
+    //   );
 
-    }
+    // }
 
     return res
       .status(200)

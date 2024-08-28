@@ -3,6 +3,11 @@ const { errorHandler } = require("../../utils/error")
 const User = require("../../model/user");
 const Kyc = require("../../model/compliance/kyc");
 const TransactionsPayIn = require("../../model/transaction/transactions")
+const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
+const Property = require("../../model/developer/properties");
+const Funds = require("../../model/institutional/fund");
+
+
 
 const Compliance = require("../../model/compliance/accreditation");
 const { mailerController } = require("../../utils/mailer");
@@ -131,6 +136,37 @@ exports.VerifyPayIn = async(req,res,next) => {
 
      if(type === "reject"){
       response.status = "Failed"
+      if(response.transaction_type == "property purchase"){
+         
+        await Non_Institutional_Investor.findByIdAndUpdate(
+         response.investor,
+         { $pull: { transactions: response._id, properties: response.property } },
+         { new: true, useFindAndModify: false }
+       );
+     
+       await Property.findByIdAndUpdate(
+       response.property,
+         { $push: { transactions: response._id } },
+         { new: true, useFindAndModify: false }
+       );
+
+      }
+      if(response.transaction_type == "funds"){
+       await Non_Institutional_Investor.findByIdAndUpdate(
+         response.investor,
+         { $pull: { transactions: response._id, funds: response.funds } },
+         { new: true, useFindAndModify: false }
+       );
+       
+       await Funds.findByIdAndUpdate(
+         response.funds,
+         { $pull: { investments: response._id } },
+         { new: true, useFindAndModify: false }
+       );
+
+      }
+
+
       mailerController(
         GeneralMailOption({
           email: response?.investor?.email,
@@ -142,13 +178,47 @@ exports.VerifyPayIn = async(req,res,next) => {
      
      if(type === "approve") {
          response.status = "Success"
+
+         if(response.transaction_type == "property purchase"){
+         
+           await Non_Institutional_Investor.findByIdAndUpdate(
+            response.investor,
+            { $push: { transactions: response._id, properties: response.property } },
+            { new: true, useFindAndModify: false }
+          );
+        
+          await Property.findByIdAndUpdate(
+          response.property,
+            { $push: { transactions: response._id } },
+            { new: true, useFindAndModify: false }
+          );
+
+         }
+         if(response.transaction_type == "funds"){
+          await Non_Institutional_Investor.findByIdAndUpdate(
+            response.investor,
+            { $push: { transactions: response._id, funds: response.funds } },
+            { new: true, useFindAndModify: false }
+          );
+          
+          await Funds.findByIdAndUpdate(
+            response.funds,
+            { $push: { investments: response._id } },
+            { new: true, useFindAndModify: false }
+          );
+
+         }
+
+      
+
+
      }
 
      response.save()
   
 
      res.status(200).json({
-        message: type !== "approve" ? "Rejected successfully" : "Approved successfully"
+        message: type !== "approve" ? "Rejected successfully" : "Approved successfully",response
      })
       
     } catch (error) {

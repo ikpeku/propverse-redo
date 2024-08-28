@@ -91,11 +91,23 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
                 as: "property_invested",
               },
             },
+            
 
             {
               $addFields:{
                 amount_invested: {
                  "$sum": { $sum: "$property_invested.paid.amount"}
+                }
+              }
+            },
+
+            {
+              $addFields: {
+                filerItem : {
+                 "$arrayElemAt": [ { "$filter" : {
+                    "input" : "$property_invested" ,
+                    "cond" : { "$eq" : [ "status", "Failed" ] }
+                  } } , 0 ]
                 }
               }
             },
@@ -146,7 +158,6 @@ exports.get_All_Non_Institutional = async (req, res, next) => {
               status: "$accreditation_status.status" == "verified" ? "Accredited" : "$accreditation_status.status",
               _id: 1,
                amount_invested: 1,
-              test:"$property_invested.status"
               
             },
           },
