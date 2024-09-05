@@ -40,7 +40,7 @@ const propertiesSchema = new Schema(
     investment_status: {
         type: String,
         default: "Pending",
-        enums: ["Pending", "Completed"]
+        enums: ["Pending", "Sold"]
       },
     property_state: {
         type: String,

@@ -297,7 +297,6 @@ isAdminAproved:"Not Approve",
 exports.getPropertyById = async(req, res, next) => {
     const {prodId} = req.params
 
-    console.log(prodId)
     try {
         
       let query = [
@@ -358,47 +357,47 @@ exports.getPropertyById = async(req, res, next) => {
 
       const myAggregate = await properties.aggregate(query);
 
-      let transactionQeury = [
-        {
-          $match: {_id: prodId}
-        },
-        {
-          $lookup: {
-            from: "transactions",
-            localField: "transactions",
-            foreignField: "_id",
-            as: "transaction",
-          },
-        },
-        {
-$unwind: "$transaction"
-        },
-           {
-                $group: {
-                  _id:  "$transaction.payment_status",
-                  status: {$first: "$transaction.payment_status"},
-                  amount:{$sum: "$transaction.paid.amount"},
-                  created: { $last:"$transaction.createdAt"},
-                  data: { $push: "$$ROOT" },
-                }
-               },
-               {
-                $unwind: "$data",
-              },
-              {
-                $replaceRoot: { newRoot: "$data" },
-              },
+//       let transactionQeury = [
+//         {
+//           $match: {_id: prodId}
+//         },
+//         {
+//           $lookup: {
+//             from: "transactions",
+//             localField: "transactions",
+//             foreignField: "_id",
+//             as: "transaction",
+//           },
+//         },
+//         {
+// $unwind: "$transaction"
+//         },
+//            {
+//                 $group: {
+//                   _id:  "$transaction.payment_status",
+//                   status: {$first: "$transaction.payment_status"},
+//                   amount:{$sum: "$transaction.paid.amount"},
+//                   created: { $last:"$transaction.createdAt"},
+//                   data: { $push: "$$ROOT" },
+//                 }
+//                },
+//                {
+//                 $unwind: "$data",
+//               },
+//               {
+//                 $replaceRoot: { newRoot: "$data" },
+//               },
               
-      ]
+//       ]
 
 
-     const txn = await properties.aggregate(transactionQeury);
+//      const txn = await properties.aggregate(transactionQeury);
 
     //  myAggregate[0].
-      // return res.status(200).json({status:"success", data: myAggregate[0]})
+      return res.status(200).json({status:"success", data: myAggregate[0]})
 
 
-      return res.status(200).json({status:"success", data: txn})
+      // return res.status(200).json({status:"success", data: txn})
 
     } catch (error) {
       next(error)
@@ -408,13 +407,10 @@ $unwind: "$transaction"
 }
 
 
-// created_date : 
-//                   {$gte:{$date:'2012-09-01T04:00:00Z'}, 
-//                   $lt:  {date:'2012-10-01T04:00:00Z'} 
-//                   }}
 exports.isPropertyCurrent = (req, res, next) => {
     req.body = {
-        "property_detail.property_overview.date.closing_date" : {$gte: new Date()},
+        // "property_detail.property_overview.date.closing_date" : {$gte: new Date()},
+        investment_status: "Pending",
         isAdminAproved : "Approved"
     }
     next()

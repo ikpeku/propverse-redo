@@ -225,13 +225,52 @@ exports.statusProperty = async (req, res, next) => {
     }
 
     delete data.user
+    // data: data
 
-    return res.status(200).json({ status: "success", data: data });
+    return res.status(200).json({ status: "success",  });
   } catch (error) {
    
     next(errorHandler(500, "updated fail"));
   }
 };
+
+
+  exports.sold = async (req, res, next) => {
+    req.body.investment_status = "Sold";
+    next();
+  };
+  
+  exports.not_sold = async (req, res, next) => {
+    req.body.investment_status = "Pending";
+    next();
+  };
+
+exports.propertyInvestmentState = async (req, res, next) => {
+  const { prodId } = req.params;
+ const {investment_status} = req.body
+
+  try {
+
+
+    const data = await Property.findByIdAndUpdate(
+        prodId,
+      {investment_status},
+      { new: true }
+    )
+
+    if (!data) {
+      return next(errorHandler(500, "updated fail"));
+    }
+
+    return res.status(200).json({ message: "success" });
+  } catch (error) {
+   
+    next(errorHandler(500, "updated fail"));
+  }
+};
+
+
+
 
 
 /**
@@ -324,7 +363,7 @@ exports.get_Current_Listed_Properties = async (req, res, next) => {
   const limit = parseInt(req?.query?.limit) || 10;
   const searchText = req?.query?.searchText;
 
-  const current_time = new Date()
+  // const current_time = new Date()
 
   const options = {
     page,
@@ -333,7 +372,7 @@ exports.get_Current_Listed_Properties = async (req, res, next) => {
 
   let query =  [
     {
-      $match: {isAdminAproved: "Approved"}
+      $match: {isAdminAproved: "Approved", investment_status: "Pending"}
     },
     {
       $lookup: {
@@ -377,9 +416,9 @@ exports.get_Current_Listed_Properties = async (req, res, next) => {
           _id: 1,
         },
       },
-{
-$match: { closing_date : {$gte:current_time}}
-},
+// {
+// $match: { closing_date : {$gte:current_time}}
+// },
     {
       $sort: {
         createdAt: -1,

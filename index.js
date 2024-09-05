@@ -30,6 +30,7 @@ const app = express();
     callback(null, corsOptions) // callback expects two parameters: error and options
   } 
 app.use(cors(corsOptionsDelegate))
+// app.options('*', cors())
 
 
 // app.use(cors(corsConfigs))

@@ -9,7 +9,10 @@ const {
   rejectProperty,
   statusProperty,
   get_Properties,
-  get_Current_Listed_Properties
+  get_Current_Listed_Properties,
+  propertyInvestmentState,
+  not_sold,
+  sold
   
 } = require("../../controller/Admin/Developers/adminDevelopers");
 
@@ -41,6 +44,21 @@ route.patch(
   approveProperty,
   statusProperty
 );
+
+route.patch(
+  "/property/sold/:prodId",
+  sold,
+  propertyInvestmentState
+);
+route.patch(
+  "/property/not_sold/:prodId",
+  not_sold,
+  propertyInvestmentState
+);
+
+
+
+
 
 route.post("/property/reject/:prodId", 
 rejectProperty,
