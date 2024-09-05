@@ -17,8 +17,12 @@ const { config } = require("dotenv");
 // const { corsConfigs } = require("./utils/corsConfig");
 const { getCurrentUser } = require("./utils/bearerToken");
 const app = express();
+var corsOptions = {
+    origin: 'http://localhost:3000',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  }
 
-app.use(cors())
+app.use(cors(corsOptions))
 
 // app.use(cors(corsConfigs))
 
@@ -42,14 +46,14 @@ app.use(jsonParser);
 
 app.use(getCurrentUser)
 
-app.use("/api/auth", Authentication)
-app.use("/api/developer", Developer)
-app.use("/api/admin", Admin)
-app.use("/api/institutional", Institutional )
-app.use("/api/non-Instititution", Non_Institutional )
-app.use("/api/file", FilesData)
-app.use("/api/sheet", Sheet)
-app.use("/api/user", General)
+app.use("/api/auth",cors(corsOptions), Authentication)
+app.use("/api/developer",cors(corsOptions), Developer)
+app.use("/api/admin",cors(corsOptions), Admin)
+app.use("/api/institutional",cors(corsOptions), Institutional )
+app.use("/api/non-Instititution",cors(corsOptions), Non_Institutional )
+app.use("/api/file", cors(corsOptions), FilesData)
+app.use("/api/sheet", cors(corsOptions),Sheet)
+app.use("/api/user", cors(corsOptions),General)
 // suspend account
 
 /**
