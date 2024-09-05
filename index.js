@@ -14,13 +14,11 @@ const Sheet = require("./routes/googlesheet/sheet")
 const General = require("./routes/general/user")
 
 const { config } = require("dotenv");
-const { corsConfigs } = require("./utils/corsConfig");
+// const { corsConfigs } = require("./utils/corsConfig");
 const { getCurrentUser } = require("./utils/bearerToken");
 const app = express();
 
-app.use(cors({
-    origin: true
-}))
+app.use(cors())
 
 // app.use(cors(corsConfigs))
 
