@@ -17,13 +17,19 @@ const { config } = require("dotenv");
 // const { corsConfigs } = require("./utils/corsConfig");
 const { getCurrentUser } = require("./utils/bearerToken");
 const app = express();
-var corsOptions = {
-    origin: 'http://localhost:3000',
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-  }
 
-  app.options('*', cors(corsOptions))
-app.use(cors(corsOptions))
+
+  var allowlist = ['http://localhost:3000', 'https://localhost:3000', "localhost:3000"]
+  var corsOptionsDelegate = function (req, callback) {
+    var corsOptions;
+    if (allowlist.indexOf(req.header('Origin')) !== -1) {
+      corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+    } else {
+      corsOptions = { origin: false } // disable CORS for this request
+    }
+    callback(null, corsOptions) // callback expects two parameters: error and options
+  } 
+app.use(cors(corsOptionsDelegate))
 
 
 // app.use(cors(corsConfigs))
@@ -48,14 +54,14 @@ app.use(jsonParser);
 
 app.use(getCurrentUser)
 
-app.use("/api/auth",cors(corsOptions), Authentication)
-app.use("/api/developer",cors(corsOptions), Developer)
-app.use("/api/admin",cors(corsOptions), Admin)
-app.use("/api/institutional",cors(corsOptions), Institutional )
-app.use("/api/non-Instititution",cors(corsOptions), Non_Institutional )
-app.use("/api/file", cors(corsOptions), FilesData)
-app.use("/api/sheet", cors(corsOptions),Sheet)
-app.use("/api/user", cors(corsOptions),General)
+app.use("/api/auth", Authentication)
+app.use("/api/developer", Developer)
+app.use("/api/admin", Admin)
+app.use("/api/institutional", Institutional )
+app.use("/api/non-Instititution", Non_Institutional )
+app.use("/api/file",  FilesData)
+app.use("/api/sheet", Sheet)
+app.use("/api/user", General)
 // suspend account
 
 /**
