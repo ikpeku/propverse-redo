@@ -18,12 +18,13 @@ const { corsConfigs } = require("./utils/corsConfig");
 const { getCurrentUser } = require("./utils/bearerToken");
 const app = express();
 
+app.use(cors({
+    origin: true
+}))
+
+// app.use(cors(corsConfigs))
+
 config({ path: "./.env" });
-
-
-// app.use(cookieParser());
-app.use(cors(corsConfigs))
-
 
 const PORT = process.env.PORT || 5000;
 
