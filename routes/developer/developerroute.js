@@ -39,12 +39,10 @@ route.get("/current/properties/", isSubmmited, isPropertyCurrent, getUserPropert
 
 // isOld,isNotSubmmited,
 
-route.post("/property/old/", isOld, isSubmmited, createProperty)
-route.post("/property/new/", isNew, isSubmmited, createProperty)
+route.post("/property/create/", isSubmmited, createProperty)
 route.patch("/property/:prodId/", updateProperty)
 
 
-route.post("/property/draft/old/", isOld, isNotSubmmited, createProperty)
-route.post("/property/draft/new/", isNew, isNotSubmmited, createProperty)
+route.post("/property/draft/",  isNotSubmmited, createProperty)
 
 module.exports = route;

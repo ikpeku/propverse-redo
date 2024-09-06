@@ -3,6 +3,7 @@ const { ObjectId } = require("mongodb");
 const Due_Deligence = require("../../model/developer/due_deligence");
 const Docs = require("../../model/developer/property_docs");
 const { errorHandler } = require("../../utils/error");
+const Project = require("../../model/developer/properties")
 
 
 
@@ -11,12 +12,20 @@ exports.get_Developer_Info = async (req, res, next) => {
     const { userId } = req.params
     
     try {
-
             let data = {}; 
             
-            data.user_info = await User.findById(userId).select("-password")
+            // data.user_info = await User.findById(userId).select("-password")
 
-            data.company_information = await Due_Deligence.findById(userId)
+
+            const due_deligence  = await Due_Deligence.findById(userId);
+
+            data.company_information = due_deligence.company_information;
+            data.verify =   due_deligence.isAdminAproved;
+
+
+            data.current_project = await Project.find({user: userId, isAdminAproved: "Approved", investment_status: "Available"}).select("property_detail investment_status")
+            data.past_project = await Project.find({user: userId, isAdminAproved: "Approved", investment_status: "Sold"}).select("property_detail investment_status")
+
        
            return res.status(200).json({status:"success", data})
             
@@ -252,7 +261,7 @@ exports.update_Due_deligence_company_profile = async (req, res, next) => {
             )
 
        
-           return res.status(200).json({status:"success", data})
+           return res.status(200).json({status:"success"})
             
         } 
 
