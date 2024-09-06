@@ -117,6 +117,7 @@ const propertiesSchema = new Schema(
             default: "",
           },
           amenities: Array,
+          useramenities: Array,
         },
       },
 
@@ -215,12 +216,11 @@ const propertiesSchema = new Schema(
           size: Number,
           number_of_bedroom: Number,
           number_of_bathroom: Number,
-          avatar: {
-            location: String,
-            originalname: String,
-            mimetype: String,
-            size: String,
-            key: String,
+          avatar: Object,
+          investment_status: {
+            type: String,
+            default: "Available",
+            enums: ["Available","Pending", "Sold"],
           },
         },
       ],
