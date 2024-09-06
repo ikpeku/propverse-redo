@@ -40,7 +40,7 @@ exports.createProperty = async (req, res, next) => {
       price: { amount, currency },
       size,
       date: { starting_date, closing_date },
-      property_description: { description, amenities },
+      property_description: { description, amenities ,useramenities},
     },
     property_images,
     special_facility,
@@ -68,7 +68,6 @@ exports.createProperty = async (req, res, next) => {
         investment_status: property_state == "new" ? "Available" : "Sold",
         // property_state,
         isDetail_lock,
-
         property_detail: {
           property_overview: {
             property_type,
@@ -88,6 +87,7 @@ exports.createProperty = async (req, res, next) => {
             property_description: {
               description,
               amenities,
+              useramenities
             },
           },
 
@@ -107,49 +107,78 @@ exports.createProperty = async (req, res, next) => {
         },
       });
     } else {
-      await properties.findByIdAndUpdate(_id, {
-        isAdminAproved: "Not Approve",
-        isSubmitted,
-        investment_status: property_state == "new" ? "Available" : "Sold",
-        isDetail_lock,
+      await properties.findByIdAndUpdate(_id, 
+        {$set:{
+        "isAdminAproved": "Not Approve",
+        ...isSubmitted && {"isSubmitted": isSubmitted},
+        ...property_state && {"investment_status": property_state == "new" ? "Available" : "Sold"},
+       ...isDetail_lock && { "isDetail_lock": isDetail_lock},
 
-        property_detail: {
-          property_overview: {
-            property_type,
-            property_name,
-            unit_number,
-            room_configuration,
-            location,
-            price: {
-              amount,
-              currency,
-            },
-            size,
-            date: {
-              starting_date,
-              closing_date,
-            },
-            property_description: {
-              description,
-              amenities,
-            },
-          },
+...property_overview?.property_type && {"property_detail.property_overview.property_type" : property_overview.property_type},
+...property_overview?.property_name && {"property_detail.property_overview.property_name" : property_overview.property_name},
+...property_overview?.unit_number && {"property_detail.property_overview.unit_number" : property_overview.unit_number},
+...property_overview?.room_configuration && {"property_detail.property_overview.room_configuration" : property_overview.room_configuration},
+...property_overview?.location && {"property_detail.property_overview.location" : property_overview.location},
+...property_overview?.price?.amount && {"property_detail.property_overview.price.amount" : property_overview.price.amount},
+...property_overview?.price?.currency && {"property_detail.property_overview.price.currency" : property_overview.price.currency},
+...property_overview.size && {"property_detail.property_overview.size" : property_overview.size},
+...property_overview?.date?.starting_date && {"property_detail.property_overview.date.starting_date" : property_overview.date.starting_date},
+...property_overview.date.closing_date && {"property_detail.property_overview.date.closing_date" : property_overview.date.closing_date},
+...property_overview?.property_description?.description && {"property_detail.property_overview.property_description.description" : property_overview.property_description.description},
+...property_overview.property_description.amenities && {"property_detail.property_overview.property_description.amenities" : property_overview.property_description.amenities},
+...property_overview.property_description.useramenities && {"property_detail.property_overview.property_description.useramenities" : property_overview.property_description.useramenities},
 
-          property_images,
+...property_images && {"property_detail.property_images": property_images},
+...special_facility && {"property_detail.special_facility": special_facility},
+...payment_plan && {"property_detail.payment_plan": payment_plan},
+...property_documents && {"property_detail.property_documents": property_documents},
+...property_location?.country && {"property_detail.property_location.country": property_location.country},
+...property_location?.state && {"property_detail.property_location.state": property_location.state},
+...property_location?.city && {"property_detail.property_location.city": property_location.city},
+...property_location?.address && {"property_detail.property_location.address": property_location.address},
+...property_units && {"property_detail.property_units": property_units},
 
-          special_facility,
-          payment_plan,
-          property_documents,
-          property_location: {
-            country,
-            state,
-            city,
-            address,
-          },
 
-          property_units,
-        },
-      });
+
+        // property_detail: {
+        //   property_overview: {
+        //     property_type,
+        //     property_name,
+        //     unit_number,
+        //     room_configuration,
+        //     location,
+        //     price: {
+        //       amount,
+        //       currency,
+        //     },
+        //     size,
+        //     date: {
+        //       starting_date,
+        //       closing_date,
+        //     },
+        //     property_description: {
+        //       description,
+        //       amenities,
+        //     },
+        //   },
+
+        //   property_images,
+
+        //   special_facility,
+        //   payment_plan,
+        //   property_documents,
+        //   property_location: {
+        //     country,
+        //     state,
+        //     city,
+        //     address,
+        //   },
+
+        //   property_units,
+        // },
+      }
+    }
+    );
     }
 
     return res.status(200).json({ status: "success" });

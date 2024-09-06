@@ -57,13 +57,13 @@ const propertiesSchema = new Schema(
       property_overview: {
         //   avatar: {
         //     type: [
-        //       {
-        //         location: String,
-        //         originalname: String,
-        //         mimetype: String,
-        //         size: String,
-        //         key: String,
-        //       },
+              // {
+              //   location: String,
+              //   originalname: String,
+              //   mimetype: String,
+              //   size: String,
+              //   key: String,
+              // },
         //     ],
         //   },
         property_type: {
