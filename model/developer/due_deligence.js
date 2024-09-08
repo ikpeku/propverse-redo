@@ -43,6 +43,13 @@ const developer_due_deligence_Schema = new Schema(
       },
       logo: {
         type: Object,
+        default: {
+          location: String,
+          originalname: String,
+          mimetype: String,
+          size: String,
+          key: String,
+        }
       },
       about: {
         type: String,
@@ -50,183 +57,190 @@ const developer_due_deligence_Schema = new Schema(
       },
       cover_image: {
         type: Object,
+        default: {
+          location: String,
+          originalname: String,
+          mimetype: String,
+          size: String,
+          key: String,
+        }
       },
     },
 
-    // projects: {
-    //   previous_project_1: {
-    //     name: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     location: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     type: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     cost: {
-    //       amount: {
-    //         type: String,
-    //         default: "",
-    //       },
-    //       currency: {
-    //         type: String,
-    //         default: "",
-    //       },
-    //     },
+    projects: {
+      previous_project_1: {
+        name: {
+          type: String,
+          default: "",
+        },
+        location: {
+          type: String,
+          default: "",
+        },
+        type: {
+          type: String,
+          default: "",
+        },
+        cost: {
+          amount: {
+            type: String,
+            default: "",
+          },
+          currency: {
+            type: String,
+            default: "",
+          },
+        },
 
-    //     documents: [
-    //       {
-    //         location: String,
-    //         originalname: String,
-    //         mimetype: String,
-    //         size: String,
-    //         key: String,
-    //       },
-    //     ],
-    //     // partner: partnerSchema
-    //     project_partners: {
-    //       partner_1: {
-    //         name: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //         contact: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //       },
-    //       partner_2: {
-    //         name: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //         contact: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //       },
-    //     },
-    //   },
-    //   previous_project_2: {
-    //     name: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     location: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     type: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     cost: {
-    //       amount: {
-    //         type: String,
-    //         default: "",
-    //       },
-    //       currency: {
-    //         type: String,
-    //         default: "",
-    //       },
-    //     },
-    //     documents: [
-    //       {
-    //         location: String,
-    //         originalname: String,
-    //         mimetype: String,
-    //         size: String,
-    //         key: String,
-    //       },
-    //     ],
-    //     // partner: partnerSchema
-    //     project_partners: {
-    //       partner_1: {
-    //         name: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //         contact: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //       },
-    //       partner_2: {
-    //         name: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //         contact: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //       },
-    //     },
-    //   },
-    //   previous_project_3: {
-    //     name: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     location: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     type: {
-    //       type: String,
-    //       default: "",
-    //     },
-    //     cost: {
-    //       amount: {
-    //         type: String,
-    //         default: "",
-    //       },
-    //       currency: {
-    //         type: String,
-    //         default: "",
-    //       },
-    //     },
-    //     documents: [
-    //       {
-    //         location: String,
-    //         originalname: String,
-    //         mimetype: String,
-    //         size: String,
-    //         key: String,
-    //       },
-    //     ],
-    //     // partner: partnerSchema
-    //     project_partners: {
-    //       partner_1: {
-    //         name: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //         contact: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //       },
-    //       partner_2: {
-    //         name: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //         contact: {
-    //           type: String,
-    //           default: "",
-    //         },
-    //       },
-    //     },
-    //   },
-    // },
-    projects:{
-      
+        documents: [
+          {
+            location: String,
+            originalname: String,
+            mimetype: String,
+            size: String,
+            key: String,
+          },
+        ],
+        // partner: partnerSchema
+        project_partners: {
+          partner_1: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+          partner_2: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+        },
+      },
+      previous_project_2: {
+        name: {
+          type: String,
+          default: "",
+        },
+        location: {
+          type: String,
+          default: "",
+        },
+        type: {
+          type: String,
+          default: "",
+        },
+        cost: {
+          amount: {
+            type: String,
+            default: "",
+          },
+          currency: {
+            type: String,
+            default: "",
+          },
+        },
+        documents: [
+          {
+            location: String,
+            originalname: String,
+            mimetype: String,
+            size: String,
+            key: String,
+          },
+        ],
+        // partner: partnerSchema
+        project_partners: {
+          partner_1: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+          partner_2: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+        },
+      },
+      previous_project_3: {
+        name: {
+          type: String,
+          default: "",
+        },
+        location: {
+          type: String,
+          default: "",
+        },
+        type: {
+          type: String,
+          default: "",
+        },
+        cost: {
+          amount: {
+            type: String,
+            default: "",
+          },
+          currency: {
+            type: String,
+            default: "",
+          },
+        },
+        documents: [
+          {
+            location: String,
+            originalname: String,
+            mimetype: String,
+            size: String,
+            key: String,
+          },
+        ],
+        // partner: partnerSchema
+        project_partners: {
+          partner_1: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+          partner_2: {
+            name: {
+              type: String,
+              default: "",
+            },
+            contact: {
+              type: String,
+              default: "",
+            },
+          },
+        },
+      },
     },
+    // projects:{
+      
+    // },
 
     financials: {
       Current_Company_Valuation: {

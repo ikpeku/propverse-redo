@@ -58,11 +58,11 @@ const propertiesSchema = new Schema(
         //   avatar: {
         //     type: [
               // {
-              //   location: String,
-              //   originalname: String,
-              //   mimetype: String,
-              //   size: String,
-              //   key: String,
+                // location: String,
+                // originalname: String,
+                // mimetype: String,
+                // size: String,
+                // key: String,
               // },
         //     ],
         //   },
