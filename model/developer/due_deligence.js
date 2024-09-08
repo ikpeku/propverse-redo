@@ -42,8 +42,6 @@ const developer_due_deligence_Schema = new Schema(
         default: "",
       },
       logo: {
-        type: Object,
-        default: {
           location: {
             type: String,
             default: ""
@@ -64,37 +62,33 @@ const developer_due_deligence_Schema = new Schema(
             type: String,
             default: ""
           },
-        }
-      },
+        },
       about: {
         type: String,
         default: "",
       },
       cover_image: {
-        type: Object,
-        default: {
-          location: {
-            type: String,
-            default: ""
-          },
-          originalname: {
-            type: String,
-            default: ""
-          },
-          mimetype: {
-            type: String,
-            default: ""
-          },
-          size: {
-            type: String,
-            default: ""
-          },
-          key: {
-            type: String,
-            default: ""
-          },
-        }
-      },
+        location: {
+          type: String,
+          default: ""
+        },
+        originalname: {
+          type: String,
+          default: ""
+        },
+        mimetype: {
+          type: String,
+          default: ""
+        },
+        size: {
+          type: String,
+          default: ""
+        },
+        key: {
+          type: String,
+          default: ""
+        },
+      }
     },
 
     projects: {
