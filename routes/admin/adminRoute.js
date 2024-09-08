@@ -17,7 +17,7 @@ const {
 } = require("../../controller/Admin/Developers/adminDevelopers");
 
 
-const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance} = require("../../controller/Admin/Non_Institutional/non_institutional");
+const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance, get_All_Funds_Investors} = require("../../controller/Admin/Non_Institutional/non_institutional");
 const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayIn} = require("../../controller/Admin/GeneralAdmin");
 const route = express.Router();
 
@@ -108,7 +108,10 @@ route.patch("/transaction/:type/:txnId", VerifyPayIn)
 
 
 
-
+/**
+ * funds
+ */
+route.get("/funds/unlimited", get_All_Funds_Investors)
 
 
 module.exports = route;

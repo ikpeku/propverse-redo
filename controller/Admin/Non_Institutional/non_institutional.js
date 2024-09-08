@@ -759,7 +759,162 @@ exports.get_user_Compliance = async (req, res, next) => {
 
 
 
+/**
+ * for funding
+ */
 
+exports.get_All_Funds_Investors = async (req, res, next) => {
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+  const country = req?.query?.country;
+  const status = req?.query?.status;
+  const name = req?.query?.name;
+
+
+  const options = {
+    page,
+    limit,
+  };
+
+
+
+  let query =  [
+      {
+         $lookup: {
+              from: "users",
+              localField: "user",
+              foreignField: "_id",
+              as: "user",
+            },
+          },
+          {
+            $unwind: "$user"
+          }
+      // {
+      //    $lookup: {
+      //         from: "transactions",
+      //         localField: "transactions",
+      //         foreignField: "_id",
+      //         as: "property_invested",
+      //       },
+      //     },
+          
+
+      //     {
+      //       $addFields:{
+      //         amount_invested: {
+      //          "$sum": { $sum: "$property_invested.paid.amount"}
+      //         }
+      //       }
+      //     },
+
+          // {
+          //   $addFields: {
+          //     filerItem : {
+          //      "$arrayElemAt": [ { "$filter" : {
+          //         "input" : "$property_invested" ,
+          //         "cond" : { "$eq" : [ "status", "Failed" ] }
+          //       } } , 0 ]
+          //     }
+          //   }
+          // },
+      // {
+      //    $lookup: {
+      //         from: "accreditations",
+      //         localField: "accreditation",
+      //         foreignField: "_id",
+      //         as: "accreditation",
+      //       },
+      //     },
+      //     {
+      //       $addFields: {
+      //         user_detail: {
+      //           $arrayElemAt: ["$user", 0],
+      //         },
+      //       },
+      //     },
+      //     {
+      //       $addFields: {
+      //         accreditation_status: {
+      //           $arrayElemAt: ["$accreditation", 0],
+      //         },
+      //       },
+      //     },
+    ]
+
+    query.push(
+
+      // {
+      //     $project: {
+      //       username: "$user_detail.username",
+      //       country:"$user_detail.country",
+      //       email:"$user_detail.email",
+      //       createdAt:"$user_detail.createdAt",
+      //       status: "$accreditation_status.status" == "verified" ? "Accredited" : "$accreditation_status.status",
+      //       _id: 1,
+      //        amount_invested: 1,
+            
+      //     },
+      //   },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+    )
+
+
+    if(searchText){
+
+      query.push({
+        $match: {
+          $or: [
+            { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { email: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            { status: searchText},
+            { amount_invested: { $regex: ".*" + searchText + ".*", $options: "i" } },
+          ]
+        }
+      })
+
+      
+    }
+    
+    if(country){
+      query.push({
+        $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
+      })
+    }
+    if(status){
+      query.push({
+        $match: {status}
+      })
+    }
+    if(name){
+      query.push({
+        $match: {username: { $regex: name, $options: "i" } }
+      })
+    }
+
+
+  try {
+    const myAggregate = Non_Institiutional_Investor.aggregate(query);
+
+    const paginationResult = await Non_Institiutional_Investor.aggregatePaginate(
+      myAggregate,
+      options
+    );
+
+    return res.status(200).json({ status: "success", data: paginationResult });
+  } catch (error) {
+    // next(errorHandler(500, "network error"));
+    next(errorHandler(500,error));
+    
+  }
+}
 
 
 

@@ -22,7 +22,7 @@ const non_Institutional_Schema = new Schema({
       properties: [{
         // type: SchemaTypes.ObjectId,
         type: String,
-        ref: "fund",
+        ref: "properties",
       }
       ],
       funds: [{
