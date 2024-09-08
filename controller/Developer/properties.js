@@ -31,22 +31,26 @@ exports.createProperty = async (req, res, next) => {
     isSubmitted,
     isDetail_lock,
 
-    property_overview: {
-      property_type,
-      property_name,
-      unit_number,
-      room_configuration,
-      location,
-      price: { amount, currency },
-      size,
-      date: { starting_date, closing_date },
-      property_description: { description, amenities ,useramenities},
-    },
+    property_overview
+    // : {
+    //   property_type,
+    //   property_name,
+    //   unit_number,
+    //   room_configuration,
+    //   location,
+    //   price: { amount, currency },
+    //   size,
+    //   date: { starting_date, closing_date },
+    //   property_description: { description, amenities ,useramenities},
+    // }
+    ,
     property_images,
     special_facility,
     payment_plan,
     property_documents,
-    property_location: { country, state, city, address },
+    property_location
+    // : { country, state, city, address }
+    ,
     property_units,
   } = req.body;
 
@@ -57,6 +61,8 @@ exports.createProperty = async (req, res, next) => {
 
   try {
     const response = await properties.findById(_id);
+
+    // console.log(response)
 
     if (!response) {
       await properties.create({
@@ -132,10 +138,10 @@ exports.createProperty = async (req, res, next) => {
 ...special_facility && {"property_detail.special_facility": special_facility},
 ...payment_plan && {"property_detail.payment_plan": payment_plan},
 ...property_documents && {"property_detail.property_documents": property_documents},
-...property_location?.country && {"property_detail.property_location.country": property_location.country},
-...property_location?.state && {"property_detail.property_location.state": property_location.state},
-...property_location?.city && {"property_detail.property_location.city": property_location.city},
-...property_location?.address && {"property_detail.property_location.address": property_location.address},
+// ...property_location?.country && {"property_detail.property_location.country": property_location.country},
+// ...property_location?.state && {"property_detail.property_location.state": property_location.state},
+// ...property_location?.city && {"property_detail.property_location.city": property_location.city},
+// ...property_location?.address && {"property_detail.property_location.address": property_location.address},
 ...property_units && {"property_detail.property_units": property_units},
 
 
