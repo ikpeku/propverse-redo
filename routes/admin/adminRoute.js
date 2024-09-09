@@ -19,6 +19,7 @@ const {
 
 const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance, get_All_Funds_Investors} = require("../../controller/Admin/Non_Institutional/non_institutional");
 const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayIn} = require("../../controller/Admin/GeneralAdmin");
+const { FundsManagement ,currentListed, fundsListedApproval, statusFund, approveFund, rejectFund, pauseFund, unPauseFund} = require("../../controller/Admin/Institutional/funds");
 const route = express.Router();
 
 /**
@@ -107,11 +108,39 @@ route.patch("/compliance/reject/:userId", (req,res,next) => {
 route.patch("/transaction/:type/:txnId", VerifyPayIn)
 
 
-
+// institional investor
 /**
  * funds
  */
 route.get("/funds/unlimited", get_All_Funds_Investors)
+
+route.get("/institutional/approval",fundsListedApproval, FundsManagement)
+route.get("/institutional/currentlisted",currentListed, FundsManagement)
+
+route.patch("/fund/pause/:fundId", 
+  pauseFund,
+  statusFund);
+
+route.patch(
+    "/fund/resume/:fundId",
+    unPauseFund,
+    statusFund
+);
+
+route.patch("/fund/reject/:fundId", 
+  rejectFund,
+  pauseFund,
+  statusFund);
+
+route.patch(
+    "/fund/approve/:fundId",
+    approveFund,
+    statusFund
+);
+
+
+
+// 
 
 
 module.exports = route;

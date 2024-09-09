@@ -1,21 +1,31 @@
 const mongoose = require('mongoose');
-const { model, Schema, SchemaTypes } = mongoose;
+const { model, Schema } = mongoose;
+const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 
 const fundSchema = new Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'user',
     },
     investments: [{
-      type: SchemaTypes.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "transaction",
     }],
+    isAdmin_Approved:{
+      type: String,
+      default: "pending",
+      enum: ["rejected", "pending", "approved"]
+    },
+    funding_state:{
+      type: String,
+      default: "Ongoing",
+      enum: ["Ongoing", "Pause", "Ended"]
+    },
     name: {
       type: String,
       required: [true, 'Please enter the name of the fund'],
     },
-
     description: {
       type: String,
       required: [true, 'Please enter the name of the fund'],
@@ -318,8 +328,10 @@ const fundSchema = new Schema(
 );
 
 fundSchema.post('find', function (docs, next) {
-  console.log(`${docs.length} funds were found`);
+  // console.log(`${docs.length} funds were found`);
   next();
 });
 
+
+fundSchema.plugin(aggregatePaginate);
 module.exports = model('fund', fundSchema);

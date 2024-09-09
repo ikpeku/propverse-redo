@@ -138,7 +138,7 @@ exports.statusDueDeligence = async (req, res, next) => {
   const { isAdminAproved, rejection_reason } = req.body;
 
   try {
-    // console.log(userId, isAdminAproved)
+
 
     const data = await Due_Deligence.findByIdAndUpdate(
       userId,

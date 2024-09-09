@@ -1,9 +1,6 @@
 const { errorHandler } = require('../../utils/error');
 
 exports.checkInstitutionalUser = (req, res, next) => {
-  // const { userId, status } = req.payload;
-
-  console.log("payload: ",req.payload)
 
   const status = req?.payload?.status
   const userId = req?.payload?.userId

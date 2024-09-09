@@ -17,14 +17,9 @@ const transporter = nodemailer.createTransport({
 });
 
 
-transporter.verify((error, success) => {
-    if (error) {
-        // console.log(error)
-    } else {
-        // console.log("success: ready to send message")
-        // console.log(success)
-    }
-})
+// transporter.verify((error, success) => {
+  
+// })
 
 
 

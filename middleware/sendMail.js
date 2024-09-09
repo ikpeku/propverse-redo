@@ -20,14 +20,9 @@ const transporter = nodemailer.createTransport({
   tls: { rejectUnauthorized: true },
 });
 
-transporter.verify((error, success) => {
-  if (error) {
-    // console.log(error)
-  } else {
-    // console.log("success: ready to send message")
-    // console.log(success)
-  }
-});
+// transporter.verify((error, success) => {
+
+// });
 
 exports.sendSignUpVerifyEmail = async (
   { _id, email, username },

@@ -662,7 +662,6 @@ exports.get_Transactions = async (req, res, next) => {
       })
     }
 
-    // console.log(req.payload)
 
      query.push(
      
