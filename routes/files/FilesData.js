@@ -52,7 +52,8 @@ route.post(
   upload.any("file"),
   async function (req, res, next) {
     const { userId } = req.params;
-    if (userId !== req?.user?.userId)
+   
+    if (userId !== req?.payload?.userId)
       next(errorHandler(403, "route forbidden"));
 
     const response = await req?.files.map((file) => {
@@ -80,7 +81,7 @@ route.get(
   "/list/:userId",
   async (req, res) => {
     const { userId } = req.params;
-    if (userId !== req?.user?.userId)
+    if (userId !== req?.payload?.userId)
       next(errorHandler(403, "route forbidden"));
     try {
       let r = await s3.send(new ListObjectsCommand({ Bucket: BUCKET_NAME }));
