@@ -46,6 +46,10 @@ const institutionalUserSchema = new Schema({
     type: Boolean,
     default: false,
   },
+
+
+
+  
 });
 
 const InstitutionalUser = mongoose.model(

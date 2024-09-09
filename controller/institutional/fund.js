@@ -36,13 +36,46 @@ exports.createFund = async (req, res) => {
 };
 
 exports.getAllFunds = async (req, res) => {
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+  const country = req?.query?.country;
+  const status = req?.query?.status;
+  const name = req?.query?.name;
+
+
+  const myCustomLabels = {
+    docs: 'data',
+  };
+
+  const options = {
+    page,
+    limit,
+    customLabels: myCustomLabels
+  };
+  
   try {
-    const allFunds = await Fund.find();
+    const allFunds = Fund.aggregate([
+      {
+        $match: {isAdmin_Approved: "approved", funding_state: "Ongoing"}
+      },
+      {
+        $sort: {
+          updatedAt: -1
+        }
+      }
+    ]);
+
+    const paginationResult = await Fund.aggregatePaginate(
+      allFunds,
+      options
+    );
 
     res.status(200).json({
       success: true,
       count: allFunds.length,
-      data: allFunds,
+       ...paginationResult,
     });
   } catch (error) {
     res.status(500).json({
@@ -51,6 +84,8 @@ exports.getAllFunds = async (req, res) => {
       message: error.message,
     });
   }
+
+
 };
 
 exports.getSingleFund = async (req, res) => {
