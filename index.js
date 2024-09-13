@@ -14,7 +14,7 @@ const Sheet = require("./routes/googlesheet/sheet")
 const General = require("./routes/general/user")
 
 const { config } = require("dotenv");
-const { corsConfigs } = require("./utils/corsConfig");
+// const { corsConfigs } = require("./utils/corsConfig");
 const { getCurrentUser } = require("./utils/bearerToken");
 const app = express();
 
@@ -30,10 +30,18 @@ const app = express();
 //     callback(null, corsOptions) // callback expects two parameters: error and options
 //   } 
 // app.use(cors(corsOptionsDelegate))
-// app.options('*', cors())
+app.options('*', cors())
 
 
-app.use(cors(corsConfigs))
+// app.use(cors(corsConfigs))
+
+
+const corsOptions = {
+  credentials: true,
+  origin: ['http://localhost:3000', 'http://localhost:80'] // Whitelist the domains you want to allow
+};
+
+app.use(cors(corsOptions)); 
 
 config({ path: "./.env" });
 
@@ -55,14 +63,14 @@ app.use(jsonParser);
 
 app.use(getCurrentUser)
 
-app.use("/api/auth", Authentication)
-app.use("/api/developer", Developer)
-app.use("/api/admin", Admin)
-app.use("/api/institutional", Institutional )
-app.use("/api/non-Instititution", Non_Institutional )
-app.use("/api/file",  FilesData)
-app.use("/api/sheet", Sheet)
-app.use("/api/user", General)
+app.use("/api/auth", cors(corsOptions), Authentication)
+app.use("/api/developer", cors(corsOptions), Developer)
+app.use("/api/admin",cors(corsOptions), Admin)
+app.use("/api/institutional", cors(corsOptions), Institutional )
+app.use("/api/non-Instititution",cors(corsOptions), Non_Institutional )
+app.use("/api/file", cors(corsOptions), FilesData)
+app.use("/api/sheet", cors(corsOptions), Sheet)
+app.use("/api/user", cors(corsOptions), General)
 // suspend account
 
 /**
