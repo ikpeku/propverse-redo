@@ -1,6 +1,7 @@
 const { ObjectId } = require("mongodb");
 const properties = require("../../model/developer/properties");
 const { errorHandler } = require("../../utils/error");
+const Due_Deligence = require("../../model/developer/due_deligence");
 
 exports.isSubmmited = (req, res, next) => {
   req.body.isSubmitted = true;
@@ -223,6 +224,8 @@ exports.updateProperty = async (req, res, next) => {
 exports.getPropertyById = async (req, res, next) => {
   const { prodId } = req.params;
 
+  console.log("getPropertyById")
+
   try {
     let query = [
       {
@@ -278,6 +281,20 @@ exports.getPropertyById = async (req, res, next) => {
     ];
 
     const myAggregate = await properties.aggregate(query);
+
+
+    const project  = await properties.findById(prodId);
+
+
+    const due_deligence  = await Due_Deligence.findById(project.user);
+
+    myAggregate[0].company_information = due_deligence?.company_information;
+    myAggregate[0].verify =   due_deligence?.isAdminAproved;
+
+
+    // myAggregate[0].current_project = await Project.find({user: userId, isAdminAproved: "Approved", investment_status: "Available"}).select("property_detail investment_status")
+   const past_project = await properties.find({user: project.user, isAdminAproved: "Approved", investment_status: "Sold"}).select("property_detail investment_status")
+   myAggregate[0].pastProject  = past_project.length;
 
     //       let transactionQeury = [
     //         {

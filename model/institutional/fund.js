@@ -29,11 +29,11 @@ const fundSchema = new Schema(
     },
     name: {
       type: String,
-      required: [true, 'Please enter the name of the fund'],
+      // required: [true, 'Please enter the name of the fund'],
     },
     description: {
       type: String,
-      required: [true, 'Please enter the name of the fund'],
+      // required: [true, 'Please enter the name of the fund'],
     },
 
     thumbnails: {
@@ -74,20 +74,20 @@ const fundSchema = new Schema(
       type: [String],
       enum: ['residential', 'industrial', 'commercial'],
       default: [],
-      require: [true, 'Select at least one property type'],
+      // require: [true, 'Select at least one property type'],
     },
 
     investment_structure: {
       type: String,
       enum: ['opportunistic', 'reit'],
       default: 'opportunistic',
-      required: [true, 'Select Investment structure'],
+      // required: [true, 'Select Investment structure'],
     },
 
     location: {
       type: String,
       default: 'enter location',
-      required: true,
+      // required: true,
     },
 
     raise_goal:  {
@@ -116,34 +116,34 @@ const fundSchema = new Schema(
       type: Number,
       enum: [2, 3],
       default: 1,
-      require: [true, 'Select Mininmum Hold Period'],
+      // require: [true, 'Select Mininmum Hold Period'],
     },
 
     distribution_period: {
       type: String,
       enum: ['Annually', 'Bi-Annually'],
       default: 'Annually',
-      require: [true, 'Select Distribution'],
+      // require: [true, 'Select Distribution'],
     },
 
     number_of_investors: {
       type: Number,
-      required: true,
+      // required: true,
     },
 
     loan_to_cost: {
       type: Number,
-      required: true,
+      // required: true,
     },
 
     annual_yield: {
       type: Number,
-      required: true,
+      // required: true,
     },
 
     deadline: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     // Fund Pitch
@@ -188,49 +188,49 @@ const fundSchema = new Schema(
 
     name_of_current_fund_investment: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     key_fund_highlights: {
       type: [String],
       default: [],
-      required: true,
+      // required: true,
     },
 
     investment_strategy: {
       type: [String],
       default: [],
-      required: true,
+      // required: true,
     },
 
     //   FUNDS TERMS
     fund_terms: {
       type: [String],
       default: [],
-      required: true,
+      // required: true,
     },
 
     primary_target_market: {
       type: [String],
       default: [],
-      required: true,
+      // required: true,
     },
 
     distribution_and_fees: {
       type: [String],
       default: [],
-      required: true,
+      // required: true,
     },
 
     closing: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     reporting: {
       type: [String],
       default: [],
-      required: true,
+      // required: true,
     },
 
     // Fund Investment Team
@@ -242,11 +242,11 @@ const fundSchema = new Schema(
         properties: {
           name_of_team_member: {
             type: String,
-            required: true,
+            // required: true,
           },
           position_of_team_member: {
             type: String,
-            required: true,
+            // required: true,
           },
           image_of_team_member: {
             type: Object,
