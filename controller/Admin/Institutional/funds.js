@@ -32,6 +32,9 @@ exports.FundsManagement = async (req, res, next) => {
 
   let query = [
     {
+      $match: {isSubmitted: true}
+    },
+    {
       $lookup: {
         from: "users",
         localField: "user",
@@ -49,55 +52,6 @@ exports.FundsManagement = async (req, res, next) => {
               },
             }
 
-    // {
-    //    $lookup: {
-    //         from: "transactions",
-    //         localField: "transactions",
-    //         foreignField: "_id",
-    //         as: "property_invested",
-    //       },
-    //     },
-
-    //     {
-    //       $addFields:{
-    //         amount_invested: {
-    //          "$sum": { $sum: "$property_invested.paid.amount"}
-    //         }
-    //       }
-    //     },
-
-    //     {
-    //       $addFields: {
-    //         filerItem : {
-    //          "$arrayElemAt": [ { "$filter" : {
-    //             "input" : "$property_invested" ,
-    //             "cond" : { "$eq" : [ "status", "Failed" ] }
-    //           } } , 0 ]
-    //         }
-    //       }
-    //     },
-    // {
-    //    $lookup: {
-    //         from: "accreditations",
-    //         localField: "accreditation",
-    //         foreignField: "_id",
-    //         as: "accreditation",
-    //       },
-    //     },
-    //     {
-    //       $addFields: {
-    //         user_detail: {
-    //           $arrayElemAt: ["$user", 0],
-    //         },
-    //       },
-    //     },
-    //     {
-    //       $addFields: {
-    //         accreditation_status: {
-    //           $arrayElemAt: ["$accreditation", 0],
-    //         },
-    //       },
-    //     },
   ];
 
   if (fundType == "fundsListedApproval") {
@@ -147,27 +101,6 @@ exports.FundsManagement = async (req, res, next) => {
   }
 
 
-
-
-//   query.push(
-//     // {
-//     //     $project: {
-//     //       username: "$user_detail.username",
-//     //       country:"$user_detail.country",
-//     //       email:"$user_detail.email",
-//     //       createdAt:"$user_detail.createdAt",
-//     //       status: "$accreditation_status.status" == "verified" ? "Accredited" : "$accreditation_status.status",
-//     //       _id: 1,
-//     //        amount_invested: 1,
-
-//     //     },
-//     //   },
-//     {
-//       $sort: {
-//         createdAt: -1,
-//       },
-//     }
-//   );
 
   if (searchText) {
     query.push({

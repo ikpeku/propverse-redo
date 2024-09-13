@@ -77,7 +77,6 @@ description,
 
     const FundItem = await Fund.findById(fundId)
 
-    console.log("fundItem: ", FundItem)
 
     if(!FundItem) {
       const newFund = new Fund({
