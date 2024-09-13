@@ -114,8 +114,8 @@ const fundSchema = new Schema(
 
     mininmum_hold_period: {
       type: Number,
-      enum: [2, 3],
-      default: 1,
+      // enum: [2, 3],
+      // default: 1,
       // require: [true, 'Select Mininmum Hold Period'],
     },
 
