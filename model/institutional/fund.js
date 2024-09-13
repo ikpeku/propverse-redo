@@ -4,6 +4,7 @@ const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 
 const fundSchema = new Schema(
   {
+    _id: String,
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',
@@ -12,6 +13,10 @@ const fundSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "transaction",
     }],
+    isSubmitted: {
+      type: Boolean,
+      default: false,
+    },
     isAdmin_Approved:{
       type: String,
       default: "pending",
