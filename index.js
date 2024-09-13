@@ -14,26 +14,26 @@ const Sheet = require("./routes/googlesheet/sheet")
 const General = require("./routes/general/user")
 
 const { config } = require("dotenv");
-// const { corsConfigs } = require("./utils/corsConfig");
+const { corsConfigs } = require("./utils/corsConfig");
 const { getCurrentUser } = require("./utils/bearerToken");
 const app = express();
 
 
-  var allowlist = ['http://localhost:3000', 'https://localhost:3000', "localhost:3000"]
-  var corsOptionsDelegate = function (req, callback) {
-    var corsOptions;
-    if (allowlist.indexOf(req.header('Origin')) !== -1) {
-      corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-    } else {
-      corsOptions = { origin: false } // disable CORS for this request
-    }
-    callback(null, corsOptions) // callback expects two parameters: error and options
-  } 
-app.use(cors(corsOptionsDelegate))
+//   var allowlist = ['http://localhost:3000', 'https://localhost:3000', "localhost:3000"]
+//   var corsOptionsDelegate = function (req, callback) {
+//     var corsOptions;
+//     if (allowlist.indexOf(req.header('Origin')) !== -1) {
+//       corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+//     } else {
+//       corsOptions = { origin: false } // disable CORS for this request
+//     }
+//     callback(null, corsOptions) // callback expects two parameters: error and options
+//   } 
+// app.use(cors(corsOptionsDelegate))
 // app.options('*', cors())
 
 
-// app.use(cors(corsConfigs))
+app.use(cors(corsConfigs))
 
 config({ path: "./.env" });
 
