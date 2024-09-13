@@ -77,7 +77,7 @@ exports.get_All_Institutional = async (req, res, next) => {
           },
           {
             $sort: {
-              createdAt: -1,
+                updatedAt: -1,
             },
           },
 
@@ -191,7 +191,7 @@ exports.get_Institutional = async (req, res, next) => {
           },
           {
             $sort: {
-              createdAt: -1,
+              updatedAt: -1,
             },
           },
 
@@ -201,12 +201,25 @@ exports.get_Institutional = async (req, res, next) => {
 
     try {
 
-        const OngoingFund = await Funds.find({funding_state : "Ongoing"})
+
+        const OngoingFund = await Funds.aggregate([
+            {
+$match: {user:  new ObjectId(userId), funding_state: "Ongoing", isAdmin_Approved: "approved"}
+
+            },
+
+                      {
+            $sort: {
+              updatedAt: -1,
+            },
+          },
+        ])
         const isVerify = await Kyc.findById(userId).select("isApproved")
       const data = await InstitutionalUser.aggregate(query);
 
 
       return res.status(200).json({ ...data[0],isVerify:isVerify?.isApproved ,OngoingFund });
+  
 
 
     } catch (error) {
