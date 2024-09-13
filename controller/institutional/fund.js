@@ -76,14 +76,14 @@ description,
 
 
     const FundItem = await Fund.findById(fundId)
-
+       
 
     if(!FundItem) {
       const newFund = new Fund({
         _id: fundId,
       //  ...req.body,
        user: req.payload.userId,
-       ...isSubmitted,
+       ...isSubmitted && {isSubmitted},
        ...name && {name},
        ...description && {description},
            ...thumbnails && {thumbnails},
@@ -131,10 +131,10 @@ description,
      });
 
     } else {
-       
+
      // Save the fund
      const savedFund = await Fund.findByIdAndUpdate(fundId, {$set: {
-      ...isSubmitted,
+      ...isSubmitted && {isSubmitted},
       ...name && {name},
       ...description && {description},
           ...thumbnails && {thumbnails},
