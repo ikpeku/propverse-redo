@@ -1,5 +1,5 @@
 const Funds = require("../../../model/institutional/fund");
-const { ObjectId } = require("mongodb");
+
 const { errorHandler } = require("../../../utils/error");
 const { mailerController } = require("../../../utils/mailer");
 const { GeneralMailOption } = require("../../../middleware/sendMail");

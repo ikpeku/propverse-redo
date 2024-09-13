@@ -20,6 +20,7 @@ const {
 const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance, get_All_Funds_Investors} = require("../../controller/Admin/Non_Institutional/non_institutional");
 const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayIn} = require("../../controller/Admin/GeneralAdmin");
 const { FundsManagement ,currentListed, fundsListedApproval, statusFund, approveFund, rejectFund, pauseFund, unPauseFund} = require("../../controller/Admin/Institutional/funds");
+const { get_All_Institutional, get_Institutional } = require("../../controller/Admin/Institutional/institutional");
 const route = express.Router();
 
 /**
@@ -116,6 +117,9 @@ route.get("/funds/unlimited", get_All_Funds_Investors)
 
 route.get("/institutional/approval",fundsListedApproval, FundsManagement)
 route.get("/institutional/currentlisted",currentListed, FundsManagement)
+
+route.get("/institutional/managers", get_All_Institutional)
+route.get("/institutional/manager/:userId", get_Institutional)
 
 route.patch("/fund/pause/:fundId", 
   pauseFund,

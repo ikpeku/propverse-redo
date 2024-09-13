@@ -1,5 +1,6 @@
 const Fund = require('../../model/institutional/fund');
-const InstitutionalUser = require('../../model/institutional/primaryContactDetails')
+const InstitutionalUser = require('../../model/institutional/primaryContactDetails');
+const { errorHandler } = require('../../utils/error');
 
 exports.createFund = async (req, res) => {
   try {
@@ -78,11 +79,7 @@ exports.getAllFunds = async (req, res) => {
        ...paginationResult,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Server Error',
-      message: error.message,
-    });
+    next(errorHandler(500, "server error"));
   }
 
 
@@ -105,14 +102,8 @@ exports.getSingleFund = async (req, res) => {
     });
   } catch (error) {
     if (error.name === 'CastError') {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid Fund ID',
-      });
+      return next(errorHandler(400, "Invalid Fund ID"));
     }
-    res.status(500).json({
-      success: false,
-      error: 'Server Error',
-    });
+    next(errorHandler(500, "Server Error"));
   }
 };

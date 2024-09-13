@@ -14,13 +14,13 @@ exports.get_Developer_Info = async (req, res, next) => {
     try {
             let data = {}; 
             
-            // data.user_info = await User.findById(userId).select("-password")
+            data.user_info = await User.findById(userId).select("-password -payout_account -referral")
 
 
             const due_deligence  = await Due_Deligence.findById(userId);
 
-            data.company_information = due_deligence.company_information;
-            data.verify =   due_deligence.isAdminAproved;
+            data.company_information = due_deligence?.company_information;
+            data.verify =   due_deligence?.isAdminAproved;
 
 
             data.current_project = await Project.find({user: userId, isAdminAproved: "Approved", investment_status: "Available"}).select("property_detail investment_status")
