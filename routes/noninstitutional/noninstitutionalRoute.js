@@ -5,7 +5,7 @@ const { makeInvestmentOnproperty,makeInvestmentFunds, getUserInvestment ,getInve
 const route = express.Router();
 
 route.post("/request-doc", userRequestDocs)
-route.post("/contact-support", contactSupport)
+route.post("/contact-support/:prodId", contactSupport)
 route.post("/property/invest/:userId", (req, res,next) =>{
     req.body.investmentType = "property"
      next()

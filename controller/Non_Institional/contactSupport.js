@@ -7,6 +7,7 @@ const { mailerController } = require("../../utils/mailer")
 
 
 exports.contactSupport = async(req,res,next) => {
+    const {prodId} = req.params
 
     const {firstName, lastName, email, phone, message} = req.body
     try {
