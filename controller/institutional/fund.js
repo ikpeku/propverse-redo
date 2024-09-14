@@ -1,7 +1,7 @@
 const Fund = require('../../model/institutional/fund');
 const InstitutionalUser = require('../../model/institutional/primaryContactDetails');
 const { errorHandler } = require('../../utils/error');
-
+const { ObjectId } = require("mongodb");
 
 exports.submitFund = async (req, res, next) => {
   req.body.isSubmitted = true
@@ -77,7 +77,6 @@ description,
 
     const FundItem = await Fund.findById(fundId)
        
-
     if(!FundItem) {
       const newFund = new Fund({
         _id: fundId,
@@ -131,9 +130,10 @@ description,
      });
 
     } else {
-
+   
      // Save the fund
      const savedFund = await Fund.findByIdAndUpdate(fundId, {$set: {
+      ...{isAdmin_Approved: "pending"},
       ...isSubmitted && {isSubmitted},
       ...name && {name},
       ...description && {description},
@@ -193,7 +193,28 @@ description,
   }
 };
 
-exports.getAllFunds = async (req, res) => {
+
+
+exports.AllApprovedFunds = async (req, res, next) => {
+   req.body.isAdmin_Approved = "approved";
+   req.body.funding_state = "Ongoing";
+   next()
+}
+
+exports.AllUserSubmitFunds = async (req, res, next) => {
+  req.query.user = req.payload.userId;
+  req.body.isSubmitted = true;
+  next()
+}
+exports.AllUserDraftFunds = async (req, res, next) => {
+  req.query.user = req.payload.userId;
+  req.body.isSubmitted = false;
+  next()
+}
+
+
+
+exports.getAllFunds = async (req, res, next) => {
   const page = parseInt(req?.query?.page) || 1;
 
   const limit = parseInt(req?.query?.limit) || 10;
@@ -201,6 +222,11 @@ exports.getAllFunds = async (req, res) => {
   const country = req?.query?.country;
   const status = req?.query?.status;
   const name = req?.query?.name;
+
+
+  // console.log("data: ",req.body)
+  // console.log("user: ",req.query.user)
+  // console.log("payload: ",req.payload)
 
 
   const myCustomLabels = {
@@ -212,18 +238,31 @@ exports.getAllFunds = async (req, res) => {
     limit,
     customLabels: myCustomLabels
   };
+
+
+  const query = [
+    {
+      $match: {...req.body}
+    },
+    {
+      $sort: {
+        updatedAt: -1
+      }
+    }
+  ]
+
+
+if(req?.query?.user){
+  query.unshift({
+    $match: {user: new ObjectId(req?.query?.user)}
+  })
+}
+
+
+
   
   try {
-    const allFunds = Fund.aggregate([
-      {
-        $match: {isAdmin_Approved: "approved", funding_state: "Ongoing"}
-      },
-      {
-        $sort: {
-          updatedAt: -1
-        }
-      }
-    ]);
+    const allFunds = Fund.aggregate(query);
 
     const paginationResult = await Fund.aggregatePaginate(
       allFunds,
@@ -242,7 +281,7 @@ exports.getAllFunds = async (req, res) => {
 
 };
 
-exports.getSingleFund = async (req, res) => {
+exports.getSingleFund = async (req, res,next ) => {
   try {
     const fund = await Fund.findById(req.params.id);
 
@@ -291,8 +330,5 @@ exports.fundtransationdatail = async(req, res) => {
   }
 
 }
-
-
-
 
 
