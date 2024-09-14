@@ -65,6 +65,10 @@ const userSchema = new Schema(
         type: String,
         default: '',
       },
+      swift_code: {
+        type: String,
+        default: '',
+      },
     },
 
     referral: {

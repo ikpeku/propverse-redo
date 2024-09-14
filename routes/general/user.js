@@ -13,7 +13,11 @@ Accreditation4,
 AccreditationEntity,
 AccreditationEntityDocument,
 get_Transactions,
-get_Transaction_by_Id
+get_Transaction_by_Id,
+get_UserInfo,
+set_Payout,
+set_User_Info,
+set_User_Avatar
 } = require("../../controller/General/user");
 
 const route = express.Router();
@@ -40,5 +44,16 @@ route.get("/fund/:prodId", propertyInvestmentInfo);
 route.get("/transaction/:txnId", get_Transaction_by_Id)
 route.get("/transactions/payin", get_Transactions)
 
+
+
+/**
+ * Account Section
+ */
+
+route.patch("/payout", set_Payout)
+route.patch("/", set_User_Info)
+route.patch("/avatar", set_User_Avatar)
+
+route.get("/", get_UserInfo)
 
 module.exports = route;

@@ -1,8 +1,9 @@
 const Kyc = require("../../model/compliance/kyc")
+const User = require("../../model/user")
 const Accreditation = require("../../model/compliance/accreditation")
 const { errorHandler } = require("../../utils/error")
-const Property = require("../../model/developer/properties");
-const Fund = require("../../model/institutional/fund");
+// const Property = require("../../model/developer/properties");
+// const Fund = require("../../model/institutional/fund");
 const PayInTransaction = require("../../model/transaction/transactions");
 const { ObjectId } = require("mongodb");
 
@@ -720,6 +721,95 @@ exports.get_Transaction_by_Id = async (req, res, next) => {
   
 
     return res.status(200).json({ status: "success", data: myAggregate[0] });
+  } catch (error) {
+    next(errorHandler(500, "network error"));
+    
+  }
+}
+
+
+/**
+ * Account Section
+ */
+
+exports.get_UserInfo = async (req, res, next) => {
+ 
+  try {
+    const myAggregate = await User.findById(req.payload.userId).select("-password");
+
+    return res.status(200).json({ status: "success", data: myAggregate });
+  } catch (error) {
+    next(errorHandler(500, "network error"));
+    
+  }
+}
+
+exports.set_Payout = async (req, res, next) => {
+  const {
+  bank_name,
+          account_name,
+          account_number,
+          swift_code
+  } = req.body
+ 
+  try {
+    const myAggregate = await User.findById(req.payload.userId).select("-password");
+
+    myAggregate.payout_account.bank_name =  bank_name;
+    myAggregate.payout_account.account_name =  account_name;
+    myAggregate.payout_account.account_number =  account_number;
+    myAggregate.payout_account.swift_code =  swift_code;
+
+    myAggregate.save()
+
+
+
+    return res.status(200).json({ status: "success", data: myAggregate.payout_account });
+  } catch (error) {
+    next(errorHandler(500, "network error"));
+    
+  }
+}
+
+exports.set_User_Info = async (req, res, next) => {
+  const {
+ username,
+ email,
+ phone_number,
+ country,
+ address
+  } = req.body
+ 
+  try {
+    const myAggregate = await User.findById(req.payload.userId).select("-password");
+
+    myAggregate.username =  username;
+    myAggregate.email =  email;
+    myAggregate.phone_number =  phone_number;
+    myAggregate.country =  country;
+    myAggregate.address =  address;
+
+    myAggregate.save()
+
+
+
+    return res.status(200).json({ status: "success" });
+  } catch (error) {
+    next(errorHandler(500, "network error"));
+    
+  }
+}
+
+
+exports.set_User_Avatar = async (req, res, next) => {
+  const { avatar } = req.body;
+ 
+  try {
+    const myAggregate = await User.findById(req.payload.userId).select("-password");
+    myAggregate.avatar =  avatar;
+    myAggregate.save()
+
+    return res.status(200).json({ status: "success" });
   } catch (error) {
     next(errorHandler(500, "network error"));
     
