@@ -8,6 +8,8 @@ const ValidationUser = require("../../model/verifyUser");
 const { sendSignUpVerifyEmail } = require("../../middleware/sendMail");
 const { errorHandler } = require("../../utils/error");
 
+const Due_deligence = require("../../model/developer/due_deligence");
+
 const authToken  = require("../../middleware/refreshToken");
 
 require("dotenv").config();
@@ -59,13 +61,19 @@ exports.loginUser = async (req, res, next) => {
         delete user["_doc"].password;
         await ResetPassword.deleteMany({ userId: user._id })
 
-        
-      
+
+
+        let developer;
+        if(user?.account_type === "Developer"){
+          developer = await Due_deligence.findById(user._id).select("isAdminAproved isSubmited")
+        }
+
+       
         res
           .status(200)
           .json({
             message: "Login you successful",
-            data: user,
+            data:  user?.account_type === "Developer" ? {...user._doc, ...developer._doc} : user,
             token: token.token,
             expiresIn: token.expiredAt,
           });
