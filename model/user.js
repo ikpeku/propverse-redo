@@ -28,7 +28,7 @@ const userSchema = new Schema(
     },
     phone_number: {
       type: String,
-      default: '0X0000000',
+      default: '',
     },
     account_type: {
       type: String,
