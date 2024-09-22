@@ -52,10 +52,10 @@ exports.loginUser = async (req, res, next) => {
       return next(errorHandler(401, "Invalid credential"));
 
     } else {
-      if (!user.verify_account) {
-        await ValidationUser.deleteMany({ userId: user._id.toString() });
-        await sendSignUpVerifyEmail(user, res, next, (islogin = true));
-      } else {
+      // if (!user.verify_account) {
+      //   await ValidationUser.deleteMany({ userId: user._id.toString() });
+      //   await sendSignUpVerifyEmail(user, res, next, (islogin = true));
+      // } else {
         const token = await authTokenInit.createToken(user);
 
         delete user["_doc"].password;
@@ -77,7 +77,7 @@ exports.loginUser = async (req, res, next) => {
             token: token.token,
             expiresIn: token.expiredAt,
           });
-      }
+      // }
     }
   } catch (err) {
     if (!err.statusCode) {
