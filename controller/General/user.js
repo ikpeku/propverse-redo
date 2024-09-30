@@ -5,6 +5,7 @@ const { errorHandler } = require("../../utils/error")
 // const Property = require("../../model/developer/properties");
 // const Fund = require("../../model/institutional/fund");
 const PayInTransaction = require("../../model/transaction/transactions");
+const Due_deligence = require("../../model/developer/due_deligence");
 const { ObjectId } = require("mongodb");
 
 exports.userKyc = async(req, res, next) => {
@@ -737,7 +738,16 @@ exports.get_UserInfo = async (req, res, next) => {
   try {
     const myAggregate = await User.findById(req.payload.userId).select("-password");
 
-    return res.status(200).json({ status: "success", data: myAggregate });
+    let developer;
+        if(myAggregate?.account_type === "Developer"){
+          developer = await Due_deligence.findById(req.payload.userId).select("isAdminAproved isSubmited")
+        }
+
+    return res.status(200).json({ status: "success",
+       data: myAggregate?.account_type === "Developer" ? {...myAggregate._doc, ...developer._doc} : myAggregate
+      });
+
+      
   } catch (error) {
     next(errorHandler(500, "network error"));
     
