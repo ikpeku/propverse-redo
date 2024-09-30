@@ -827,6 +827,37 @@ exports.set_User_Avatar = async (req, res, next) => {
 }
 
 
+// referrals
+
+/**
+ * Account Section
+ */
+
+exports.get_UserInfo = async (req, res, next) => {
+ 
+  try {
+    const data = await User.findById(req.payload.userId).select("-password"); 
+
+
+    let referralDetail = {
+      referralurl: `http://localhost:3000/select-account?refId=${data.referral.referralId}`,
+      referral: 0,
+      Invested: 0,
+      InvestedReward: 0,
+    }
+
+    
+    return res.status(200).json({ status: "success",
+       data: referralDetail
+      });
+
+      
+  } catch (error) {
+    next(errorHandler(500, "network error"));
+    
+  }
+}
+
 
 
 

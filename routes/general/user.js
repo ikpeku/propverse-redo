@@ -55,5 +55,7 @@ route.patch("/", set_User_Info)
 route.patch("/avatar", set_User_Avatar)
 
 route.get("/", get_UserInfo)
+route.get("/referral", get_UserInfo)
+
 
 module.exports = route;
