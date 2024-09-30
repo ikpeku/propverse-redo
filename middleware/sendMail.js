@@ -28,7 +28,6 @@ exports.sendSignUpVerifyEmail = async (
   { _id, email, username },
   res,
   next,
-  referralId,
   islogin
 ) => {
   const uniqueString = uuid4() + _id;

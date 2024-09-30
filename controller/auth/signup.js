@@ -49,13 +49,12 @@ exports.signUpUser = async (req, res, next) => {
     if (!userResponse) {
       throw new Error("User data is not valid");
     }
-
+  
     await sendSignUpVerifyEmail(
       userResponse,
       res,
       next,
-      referralId,
-      (islogin = false)
+      islogin = false
     );
   } catch (error) {
     next(error);
