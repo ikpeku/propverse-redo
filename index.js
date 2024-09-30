@@ -22,7 +22,7 @@ app.options('*', cors())
 
 const corsOptions = {
   credentials: true,
-  origin: ['http://localhost:3000', 'http://localhost:80'] // Whitelist the domains you want to allow
+  origin: ['http://localhost:3000', 'http://localhost:80', 'https://propverse-nfdp.vercel.app'] // Whitelist the domains you want to allow
 };
 
 app.use(cors(corsOptions)); 
