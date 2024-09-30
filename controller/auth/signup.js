@@ -18,8 +18,8 @@ exports.signUpUser = async (req, res, next) => {
 
       return res.status(400).json({
         success: false,
-        message: "Validation errors",
-        errors: validationErrors,
+        errors: "Validation errors",
+        message: validationErrors
       });
     }
 
