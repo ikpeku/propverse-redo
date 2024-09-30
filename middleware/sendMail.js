@@ -397,9 +397,7 @@ ul.social li{
                       "email-verified?userId=" +
                       _id +
                       "&token=" +
-                      uniqueString +
-                      "&refId=" +
-                      referralId
+                      uniqueString 
                     } target="_blank" > Verify Email</a></p>
             			</div>
             		</td>
@@ -433,7 +431,7 @@ ul.social li{
       throw new Error("Could not register user retry");
     }
 
-    // const userResponse = await User.findOne({_id})
+   
 
     new Promise((resolve, reject) => {
       transporter.sendMail(mailOptions, (err, info) => {
@@ -441,6 +439,7 @@ ul.social li{
           console.error(err);
           reject(err);
         } else {
+          console.log(info)
           resolve(info);
         }
       });
