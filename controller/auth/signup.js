@@ -26,7 +26,7 @@ exports.signUpUser = async (req, res, next) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const phone = phone_number ? phone_number : "08 XXX XXXX";
+    const phone = phone_number ? phone_number : "";
     const userName = username ? username : email.split("@")[0];
 
     const referralId = uuidv4().split("-")[1];
