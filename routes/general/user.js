@@ -17,7 +17,8 @@ get_Transaction_by_Id,
 get_UserInfo,
 set_Payout,
 set_User_Info,
-set_User_Avatar
+set_User_Avatar,
+get_Rerral
 } = require("../../controller/General/user");
 
 const route = express.Router();
@@ -55,7 +56,7 @@ route.patch("/", set_User_Info)
 route.patch("/avatar", set_User_Avatar)
 
 route.get("/", get_UserInfo)
-route.get("/referral", get_UserInfo)
+route.get("/referral", get_Rerral)
 
 
 module.exports = route;

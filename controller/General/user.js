@@ -833,7 +833,7 @@ exports.set_User_Avatar = async (req, res, next) => {
  * Account Section
  */
 
-exports.get_UserInfo = async (req, res, next) => {
+exports.get_Rerral = async (req, res, next) => {
  
   try {
     const data = await User.findById(req.payload.userId).select("-password"); 
