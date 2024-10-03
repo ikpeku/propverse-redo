@@ -105,117 +105,308 @@ exports.update_Due_deligence = async (req, res, next) => {
 
         if(userData) {
            
+            // const data = await Due_Deligence.findByIdAndUpdate(payloadUserId, 
+            //     {
+            //         isSubmited,
+            //  company_information: {
+            //      ...(company_information.name && {name: company_information.name}),
+            //      ...(company_information.address && {address: company_information.address}),
+            //     ...({ website: company_information.website}),
+            //      ...(company_information.phone_number && {phone_number: company_information.phone_number})
+            //     },
+            //  projects: {
+            //      previous_project_1: {
+            //          cost: {
+            //             ...(previous_project_1.cost.amount && { amount: previous_project_1.cost.amount}),
+            //              ...(previous_project_1.cost.currency && {currency: previous_project_1.cost.currency})
+            //             },
+            //          project_partners: {
+            //              partner_1: {
+            //                  ...(previous_project_1.project_partners.partner_1.name && {name: previous_project_1.project_partners.partner_1.name}),
+            //                  ...(previous_project_1.project_partners.partner_1.contact && {contact: previous_project_1.project_partners.partner_1.contact})
+            //                 },
+            //              partner_2: {
+            //                  ...(previous_project_1.project_partners.partner_2.name && {name: previous_project_1.project_partners.partner_2.name}),
+            //                  ...(previous_project_1.project_partners.partner_2.contact && {contact: previous_project_1.project_partners.partner_2.contact})
+            //                 }
+            //             },
+            //          ...(previous_project_1.name && {name: previous_project_1.name}),
+            //          ...(previous_project_1.location && {location: previous_project_1.location}),
+            //          ...(previous_project_1.type && {type: previous_project_1.type}),
+            //          ...(previous_project_1.documents && {documents: previous_project_1.documents}),
+            //         },
+            //      previous_project_2: {
+            //          cost: {
+            //             ...(previous_project_2.cost.amount && { amount: previous_project_2.cost.amount}),
+            //              ...(previous_project_2.cost.currency && {currency: previous_project_2.cost.currency})
+            //             },
+            //          project_partners: {
+            //              partner_1: {
+            //                  ...(previous_project_2.project_partners.partner_1.name && {name: previous_project_2.project_partners.partner_1.name}),
+            //                  ...(previous_project_2.project_partners.partner_1.contact && {contact: previous_project_2.project_partners.partner_1.contact})
+            //                 },
+            //              partner_2: {
+            //                  ...(previous_project_2.project_partners.partner_2.name && {name: previous_project_2.project_partners.partner_2.name}),
+            //                  ...(previous_project_2.project_partners.partner_2.contact && {contact: previous_project_2.project_partners.partner_2.contact})
+            //                 }
+            //             },
+            //          ...(previous_project_2.name && {name: previous_project_2.name}),
+            //          ...(previous_project_2.location && {location: previous_project_2.location}),
+            //          ...(previous_project_2.type && {type: previous_project_2.type}),
+            //          ...(previous_project_2.documents && {documents: previous_project_2.documents}),
+            //         },
+            //      previous_project_3: {
+            //          cost: {
+            //             ...(previous_project_3.cost.amount && { amount: previous_project_3.cost.amount}),
+            //              ...(previous_project_3.cost.currency && {currency: previous_project_3.cost.currency})
+            //             },
+            //          project_partners: {
+            //              partner_1: {
+            //                  ...(previous_project_3.project_partners.partner_1.name && {name: previous_project_3.project_partners.partner_1.name}),
+            //                  ...(previous_project_3.project_partners.partner_1.contact && {contact: previous_project_3.project_partners.partner_1.contact})
+            //                 },
+            //              partner_2: {
+            //                  ...(previous_project_3.project_partners.partner_2.name && {name: previous_project_3.project_partners.partner_2.name}),
+            //                  ...(previous_project_3.project_partners.partner_2.contact && {contact: previous_project_3.project_partners.partner_2.contact})
+            //                 }
+            //             },
+            //          ...(previous_project_3.name && {name: previous_project_3.name}),
+            //          ...(previous_project_3.location && {location: previous_project_3.location}),
+            //          ...(previous_project_3.type && {type: previous_project_3.type}),
+            //          ...(previous_project_3.documents && {documents: previous_project_3.documents}),
+            //         },
+            //     },
+            //  financials: {
+            //      Current_Company_Valuation: {
+            //          ...(Current_Company_Valuation.amount && {amount: Current_Company_Valuation.amount}),
+            //          ...(Current_Company_Valuation.currency && {currency: Current_Company_Valuation.currency})
+            //         },
+            //      ...(Valuation_Method_Used && {Valuation_Method_Used}),
+            //      ...(Last_Financial_Audit_Date && {Last_Financial_Audit_Date}),
+            //      ...(supporting_documents && {supporting_documents}),
+            //     },
+
+
+            //  references_and_recognition: {
+            //      reference_1: {
+            //          ...(reference_1.name && {name: reference_1.name}),
+            //          ...(reference_1.title && {title: reference_1.title}),
+            //          ...(reference_1.contact && {contact: reference_1.contact}),
+            //         },
+            //      reference_2: {
+            //         ...(reference_2.name && {name: reference_2.name}),
+            //         ...(reference_2.title && {title: reference_2.title}),
+            //         ...(reference_2.contact && {contact: reference_2.contact}),
+            //         },
+            //      reference_3: {
+            //         ...(reference_3.name && {name: reference_3.name}),
+            //         ...(reference_3.title && {title: reference_3.title}),
+            //         ...(reference_3.contact && {contact: reference_3.contact}),
+            //         },
+            //      ...(recognition && {recognition}),
+            //      ...(recognition_documents && {recognition_documents})
+            //     },
+            //  declaration: {
+            //     ...(declaration.name && { name: declaration.name}),
+            //     ...(declaration.title && { title: declaration.title})
+            //     },
+            // }, {
+
+            //     new: true
+            // }
+            // )
+
+
+
             const data = await Due_Deligence.findByIdAndUpdate(payloadUserId, 
-                {
-                    isSubmited,
-             company_information: {
-                 ...(company_information.name && {name: company_information.name}),
-                 ...(company_information.address && {address: company_information.address}),
-                ...({ website: company_information.website}),
-                 ...(company_information.phone_number && {phone_number: company_information.phone_number})
-                },
-             projects: {
-                 previous_project_1: {
-                     cost: {
-                        ...(previous_project_1.cost.amount && { amount: previous_project_1.cost.amount}),
-                         ...(previous_project_1.cost.currency && {currency: previous_project_1.cost.currency})
-                        },
-                     project_partners: {
-                         partner_1: {
-                             ...(previous_project_1.project_partners.partner_1.name && {name: previous_project_1.project_partners.partner_1.name}),
-                             ...(previous_project_1.project_partners.partner_1.contact && {contact: previous_project_1.project_partners.partner_1.contact})
-                            },
-                         partner_2: {
-                             ...(previous_project_1.project_partners.partner_2.name && {name: previous_project_1.project_partners.partner_2.name}),
-                             ...(previous_project_1.project_partners.partner_2.contact && {contact: previous_project_1.project_partners.partner_2.contact})
-                            }
-                        },
-                     ...(previous_project_1.name && {name: previous_project_1.name}),
-                     ...(previous_project_1.location && {location: previous_project_1.location}),
-                     ...(previous_project_1.type && {type: previous_project_1.type}),
-                     ...(previous_project_1.documents && {documents: previous_project_1.documents}),
-                    },
-                 previous_project_2: {
-                     cost: {
-                        ...(previous_project_2.cost.amount && { amount: previous_project_2.cost.amount}),
-                         ...(previous_project_2.cost.currency && {currency: previous_project_2.cost.currency})
-                        },
-                     project_partners: {
-                         partner_1: {
-                             ...(previous_project_2.project_partners.partner_1.name && {name: previous_project_2.project_partners.partner_1.name}),
-                             ...(previous_project_2.project_partners.partner_1.contact && {contact: previous_project_2.project_partners.partner_1.contact})
-                            },
-                         partner_2: {
-                             ...(previous_project_2.project_partners.partner_2.name && {name: previous_project_2.project_partners.partner_2.name}),
-                             ...(previous_project_2.project_partners.partner_2.contact && {contact: previous_project_2.project_partners.partner_2.contact})
-                            }
-                        },
-                     ...(previous_project_2.name && {name: previous_project_2.name}),
-                     ...(previous_project_2.location && {location: previous_project_2.location}),
-                     ...(previous_project_2.type && {type: previous_project_2.type}),
-                     ...(previous_project_2.documents && {documents: previous_project_2.documents}),
-                    },
-                 previous_project_3: {
-                     cost: {
-                        ...(previous_project_3.cost.amount && { amount: previous_project_3.cost.amount}),
-                         ...(previous_project_3.cost.currency && {currency: previous_project_3.cost.currency})
-                        },
-                     project_partners: {
-                         partner_1: {
-                             ...(previous_project_3.project_partners.partner_1.name && {name: previous_project_3.project_partners.partner_1.name}),
-                             ...(previous_project_3.project_partners.partner_1.contact && {contact: previous_project_3.project_partners.partner_1.contact})
-                            },
-                         partner_2: {
-                             ...(previous_project_3.project_partners.partner_2.name && {name: previous_project_3.project_partners.partner_2.name}),
-                             ...(previous_project_3.project_partners.partner_2.contact && {contact: previous_project_3.project_partners.partner_2.contact})
-                            }
-                        },
-                     ...(previous_project_3.name && {name: previous_project_3.name}),
-                     ...(previous_project_3.location && {location: previous_project_3.location}),
-                     ...(previous_project_3.type && {type: previous_project_3.type}),
-                     ...(previous_project_3.documents && {documents: previous_project_3.documents}),
-                    },
-                },
-             financials: {
-                 Current_Company_Valuation: {
-                     ...(Current_Company_Valuation.amount && {amount: Current_Company_Valuation.amount}),
-                     ...(Current_Company_Valuation.currency && {currency: Current_Company_Valuation.currency})
-                    },
-                 ...(Valuation_Method_Used && {Valuation_Method_Used}),
-                 ...(Last_Financial_Audit_Date && {Last_Financial_Audit_Date}),
-                 ...(supporting_documents && {supporting_documents}),
-                },
+               {$set: {
+                    "isSubmited": isSubmited,
+                    "company_information.name" : company_information.name,
+                    "company_information.address" : company_information.address,
+                    "company_information.website" : company_information.website,
+                    "company_information.phone_number" : company_information.phone_number,
 
 
-             references_and_recognition: {
-                 reference_1: {
-                     ...(reference_1.name && {name: reference_1.name}),
-                     ...(reference_1.title && {title: reference_1.title}),
-                     ...(reference_1.contact && {contact: reference_1.contact}),
-                    },
-                 reference_2: {
-                    ...(reference_2.name && {name: reference_2.name}),
-                    ...(reference_2.title && {title: reference_2.title}),
-                    ...(reference_2.contact && {contact: reference_2.contact}),
-                    },
-                 reference_3: {
-                    ...(reference_3.name && {name: reference_3.name}),
-                    ...(reference_3.title && {title: reference_3.title}),
-                    ...(reference_3.contact && {contact: reference_3.contact}),
-                    },
-                 ...(recognition && {recognition}),
-                 ...(recognition_documents && {recognition_documents})
-                },
-             declaration: {
-                ...(declaration.name && { name: declaration.name}),
-                ...(declaration.title && { title: declaration.title})
-                },
-            }, {
 
+            //  company_information: {
+            //      ...(company_information.name && {name: company_information.name}),
+            //      ...(company_information.address && {address: company_information.address}),
+            //     ...({ website: company_information.website}),
+            //      ...(company_information.phone_number && {phone_number: company_information.phone_number})
+            //     },
+
+             // project1
+            "projects.previous_project_1.cost.amount": previous_project_1.cost.amount,
+            "projects.previous_project_1.cost.currency": previous_project_1.cost.currency,
+
+            "projects.previous_project_1.project_partners.partner_1.name": previous_project_1.project_partners.partner_1.name,
+            "projects.previous_project_1.project_partners.partner_1.contact": previous_project_1.project_partners.partner_1.contact,
+
+            "projects.previous_project_1.project_partners.partner_2.name": previous_project_1.project_partners.partner_2.name,
+            "projects.previous_project_1.project_partners.partner_2.contact": previous_project_1.project_partners.partner_2.contact,
+            
+            "projects.previous_project_1.name": previous_project_1.name,
+            "projects.previous_project_1.location": previous_project_1.location,
+            "projects.previous_project_1.type": previous_project_1.type,
+            "projects.previous_project_1.documents": previous_project_1.documents,
+            // project2
+            "projects.previous_project_2.cost.amount": previous_project_2.cost.amount,
+            "projects.previous_project_2.cost.currency": previous_project_2.cost.currency,
+
+            "projects.previous_project_2.project_partners.partner_1.name": previous_project_2.project_partners.partner_1.name,
+            "projects.previous_project_2.project_partners.partner_1.contact": previous_project_2.project_partners.partner_1.contact,
+
+            "projects.previous_project_2.project_partners.partner_2.name": previous_project_2.project_partners.partner_2.name,
+            "projects.previous_project_2.project_partners.partner_2.contact": previous_project_2.project_partners.partner_2.contact,
+            
+            "projects.previous_project_2.name": previous_project_2.name,
+            "projects.previous_project_2.location": previous_project_2.location,
+            "projects.previous_project_2.type": previous_project_2.type,
+            "projects.previous_project_2.documents": previous_project_2.documents,
+            // project3
+            "projects.previous_project_3.cost.amount": previous_project_3.cost.amount,
+            "projects.previous_project_3.cost.currency": previous_project_3.cost.currency,
+
+            "projects.previous_project_3.project_partners.partner_1.name": previous_project_3.project_partners.partner_1.name,
+            "projects.previous_project_3.project_partners.partner_1.contact": previous_project_3.project_partners.partner_1.contact,
+
+            "projects.previous_project_3.project_partners.partner_2.name": previous_project_3.project_partners.partner_2.name,
+            "projects.previous_project_3.project_partners.partner_2.contact": previous_project_3.project_partners.partner_2.contact,
+            
+            "projects.previous_project_3.name": previous_project_3.name,
+            "projects.previous_project_3.location": previous_project_3.location,
+            "projects.previous_project_3.type": previous_project_3.type,
+            "projects.previous_project_3.documents": previous_project_3.documents,
+            // financials
+            "financials.Current_Company_Valuation.amount": Current_Company_Valuation.amount,
+            "financials.Current_Company_Valuation.currency": Current_Company_Valuation.currency,
+            "financials.Valuation_Method_Used": Valuation_Method_Used,
+            "financials.Last_Financial_Audit_Date": Last_Financial_Audit_Date,
+            "financials.supporting_documents": supporting_documents,
+            // references_and_recognition1
+            "references_and_recognition.reference_1.name": reference_1.name,
+            "references_and_recognition.reference_1.title": reference_1.title,
+            "references_and_recognition.reference_1.contact": reference_1.contact,
+            // references_and_recognition2
+            "references_and_recognition.reference_2.name": reference_2.name,
+            "references_and_recognition.reference_2.title": reference_2.title,
+            "references_and_recognition.reference_2.contact": reference_2.contact,
+            // references_and_recognition3
+            "references_and_recognition.reference_3.name": reference_3.name,
+            "references_and_recognition.reference_3.title": reference_3.title,
+            "references_and_recognition.reference_3.contact": reference_3.contact,
+
+            //recognition
+            "references_and_recognition.recognition": recognition,
+            "references_and_recognition.recognition_documents": recognition_documents,
+            //declaration
+            "declaration.name" : declaration.name,
+            "declaration.title" : declaration.title,
+
+
+
+
+
+            //  projects: {
+            //     //  previous_project_1: {
+            //     //     //  cost: {
+            //     //     //     ...(previous_project_1.cost.amount && { amount: previous_project_1.cost.amount}),
+            //     //     //      ...(previous_project_1.cost.currency && {currency: previous_project_1.cost.currency})
+            //     //     //     },
+            //     //      project_partners: {
+            //     //         //  partner_1: {
+            //     //         //      ...(previous_project_1.project_partners.partner_1.name && {name: previous_project_1.project_partners.partner_1.name}),
+            //     //         //      ...(previous_project_1.project_partners.partner_1.contact && {contact: previous_project_1.project_partners.partner_1.contact})
+            //     //         //     },
+            //     //         //  partner_2: {
+            //     //         //      ...(previous_project_1.project_partners.partner_2.name && {name: previous_project_1.project_partners.partner_2.name}),
+            //     //         //      ...(previous_project_1.project_partners.partner_2.contact && {contact: previous_project_1.project_partners.partner_2.contact})
+            //     //         //     }
+            //     //         },
+            //     //     //  ...(previous_project_1.name && {name: previous_project_1.name}),
+            //     //     //  ...(previous_project_1.location && {location: previous_project_1.location}),
+            //     //     //  ...(previous_project_1.type && {type: previous_project_1.type}),
+            //     //     //  ...(previous_project_1.documents && {documents: previous_project_1.documents}),
+            //     //     },
+            //     //  previous_project_2: {
+            //     //      cost: {
+            //     //         ...(previous_project_2.cost.amount && { amount: previous_project_2.cost.amount}),
+            //     //          ...(previous_project_2.cost.currency && {currency: previous_project_2.cost.currency})
+            //     //         },
+            //     //      project_partners: {
+            //     //          partner_1: {
+            //     //              ...(previous_project_2.project_partners.partner_1.name && {name: previous_project_2.project_partners.partner_1.name}),
+            //     //              ...(previous_project_2.project_partners.partner_1.contact && {contact: previous_project_2.project_partners.partner_1.contact})
+            //     //             },
+            //     //          partner_2: {
+            //     //              ...(previous_project_2.project_partners.partner_2.name && {name: previous_project_2.project_partners.partner_2.name}),
+            //     //              ...(previous_project_2.project_partners.partner_2.contact && {contact: previous_project_2.project_partners.partner_2.contact})
+            //     //             }
+            //     //         },
+            //     //      ...(previous_project_2.name && {name: previous_project_2.name}),
+            //     //      ...(previous_project_2.location && {location: previous_project_2.location}),
+            //     //      ...(previous_project_2.type && {type: previous_project_2.type}),
+            //     //      ...(previous_project_2.documents && {documents: previous_project_2.documents}),
+            //     //     },
+            //     //  previous_project_3: {
+            //     //      cost: {
+            //     //         ...(previous_project_3.cost.amount && { amount: previous_project_3.cost.amount}),
+            //     //          ...(previous_project_3.cost.currency && {currency: previous_project_3.cost.currency})
+            //     //         },
+            //     //      project_partners: {
+            //     //          partner_1: {
+            //     //              ...(previous_project_3.project_partners.partner_1.name && {name: previous_project_3.project_partners.partner_1.name}),
+            //     //              ...(previous_project_3.project_partners.partner_1.contact && {contact: previous_project_3.project_partners.partner_1.contact})
+            //     //             },
+            //     //          partner_2: {
+            //     //              ...(previous_project_3.project_partners.partner_2.name && {name: previous_project_3.project_partners.partner_2.name}),
+            //     //              ...(previous_project_3.project_partners.partner_2.contact && {contact: previous_project_3.project_partners.partner_2.contact})
+            //     //             }
+            //     //         },
+            //     //      ...(previous_project_3.name && {name: previous_project_3.name}),
+            //     //      ...(previous_project_3.location && {location: previous_project_3.location}),
+            //     //      ...(previous_project_3.type && {type: previous_project_3.type}),
+            //     //      ...(previous_project_3.documents && {documents: previous_project_3.documents}),
+            //     //     },
+            //     },
+            //  financials: {
+            //      Current_Company_Valuation: {
+            //          ...(Current_Company_Valuation.amount && {amount: Current_Company_Valuation.amount}),
+            //          ...(Current_Company_Valuation.currency && {currency: Current_Company_Valuation.currency})
+            //         },
+            //      ...(Valuation_Method_Used && {Valuation_Method_Used}),
+            //      ...(Last_Financial_Audit_Date && {Last_Financial_Audit_Date}),
+            //      ...(supporting_documents && {supporting_documents}),
+            //     },
+
+
+            //  references_and_recognition: {
+            //     //  reference_1: {
+            //     //      ...(reference_1.name && {name: reference_1.name}),
+            //     //      ...(reference_1.title && {title: reference_1.title}),
+            //     //      ...(reference_1.contact && {contact: reference_1.contact}),
+            //     //     },
+            //     //  reference_2: {
+            //     //     ...(reference_2.name && {name: reference_2.name}),
+            //     //     ...(reference_2.title && {title: reference_2.title}),
+            //     //     ...(reference_2.contact && {contact: reference_2.contact}),
+            //     //     },
+            //     //  reference_3: {
+            //     //     ...(reference_3.name && {name: reference_3.name}),
+            //     //     ...(reference_3.title && {title: reference_3.title}),
+            //     //     ...(reference_3.contact && {contact: reference_3.contact}),
+            //     //     },
+            //     //  ...(recognition && {recognition}),
+            //     //  ...(recognition_documents && {recognition_documents})
+            //     },
+            //  declaration: {
+            //     ...(declaration.name && { name: declaration.name}),
+            //     ...(declaration.title && { title: declaration.title})
+            //     },
+            }}, {
                 new: true
             }
             )
-
        
            return res.status(200).json({status:"success", data})
       
@@ -223,9 +414,6 @@ exports.update_Due_deligence = async (req, res, next) => {
 
             return next(errorHandler(400, "Unauthorise"))
         }
-
-      
-
 
     } catch (error) {
         next(error)

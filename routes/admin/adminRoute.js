@@ -18,7 +18,7 @@ const {
 
 
 const {uploadActivities, get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance, get_All_Funds_Investors} = require("../../controller/Admin/Non_Institutional/non_institutional");
-const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayIn} = require("../../controller/Admin/GeneralAdmin");
+const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayIn, AdminDashbroad} = require("../../controller/Admin/GeneralAdmin");
 const { FundsManagement ,currentListed, fundsListedApproval, statusFund, approveFund, rejectFund, pauseFund, unPauseFund} = require("../../controller/Admin/Institutional/funds");
 const { get_All_Institutional, get_Institutional } = require("../../controller/Admin/Institutional/institutional");
 const route = express.Router();
@@ -143,8 +143,11 @@ route.patch(
 );
 
 
+/**
+ * Dashbroad
+ */
+route.get("/dashbroad", AdminDashbroad)
 
-// 
 
 
 module.exports = route;

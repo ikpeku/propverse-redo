@@ -228,5 +228,63 @@ exports.VerifyPayIn = async(req,res,next) => {
   }
 
 
+  exports.AdminDashbroad = async(req,res,next) => {
 
+    // let today = new Date()
+    console.log("enter")
+
+
+//         'Institutional Investor',
+//         'Developer',
+//         ,
+//         'Admin',
+//       ],
+    try {
+
+      const non_institional = await User.aggregate([
+        {
+          $group: {
+            _id: "$account_type",
+            numbersOfUsers: {
+              $count: {}
+            },
+            date: {
+              $addToSet: "$createdAt"
+            },
+          },
+          $sort: {
+            date: -1
+          },
+        },
+      //   {
+      //     $setWindowFields: {
+      //       sortBy: { day: 1 },
+      //       output: {
+      //         thirtyDaysAgoDate: {
+      //           $last: "$date",
+      //           window: { range: [30 * 24, 31 * 24], unit: 'hour' }
+      //         },
+      //         thirtyDaysAgoValue: {
+      //           $last: "$expencel",
+      //           window: { range: [30 * 24, 31 * 24], unit: 'hour' }
+      //         }
+      //       }
+      //     }
+      //   },
+      // {
+      //   $set: {thirtyDayChange: {$divide: [{$subtract: ['$totalValue','$thirtyDaysAgoValue']}, '$totalValue']}}
+      // }
+
+      ])
+
+
+      res.status(200).json({
+        data: non_institional
+      })
+      
+    } catch (error) {
+      
+    }
+
+  }
   
