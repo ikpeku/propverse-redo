@@ -68,12 +68,11 @@ exports.loginUser = async (req, res, next) => {
           developer = await Due_deligence.findById(user._id).select("isAdminAproved isSubmited")
         }
 
-       
         res
           .status(200)
           .json({
             message: "Login you successful",
-            data:  user?.account_type === "Developer" ? {...user._doc, ...developer._doc} : user,
+            data:  user?.account_type === "Developer" ? {...user?._doc, ...developer?._doc} : user,
             token: token.token,
             expiresIn: token.expiredAt,
           });
