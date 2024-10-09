@@ -41,7 +41,7 @@ const accreditation_Schema = new Schema(
       // },
       accredited_method: {
         type: String,
-        default: "Individual with net-worth of $1M+ (with or without spouse)",
+        // default: "Individual with net-worth of $1M+ (with or without spouse)",
         enum: [
           "Individual with net-worth of $1M+ (with or without spouse)",
           "Individual with annual income in last two years of $200K+ ($300K+ with spouse)",
@@ -297,7 +297,7 @@ const accreditation_Schema = new Schema(
         
         investment_entity: {
           type: String,
-          default: "LLC",
+          // default: "LLC",
           enum: ["LLC", "Trust", "Corporation", "Partnership"],
         },
         details: {

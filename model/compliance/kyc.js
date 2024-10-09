@@ -33,7 +33,6 @@ const kyc_Schema = new Schema(
 
       fund_mangager: {
         type: String,
-        default: "Individual fund manager",
         enum: ["Individual fund manager", "Corperate fund manager"]
 
       },
