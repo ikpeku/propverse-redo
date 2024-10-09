@@ -224,7 +224,6 @@ exports.updateProperty = async (req, res, next) => {
 exports.getPropertyById = async (req, res, next) => {
   const { prodId } = req.params;
 
-  console.log("getPropertyById")
 
   try {
     let query = [
@@ -292,9 +291,11 @@ exports.getPropertyById = async (req, res, next) => {
     myAggregate[0].verify =   due_deligence?.isAdminAproved;
 
 
-    // myAggregate[0].current_project = await Project.find({user: userId, isAdminAproved: "Approved", investment_status: "Available"}).select("property_detail investment_status")
+    const current_project = await properties.find({user: project.user, isAdminAproved: "Approved", investment_status: "Available"}).select("property_detail investment_status")
    const past_project = await properties.find({user: project.user, isAdminAproved: "Approved", investment_status: "Sold"}).select("property_detail investment_status")
    myAggregate[0].pastProject  = past_project.length;
+   myAggregate[0].currentProject  = current_project.length;
+   myAggregate[0].totalProject  = project.length;
 
     //       let transactionQeury = [
     //         {
