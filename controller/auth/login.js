@@ -52,10 +52,10 @@ exports.loginUser = async (req, res, next) => {
       return next(errorHandler(401, "Invalid credential"));
 
     } else {
-      // if (!user.verify_account) {
-      //   await ValidationUser.deleteMany({ userId: user._id.toString() });
-      //   await sendSignUpVerifyEmail(user, res, next, (islogin = true));
-      // } else {
+      if (!user.verify_account) {
+        await ValidationUser.deleteMany({ userId: user._id.toString() });
+        await sendSignUpVerifyEmail(user, res, next, (islogin = true));
+      } else {
         const token = await authTokenInit.createToken(user);
 
         delete user["_doc"].password;
@@ -78,6 +78,9 @@ exports.loginUser = async (req, res, next) => {
           });
       // }
     }
+  }
+
+  
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -85,3 +88,38 @@ exports.loginUser = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.SendVerificationCode = async (req, res, next) => {
+  
+  const { email } = req?.body;
+
+  try {
+    
+    const user = await User.findOne({email});
+   
+    if (!user) {
+      return next(errorHandler(401, "User not found"));
+    } 
+
+    if (!user.verify_account) {
+        await ValidationUser.deleteMany({ userId: user._id.toString() });
+        await sendSignUpVerifyEmail(user, res, next, (islogin = true));
+      } else {
+        res
+        .status(200)
+        .json({
+          message: "User account already verify",
+        });
+      }
+
+      
+    
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+

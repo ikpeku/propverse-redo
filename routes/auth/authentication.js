@@ -2,7 +2,7 @@ const express = require("express");
 const { signUpUser , signUpAdmin} = require("../../controller/auth/signup");
 const { resignup } = require("../../controller/auth/resignup");
 
-const { loginUser } = require("../../controller/auth/login");
+const { loginUser, SendVerificationCode } = require("../../controller/auth/login");
 const { verifyUser } = require("../../controller/auth/verify");
 const { resetPassword } = require("../../controller/auth/resetPassword");
 const { forgetPassword } = require("../../controller/auth/forgetPassword");
@@ -33,14 +33,10 @@ const { verifyAdminLoginToken } = require("../../controller/auth/verifyAdminLogi
 
 
 // signup a admin
-route.post(
-  "/admin-signup",
-  signUpAdmin
-);
+route.post("/admin-signup", signUpAdmin);
 
 // signup a Non Institutional Investor
-route.post(
-  "/signup",
+route.post("/signup",
   (req, res, next) => {
     (req.body.account_type = "Non-Institutional Investor"),
     next();
@@ -122,6 +118,7 @@ route.post("/otp-validate",validateotp
 
 route.post("/login/admin", AdminLogin)
 route.post("/login/admin-verify", verifyAdminLoginToken)
+route.post("/sendverifycodee", SendVerificationCode)
 
 
 
