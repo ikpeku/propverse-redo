@@ -65,13 +65,13 @@ const transaction_Schema = new Schema(
       },
     },
 
-    proof_of_payment: {
-      location: String,
-      originalname: String,
-      mimetype: String,
-      size: String,
-      key: String,
-    },
+    // proof_of_payment: {
+    //   location: String,
+    //   originalname: String,
+    //   mimetype: String,
+    //   size: String,
+    //   key: String,
+    // },
     payment_method: {
       type: String,
     },
@@ -81,6 +81,7 @@ const transaction_Schema = new Schema(
     description: {
       type: String,
     },
+    paymentDate: Date
   },
   {
     timestamps: true,

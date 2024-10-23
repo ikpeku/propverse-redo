@@ -2,6 +2,7 @@ const { ObjectId } = require("mongodb");
 const properties = require("../../model/developer/properties");
 const { errorHandler } = require("../../utils/error");
 const Due_Deligence = require("../../model/developer/due_deligence");
+const Activities = require("../../model/developer/property_activities");
 
 exports.isSubmmited = (req, res, next) => {
   req.body.isSubmitted = true;
@@ -141,6 +142,32 @@ exports.createProperty = async (req, res, next) => {
     next(error);
   }
 };
+
+
+exports.updatePropertyProgress = async (req, res, next) => {
+  const { prodId } = req.params;
+  const {property_progress} = req.body;
+
+
+  try {
+    if(!property_progress) return
+    const response = await properties.findById(prodId);
+  
+    if (!response) {
+      return next(errorHandler(401, "invalid property"));
+    } else {
+      response.property_progress = property_progress;
+      response.save()
+    }
+
+
+    return res.status(200).json({ status: "success" });
+  } catch (error) {
+    // next(errorHandler(500, "failed"))
+    next(error);
+  }
+};
+
 
 exports.updateProperty = async (req, res, next) => {
   const { prodId } = req.params;
@@ -437,3 +464,51 @@ exports.getUserProperties = async (req, res, next) => {
 
   }
 };
+
+
+
+exports.uploadActivities = async(req,res,next) => {
+  const {title,activity, documents} = req.body;
+  const {prodId} = req.params;
+
+  try {
+    if (!req.payload.userId) return next(errorHandler(401, "forbidden"));
+
+    const project  = await properties.findById(prodId);
+
+console.log(req.payload.status)
+
+// if(req.payload.status){
+  if (req.payload.userId !== project.user) return next(errorHandler(401, "unauthorise user"));
+
+// }
+
+      // await Activities.create({
+      //     property:prodId,
+      //     title,
+      //     activity,
+      //     documents,
+      //     // documents_type: documents[0].mimetype || ""
+      // })
+      // title: String,
+      // activity: String,
+      // // documents_type: String,
+      // property: {
+      //     // type: SchemaTypes.ObjectId,
+      //     type: String,
+      //     ref: "properties",
+      //     required: true,
+      //   },
+      // documents: 
+
+      res.status(200).json({
+        message: "success",project
+      })
+
+  } catch (error) {
+    next(error)
+      // next(errorHandler(400, "operation failed"))
+      
+  }
+
+}

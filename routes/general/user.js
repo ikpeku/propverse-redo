@@ -18,7 +18,7 @@ get_UserInfo,
 set_Payout,
 set_User_Info,
 set_User_Avatar,
-get_Rerral
+get_Rerral,
 } = require("../../controller/General/user");
 
 const route = express.Router();
@@ -42,8 +42,13 @@ route.get("/property/:prodId", propertyInvestmentInfo);
 route.get("/fund/:prodId", propertyInvestmentInfo);
 
 
-route.get("/transaction/:txnId", get_Transaction_by_Id)
-route.get("/transactions/payin", get_Transactions)
+/**
+ * transactions
+ */
+route.get("/transaction/:txnId", get_Transaction_by_Id);
+route.delete("/transaction/:txnId", get_Transaction_by_Id);
+route.get("/transactions/payin", get_Transactions);
+
 
 
 
@@ -51,12 +56,12 @@ route.get("/transactions/payin", get_Transactions)
  * Account Section
  */
 
-route.patch("/payout", set_Payout)
-route.patch("/", set_User_Info)
-route.patch("/avatar", set_User_Avatar)
+route.patch("/payout", set_Payout);
+route.patch("/", set_User_Info);
+route.patch("/avatar", set_User_Avatar);
 
-route.get("/", get_UserInfo)
-route.get("/referral", get_Rerral)
+route.get("/", get_UserInfo);
+route.get("/referral", get_Rerral);
 
 /**
  * Dashbroad

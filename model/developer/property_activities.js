@@ -7,7 +7,7 @@ const property_activities_Schema = new Schema(
   {
     title: String,
     activity: String,
-    documents_type: String,
+    // documents_type: String,
     property: {
         // type: SchemaTypes.ObjectId,
         type: String,

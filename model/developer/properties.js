@@ -53,6 +53,11 @@ const propertiesSchema = new Schema(
       default: false,
     },
 
+     property_progress: {
+      type: Number,
+      default: 0,
+    },
+
     property_detail: {
       property_overview: {
         //   avatar: {
