@@ -476,7 +476,7 @@ exports.uploadActivities = async(req,res,next) => {
 
     const project  = await properties.findById(prodId);
 
-console.log(req.payload.status)
+// console.log(req.payload.status)
 
 // if(req.payload.status){
   if (req.payload.userId !== project.user) return next(errorHandler(401, "unauthorise user"));
@@ -512,3 +512,89 @@ console.log(req.payload.status)
   }
 
 }
+
+exports.getPropertyInvestors = async (req, res, next) => {
+  const { prodId } = req.params;
+
+
+  try {
+    let query = [
+      {
+        $match: { _id: prodId },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unset: ["user.password"] },
+      {
+        $unwind: "$user",
+      },
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "transactions",
+          foreignField: "_id",
+          as: "transaction_invested",
+        },
+      },
+      {
+        $addFields: {
+          amount_invested: {
+            $sum: { $sum: "$transaction_invested.paid.amount" },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "due_deligences",
+          localField: "company",
+          foreignField: "user",
+          as: "company",
+        },
+      },
+      {
+        $unwind: "$company",
+      },
+
+      {
+        $lookup: {
+          from: "property_activities",
+          localField: "activities",
+          foreignField: "property",
+          as: "activities",
+        },
+      },
+    ];
+
+    const myAggregate = await properties.aggregate(query);
+
+
+  //   const project  = await properties.findById(prodId);
+
+
+  //   const due_deligence  = await Due_Deligence.findById(project.user);
+
+  //   myAggregate[0].company_information = due_deligence?.company_information;
+  //   myAggregate[0].verify =   due_deligence?.isAdminAproved;
+
+
+  //   const current_project = await properties.find({user: project.user, isAdminAproved: "Approved", investment_status: "Available"}).select("property_detail investment_status")
+  //  const past_project = await properties.find({user: project.user, isAdminAproved: "Approved", investment_status: "Sold"}).select("property_detail investment_status")
+  //  myAggregate[0].pastProject  = past_project.length;
+  //  myAggregate[0].currentProject  = current_project.length;
+  //  myAggregate[0].totalProject  = project.length;
+
+   
+    return res.status(200).json({ status: "success", data: myAggregate[0] });
+
+
+  } catch (error) {
+    next(error);
+    // next("failed to return data")
+  }
+};

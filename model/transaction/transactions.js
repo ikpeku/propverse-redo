@@ -13,7 +13,7 @@ const transaction_Schema = new Schema(
 
     transaction_type: {
       type: String,
-      enum: ["property purchase", "funds"],
+      enum: ["property", "funds"],
     },
     isVerify: {
       type: Boolean,

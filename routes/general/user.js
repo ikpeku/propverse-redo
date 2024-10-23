@@ -19,6 +19,7 @@ set_Payout,
 set_User_Info,
 set_User_Avatar,
 get_Rerral,
+delete_Transaction,
 } = require("../../controller/General/user");
 
 const route = express.Router();
@@ -46,7 +47,7 @@ route.get("/fund/:prodId", propertyInvestmentInfo);
  * transactions
  */
 route.get("/transaction/:txnId", get_Transaction_by_Id);
-route.delete("/transaction/:txnId", get_Transaction_by_Id);
+route.delete("/transaction/:txnId", delete_Transaction);
 route.get("/transactions/payin", get_Transactions);
 
 

@@ -3,7 +3,8 @@ const User = require("../../model/user")
 const Accreditation = require("../../model/compliance/accreditation")
 const { errorHandler } = require("../../utils/error")
 const properties = require("../../model/developer/properties");
-// const Fund = require("../../model/institutional/fund");
+const Funds = require("../../model/institutional/fund");
+const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const PayInTransaction = require("../../model/transaction/transactions");
 const Due_deligence = require("../../model/developer/due_deligence");
 const { ObjectId } = require("mongodb");
@@ -895,6 +896,10 @@ exports.get_Transaction_by_Id = async (req, res, next) => {
   }
 }
 
+
+
+
+
 exports.delete_Transaction = async (req, res, next) => {
  
  
@@ -904,7 +909,7 @@ exports.delete_Transaction = async (req, res, next) => {
 
   
 
-    return res.status(200).json({ status: "success", data: myAggregate[0] });
+    return res.status(200).json({ status: "delete success" });
   } catch (error) {
     next(errorHandler(500, "network error"));
     
@@ -946,7 +951,7 @@ exports.create_Transactions = async (req, res, next) => {
       isVerify: true,
       investor: investorId,
       company: response.user,
-      transaction_type: "funds",
+      transaction_type: "property",
       funds: fundId,
       name: response.property_detail.property_overview.property_name,
       status: "Success",
@@ -989,7 +994,7 @@ exports.create_Transactions = async (req, res, next) => {
       isVerify: true,
       investor: investorId,
       company: response.user,
-      transaction_type: "property purchase",
+      transaction_type: "property",
       property: prodId,
       name: response.property_detail.property_overview.property_name,
       status: "Success",
@@ -1020,7 +1025,7 @@ exports.create_Transactions = async (req, res, next) => {
       { new: true, useFindAndModify: false }
     );
   
-    await Property.findByIdAndUpdate(
+    await properties.findByIdAndUpdate(
       txnProperty.property,
       { $push: { transactions: txnProperty._id } },
       { new: true, useFindAndModify: false }
@@ -1127,84 +1132,6 @@ exports.create_Transactions = async (req, res, next) => {
   
 }
 
-
-// {
-//   investor: {
-//     type: SchemaTypes.ObjectId,
-//     ref: "user",
-//     required: true,
-//   },
-
-//   transaction_type: {
-//     type: String,
-//     enum: ["property purchase", "funds"],
-//   },
-//   isVerify: {
-//     type: Boolean,
-//     default: false,
-//   },
-  // company: {
-  //   type: SchemaTypes.ObjectId,
-  //   ref: "due_deligence",
-  //   // required: true,
-  // },
-
-  // property: {
-  //   // type: SchemaTypes.ObjectId,
-  //   type: String,
-  //   ref: "properties",
-  //   // required: true,
-  // },
-  // funds: {
-  //   // type: SchemaTypes.ObjectId,
-  //   type: String,
-  //   ref: "fund",
-  //   // required: true,
-  // },
-  // name: String,
-  // status: {
-  //   type: String,
-  //   enum: ["Success", "Failed", "Pending"],
-  //   required: true,
-  // },
-  // paid: {
-  //   amount: {
-  //     type: Number,
-  //     default: 0,
-  //   },
-  //   currency: {
-  //     type: String,
-  //     default: "",
-  //   },
-  // },
-
-  // property_amount: {
-  //   amount: {
-  //     type: Number,
-  //     default: 0,
-  //   },
-  //   currency: {
-  //     type: String,
-  //     default: "",
-  //   },
-  // },
-
-  // proof_of_payment: {
-  //   location: String,
-  //   originalname: String,
-  //   mimetype: String,
-  //   size: String,
-  //   key: String,
-  // },
-  // payment_method: {
-  //   type: String,
-  // },
-  // payment_status: {
-  //   type: String,
-  // },
-  // description: {
-  //   type: String,
-  // },
 
 
 
