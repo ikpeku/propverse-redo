@@ -21,6 +21,7 @@ set_User_Avatar,
 get_Rerral,
 delete_Transaction,
 } = require("../../controller/General/user");
+const { AllProperties, AllFunds, AllUsers } = require("../../controller/Admin/GeneralAdmin");
 
 const route = express.Router();
 
@@ -69,5 +70,11 @@ route.get("/referral", get_Rerral);
  */
 
 
+/**
+ * all datas
+ */
 
+ route.get("/allproperties", AllProperties);
+ route.get("/allfunds", AllFunds);
+ route.get("/allusers", AllUsers);
 module.exports = route;

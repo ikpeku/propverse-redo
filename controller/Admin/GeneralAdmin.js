@@ -231,7 +231,7 @@ exports.VerifyPayIn = async(req,res,next) => {
   exports.AdminDashbroad = async(req,res,next) => {
 
     // let today = new Date()
-    console.log("enter")
+    // console.log("enter")
 
 
 //         'Institutional Investor',
@@ -288,3 +288,46 @@ exports.VerifyPayIn = async(req,res,next) => {
 
   }
   
+
+  /**
+   * return all property without pagination
+   */
+
+  exports.AllProperties = async(req,res,next) => {
+
+    try {
+    const data =  await Property.find({ isAdminAproved: "Approved", }).select("_id property_detail.property_overview.property_name")
+    res.status(200).json({
+      data
+    })
+    } catch (error) {
+      next(error)
+      
+    }
+  }
+
+  exports.AllFunds = async(req,res,next) => {
+  
+    try {
+    const data =  await Funds.find({ isAdmin_Approved: "approved"}).select("_id name")
+    res.status(200).json({
+      data
+    })
+    } catch (error) {
+      next(error)
+      
+    }
+  }
+
+  exports.AllUsers = async(req,res,next) => {
+  
+    try {
+    const data =  await User.find({verify_account: true}).select("_id username")
+    res.status(200).json({
+      data
+    })
+    } catch (error) {
+      next(error)
+      
+    }
+  }
