@@ -1195,13 +1195,28 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     //   { new: true, useFindAndModify: false }
     // );
 
-    const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:fundId, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
-      
-    await Funds.findByIdAndUpdate(
-      fundInvestment.funds,
-      { $push: { investments: fundInvestment._id , limitedpartners: Limited_partnersresponse._id} },
-      { new: true, useFindAndModify: false }
-    );
+    const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
+
+
+    if(!dataLimited){
+      const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:fundId, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
+        
+      await Funds.findByIdAndUpdate(
+        fundInvestment.funds,
+        { $push: { investments: fundInvestment._id , limitedpartners: Limited_partnersresponse._id} },
+        { new: true, useFindAndModify: false }
+      );
+
+    } else {
+      dataLimited.capital_deploy.amount += amount;
+      dataLimited.save();
+
+      await Funds.findByIdAndUpdate(
+        fundInvestment.funds,
+        { $push: { investments: fundInvestment._id,} },
+        { new: true, useFindAndModify: false }
+      );
+    }
 
     // investments: [{
     //   type: Schema.Types.ObjectId,
@@ -1266,14 +1281,30 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       { new: true, useFindAndModify: false }
     );
 
-    const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
-  
+    const dataLimited_partners =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
 
-    await Funds.findByIdAndUpdate(
-      txnProperty.funds,
-      { $push: { investments: txnProperty._id , limitedpartners: Limited_partnersresponse._id} },
-      { new: true, useFindAndModify: false }
-    );
+    if(!dataLimited_partners){
+      const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
+    
+  
+      await Funds.findByIdAndUpdate(
+        txnProperty.funds,
+        { $push: { investments: txnProperty._id , limitedpartners: Limited_partnersresponse._id} },
+        { new: true, useFindAndModify: false }
+      );
+
+    } else {
+      dataLimited_partners.capital_deploy.amount += amount;
+      dataLimited_partners.save();
+
+      await Funds.findByIdAndUpdate(
+        txnProperty.funds,
+        { $push: { investments: txnProperty._id} },
+        { new: true, useFindAndModify: false }
+      );
+
+    }
+
 
 
 
@@ -1320,26 +1351,6 @@ exports.create_Funds_Transactions = async (req, res, next) => {
 exports.capitalcommitted = async (req, res, next) => {
   const {userId, fundId} = req.params;
 
-  const page = parseInt(req?.query?.page) || 1;
-
-  const limit = parseInt(req?.query?.limit) || 10;
-  const searchText = req?.query?.searchText;
-  const country = req?.query?.country;
-  const status = req?.query?.status;
-  const name = req?.query?.name;
-
-
-  const myCustomLabels = {
-    docs: 'data',
-  };
-
-  const options = {
-    page,
-    limit,
-    customLabels: myCustomLabels
-  };
-
-
   const query = [
     {
       $match: {user: new ObjectId(userId),  fund: fundId}
@@ -1372,36 +1383,12 @@ exports.capitalcommitted = async (req, res, next) => {
    
   ]
 
-
-// if(req?.query?.user){
-//   query.unshift({
-//     $match: {user: new ObjectId(req?.query?.user)}
-//   })
-// }
-
-
-// "capital_committed": {
-//   "amount": 3100,
-//   "currency": "$"
-// },
-// "capital_deploy": {
-//   "amount": 1100,
-//   "currency": "$"
-// },
-
-
   
   try {
     const allFunds = await Limited_partners.aggregate(query);
 
-    // const paginationResult = await Limited_partners.aggregatePaginate(
-    //   allFunds,
-    //   options
-    // );
-
     res.status(200).json({
       success: true,
-      // count: allFunds.length,
        data: allFunds[0],
     });
   } catch (error) {
