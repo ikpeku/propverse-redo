@@ -25,15 +25,15 @@ const Institutional_Schema = new Schema({
       //   ref: "properties",
       // }
       // ],
-      // funds: [{
-      //   type: SchemaTypes.ObjectId,
-      //   ref: "fund",
-      // }
-      // ],
+      funds: [{
+        type: SchemaTypes.ObjectId,
+        ref: "fund",
+      }
+      ],
 
       limitedpartners: [{
         type: Schema.Types.ObjectId,
-        ref: "transaction",
+        ref: "limited_partner",
       }],
   
       funds_holdings: {
@@ -67,5 +67,5 @@ const Institutional_Schema = new Schema({
   
   Institutional_Schema.plugin(aggregatePaginate);
   
-  module.exports = mongoose.model("non_Institutional", Institutional_Schema);
+  module.exports = mongoose.model("Institutional", Institutional_Schema);
   

@@ -14,6 +14,23 @@ const fundSchema = new Schema(
       ref: "transaction",
     }],
 
+    limitedpartners: [{
+      type: Schema.Types.ObjectId,
+      ref: "limited_partner",
+    }],
+  
+    funds_holdings: {
+      project_investments: [{
+        type: Schema.Types.ObjectId,
+        ref: "properties",
+      }],
+      funds_investments: [{
+        type: Schema.Types.ObjectId,
+        ref: "fund",
+      }],
+  
+    },
+
 
     isSubmitted: {
       type: Boolean,

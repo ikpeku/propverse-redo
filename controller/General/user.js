@@ -6,6 +6,7 @@ const properties = require("../../model/developer/properties");
 const Funds = require("../../model/institutional/fund");
 const Limited_partners = require("../../model/institutional/limitedpartners");
 const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
+const Institutional_Investor = require("../../model/institutional/primaryContactDetails");
 const PayInTransaction = require("../../model/transaction/transactions");
 const Due_deligence = require("../../model/developer/due_deligence");
 const { ObjectId } = require("mongodb");
@@ -1132,11 +1133,12 @@ exports.create_Property_Transactions = async (req, res, next) => {
 
 exports.create_Funds_Transactions = async (req, res, next) => {
 
-  const {description, investorId, fundId, prodId,payment_status, paymentDate,
+  const {description, investorId, fundId, invested_fund,payment_status, paymentDate,
     paid: {
       amount,
       currency,
-    }
+    },
+    capital_committed
   } = req.body;
 
   if(req.payload.status !== 'Admin') return next(errorHandler(403, "Admin operation only"));
@@ -1148,30 +1150,31 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       return next(errorHandler(400, "invalid user id"));
     }
    
-    // console.log(prodId)
-  const response = await properties.findById(prodId);
+   
+  const response = await Funds.findById(invested_fund);
 
   if (!response) {
     return next(errorHandler(400, "confirm transact failed"));
   }
+
 
   if(fundId){
    const fundInvestment =  await PayInTransaction.create({
       isVerify: true,
       investor: investorId,
       company: response.user,
-      property: prodId,
-      transaction_type: "property",
+      // property: prodId,
+      transaction_type: "funds",
       funds: fundId,
-      name: response.property_detail.property_overview.property_name,
+      name: response.name,
       status: "Success",
       paid: {
         amount,
         currency,
       },
       property_amount: {
-        amount: response.property_detail.property_overview.price.amount,
-        currency: response.property_detail.property_overview.price.currency,
+        amount: capital_committed.amount,
+        currency: capital_committed.currency,
       },
       // proof_of_payment: {
       //   location,
@@ -1191,12 +1194,36 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     //   { $push: { transactions: fundInvestment._id, funds: fundInvestment.funds } },
     //   { new: true, useFindAndModify: false }
     // );
-    
+
+    const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:fundId, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
+      
     await Funds.findByIdAndUpdate(
       fundInvestment.funds,
-      { $push: { investments: fundInvestment._id } },
+      { $push: { investments: fundInvestment._id , limitedpartners: Limited_partnersresponse._id} },
       { new: true, useFindAndModify: false }
     );
+
+    // investments: [{
+    //   type: Schema.Types.ObjectId,
+    //   ref: "transaction",
+    // }],
+
+    // limitedpartners: [{
+    //   type: Schema.Types.ObjectId,
+    //   ref: "limited_partner",
+    // }],
+  
+    // funds_holdings: {
+    //   project_investments: [{
+    //     type: Schema.Types.ObjectId,
+    //     ref: "properties",
+    //   }],
+    //   funds_investments: [{
+    //     type: Schema.Types.ObjectId,
+    //     ref: "fund",
+    //   }],
+  
+    // },
 
 
   } else {
@@ -1204,17 +1231,18 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       isVerify: true,
       investor: investorId,
       company: response.user,
-      transaction_type: "property",
-      property: prodId,
-      name: response.property_detail.property_overview.property_name,
+      transaction_type: "funds",
+      // property: prodId,
+      funds: invested_fund,
+      name: response.name,
       status: "Success",
       paid: {
         amount,
         currency,
       },
       property_amount: {
-        amount: response.property_detail.property_overview.price.amount,
-        currency: response.property_detail.property_overview.price.currency,
+        amount: capital_committed.amount,
+        currency: capital_committed.currency,
       },
       // proof_of_payment: {
       //   location,
@@ -1229,17 +1257,36 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       paymentDate
     });
 
+
+    // console.log(txnProperty)
+
     await Non_Institutional_Investor.findByIdAndUpdate(
       txnProperty.investor,
-      { $push: { transactions: txnProperty._id, properties: txnProperty.property } },
+      { $push: { transactions: txnProperty._id, funds: txnProperty.funds } },
       { new: true, useFindAndModify: false }
     );
+
+    const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
   
-    await properties.findByIdAndUpdate(
-      txnProperty.property,
-      { $push: { transactions: txnProperty._id } },
+
+    await Funds.findByIdAndUpdate(
+      txnProperty.funds,
+      { $push: { investments: txnProperty._id , limitedpartners: Limited_partnersresponse._id} },
       { new: true, useFindAndModify: false }
     );
+
+
+
+
+
+    // await properties.findByIdAndUpdate(
+    //   txnProperty.property,
+    //   { $push: { transactions: txnProperty._id } },
+    //   { new: true, useFindAndModify: false }
+    // );
+
+    // await Institutional_Investor.findByIdAndUpdate()
+
   }
 
 
@@ -1257,17 +1304,203 @@ exports.create_Funds_Transactions = async (req, res, next) => {
 }
 
 
+// exports. = async (req, res, next) => {
+ 
+
+//   try {
+//     const response =  await Limited_partners.findOne({user: userId,  fund:fundId})
+ 
+//     return res.status(200).json({ status: "success", data:response});
+
+//   } catch (error) {
+//     next(error)
+    
+//   }
+// }
 exports.capitalcommitted = async (req, res, next) => {
   const {userId, fundId} = req.params;
 
-  try {
-    const response =  await Limited_partners.findOne({user: userId,  fund:fundId})
- 
-    return res.status(200).json({ status: "success", data:response});
+  const page = parseInt(req?.query?.page) || 1;
 
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+  const country = req?.query?.country;
+  const status = req?.query?.status;
+  const name = req?.query?.name;
+
+
+  const myCustomLabels = {
+    docs: 'data',
+  };
+
+  const options = {
+    page,
+    limit,
+    customLabels: myCustomLabels
+  };
+
+
+  const query = [
+    {
+      $match: {user: new ObjectId(userId),  fund: fundId}
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+     {
+      $sort: {
+        updatedAt: -1
+      }
+    },
+    {
+      $project: {
+        username: "$user.username",
+        capital_committed: 1,
+        capital_deploy: 1,
+        remaining_balance: {$subtract :["$capital_committed.amount", "$capital_deploy.amount"]},
+        _id: "$_id",
+      },
+    },
+   
+  ]
+
+
+// if(req?.query?.user){
+//   query.unshift({
+//     $match: {user: new ObjectId(req?.query?.user)}
+//   })
+// }
+
+
+// "capital_committed": {
+//   "amount": 3100,
+//   "currency": "$"
+// },
+// "capital_deploy": {
+//   "amount": 1100,
+//   "currency": "$"
+// },
+
+
+  
+  try {
+    const allFunds = await Limited_partners.aggregate(query);
+
+    // const paginationResult = await Limited_partners.aggregatePaginate(
+    //   allFunds,
+    //   options
+    // );
+
+    res.status(200).json({
+      success: true,
+      // count: allFunds.length,
+       data: allFunds[0],
+    });
   } catch (error) {
-    next(error)
-    
+    next(errorHandler(500, "server error"));
+  }
+}
+
+
+
+exports.getLimitedPartners = async (req, res, next) => {
+ 
+
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+  const country = req?.query?.country;
+  const status = req?.query?.status;
+  const name = req?.query?.name;
+
+
+  const myCustomLabels = {
+    docs: 'data',
+  };
+
+  const options = {
+    page,
+    limit,
+    customLabels: myCustomLabels
+  };
+
+
+  const query = [
+    // {
+    //   $match: {...req.body}
+    // },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+     {
+      $sort: {
+        updatedAt: -1
+      }
+    },
+    {
+      $project: {
+        username: "$user.username",
+        capital_committed: 1,
+        capital_deploy: 1,
+        remaining_balance: {$subtract :["$capital_committed.amount", "$capital_deploy.amount"]},
+        _id: "$_id",
+      },
+    },
+   
+  ]
+
+
+// if(req?.query?.user){
+//   query.unshift({
+//     $match: {user: new ObjectId(req?.query?.user)}
+//   })
+// }
+
+
+// "capital_committed": {
+//   "amount": 3100,
+//   "currency": "$"
+// },
+// "capital_deploy": {
+//   "amount": 1100,
+//   "currency": "$"
+// },
+
+
+  
+  try {
+    const allFunds =  Limited_partners.aggregate(query);
+
+    const paginationResult = await Limited_partners.aggregatePaginate(
+      allFunds,
+      options
+    );
+
+    res.status(200).json({
+      success: true,
+     ...paginationResult
+      // count: allFunds.length,
+       
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
   }
 }
 

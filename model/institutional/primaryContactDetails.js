@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const { Schema ,} = mongoose;
 const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 
 const institutionalUserSchema = new Schema({
@@ -48,22 +48,30 @@ const institutionalUserSchema = new Schema({
     default: false,
   },
 
-  fundsRaise: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-    ref: 'transaction',
-    required: true,
-    }
+  // fundsRaise: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'transaction',
+  //   required: true,
+  //   }
 
-  ],
-  limitedPartners: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
-    required: true,
-    }
+  // ],
+  // limitedPartners: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //   ref: 'user',
+  //   required: true,
+  //   }
 
-  ]
+  // ]
+
+  // funds: [{
+  //   type:  Schema.Types.ObjectId,
+  //   ref: "fund",
+  // }
+  // ],
+
+ 
 
 
 

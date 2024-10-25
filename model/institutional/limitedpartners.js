@@ -49,5 +49,5 @@ const limited_partners_Schema = new Schema(
   
   limited_partners_Schema.plugin(aggregatePaginate);
   
-  module.exports = mongoose.model("limited_partners", limited_partners_Schema);
+  module.exports = mongoose.model("limited_partner", limited_partners_Schema);
   

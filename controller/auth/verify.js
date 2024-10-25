@@ -3,6 +3,7 @@ const ValidationUser = require("../../model/verifyUser");
 const User = require("../../model/user");
 const Developer_Due_Diligence = require("../../model/developer/due_deligence")
 const Non_Institutional_Investment = require("../../model/non_institional/non_institutional")
+// const Institutional_Investor = require("../../model/institutional/fund_manger");
 
 const Kyc = require("../../model/compliance/kyc")
 const Acreditation = require("../../model/compliance/accreditation")
@@ -83,7 +84,10 @@ exports.verifyUser = async (req, res, next) => {
 
          }
 
-  
+        //  if(data.account_type === "Institutional Investor"){
+        //      await  Institutional_Investor.create({_id:userId, user: userId, kyc: userId, accreditation: userId })
+        //  }
+
 
         const token = await authTokenInit.createToken(data);
 

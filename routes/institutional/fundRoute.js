@@ -15,7 +15,7 @@ const {
   checkInstitutionalUser,
 } = require('../../middleware/users/institutional');
 const { fundPurposeInquiry } = require('../../controller/institutional/primaryContactDetails');
-const { capitalcommitted } = require('../../controller/General/user');
+const { capitalcommitted, getLimitedPartners } = require('../../controller/General/user');
 const route = express.Router();
 
 route.post('/fund/submit/:fundId', checkInstitutionalUser, submitFund, createFund);
@@ -32,5 +32,6 @@ route.get('/submit/funds', AllUserSubmitFunds, getAllFunds);
 route.get('/fund/:id', getSingleFund);
 route.get('/fundtransationdatail/:fundId', fundtransationdatail);
 route.get('/capitalcommitted/:fundId/:userId', capitalcommitted);
+route.get('/limitedpartners', getLimitedPartners);
 
 module.exports = route;
