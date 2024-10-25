@@ -4,6 +4,7 @@ const Accreditation = require("../../model/compliance/accreditation")
 const { errorHandler } = require("../../utils/error")
 const properties = require("../../model/developer/properties");
 const Funds = require("../../model/institutional/fund");
+const Limited_partners = require("../../model/institutional/limitedpartners");
 const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const PayInTransaction = require("../../model/transaction/transactions");
 const Due_deligence = require("../../model/developer/due_deligence");
@@ -896,10 +897,6 @@ exports.get_Transaction_by_Id = async (req, res, next) => {
   }
 }
 
-
-
-
-
 exports.delete_Transaction = async (req, res, next) => {
  
  
@@ -916,12 +913,8 @@ exports.delete_Transaction = async (req, res, next) => {
   }
 }
 
+exports.create_Property_Transactions = async (req, res, next) => {
 
-
-
-
-exports.create_Transactions = async (req, res, next) => {
-  // const page = parseInt(req?.query?.type) || "payin";
   const {description, investorId, fundId, prodId,payment_status, paymentDate,
     paid: {
       amount,
@@ -976,9 +969,14 @@ exports.create_Transactions = async (req, res, next) => {
       paymentDate
     });
 
-    await Non_Institutional_Investor.findByIdAndUpdate(
-      fundInvestment.investor,
-      { $push: { transactions: fundInvestment._id, funds: fundInvestment.funds } },
+    // await Non_Institutional_Investor.findByIdAndUpdate(
+    //   fundInvestment.investor,
+    //   { $push: { transactions: fundInvestment._id, funds: fundInvestment.funds } },
+    //   { new: true, useFindAndModify: false }
+    // );
+    await properties.findByIdAndUpdate(
+      fundInvestment.property,
+      { $push: { transactions: fundInvestment._id } },
       { new: true, useFindAndModify: false }
     );
     
@@ -1131,6 +1129,148 @@ exports.create_Transactions = async (req, res, next) => {
 
   
 }
+
+exports.create_Funds_Transactions = async (req, res, next) => {
+
+  const {description, investorId, fundId, prodId,payment_status, paymentDate,
+    paid: {
+      amount,
+      currency,
+    }
+  } = req.body;
+
+  if(req.payload.status !== 'Admin') return next(errorHandler(403, "Admin operation only"));
+  
+  try {
+  
+    const isUser = await User.findById(investorId)
+    if (!isUser) {
+      return next(errorHandler(400, "invalid user id"));
+    }
+   
+    // console.log(prodId)
+  const response = await properties.findById(prodId);
+
+  if (!response) {
+    return next(errorHandler(400, "confirm transact failed"));
+  }
+
+  if(fundId){
+   const fundInvestment =  await PayInTransaction.create({
+      isVerify: true,
+      investor: investorId,
+      company: response.user,
+      property: prodId,
+      transaction_type: "property",
+      funds: fundId,
+      name: response.property_detail.property_overview.property_name,
+      status: "Success",
+      paid: {
+        amount,
+        currency,
+      },
+      property_amount: {
+        amount: response.property_detail.property_overview.price.amount,
+        currency: response.property_detail.property_overview.price.currency,
+      },
+      // proof_of_payment: {
+      //   location,
+      //   originalname,
+      //   mimetype,
+      //   size,
+      //   key,
+      // },
+      payment_method: "bank  transfer",
+      payment_status,
+      description,
+      paymentDate
+    });
+
+    // await Non_Institutional_Investor.findByIdAndUpdate(
+    //   fundInvestment.investor,
+    //   { $push: { transactions: fundInvestment._id, funds: fundInvestment.funds } },
+    //   { new: true, useFindAndModify: false }
+    // );
+    
+    await Funds.findByIdAndUpdate(
+      fundInvestment.funds,
+      { $push: { investments: fundInvestment._id } },
+      { new: true, useFindAndModify: false }
+    );
+
+
+  } else {
+   const txnProperty = await PayInTransaction.create({
+      isVerify: true,
+      investor: investorId,
+      company: response.user,
+      transaction_type: "property",
+      property: prodId,
+      name: response.property_detail.property_overview.property_name,
+      status: "Success",
+      paid: {
+        amount,
+        currency,
+      },
+      property_amount: {
+        amount: response.property_detail.property_overview.price.amount,
+        currency: response.property_detail.property_overview.price.currency,
+      },
+      // proof_of_payment: {
+      //   location,
+      //   originalname,
+      //   mimetype,
+      //   size,
+      //   key,
+      // },
+      payment_method: "bank  transfer",
+      payment_status,
+      description,
+      paymentDate
+    });
+
+    await Non_Institutional_Investor.findByIdAndUpdate(
+      txnProperty.investor,
+      { $push: { transactions: txnProperty._id, properties: txnProperty.property } },
+      { new: true, useFindAndModify: false }
+    );
+  
+    await properties.findByIdAndUpdate(
+      txnProperty.property,
+      { $push: { transactions: txnProperty._id } },
+      { new: true, useFindAndModify: false }
+    );
+  }
+
+
+  return res.status(200).json({ status: "success"});
+
+  } catch (error) {
+    next(error);
+    // next(errorHandler(500, "network error"));
+    
+  }
+
+
+
+  
+}
+
+
+exports.capitalcommitted = async (req, res, next) => {
+  const {userId, fundId} = req.params;
+
+  try {
+    const response =  await Limited_partners.findOne({user: userId,  fund:fundId})
+ 
+    return res.status(200).json({ status: "success", data:response});
+
+  } catch (error) {
+    next(error)
+    
+  }
+}
+
 
 
 

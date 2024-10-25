@@ -22,7 +22,7 @@ const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayI
 const { FundsManagement ,currentListed, fundsListedApproval, statusFund, approveFund, rejectFund, pauseFund, unPauseFund} = require("../../controller/Admin/Institutional/funds");
 const { get_All_Institutional, get_Institutional } = require("../../controller/Admin/Institutional/institutional");
 const { uploadActivities } = require("../../controller/Developer/properties");
-const { create_Transactions } = require("../../controller/General/user");
+const { create_Property_Transactions, create_Funds_Transactions } = require("../../controller/General/user");
 const route = express.Router();
 
 /**
@@ -153,6 +153,8 @@ route.get("/dashbroad", AdminDashbroad)
 /**
  * transaction
  */
-route.post("/payintransaction/payin", create_Transactions);
+route.post("/payintransaction/property", create_Property_Transactions);
+route.post("/payintransaction/funds", create_Funds_Transactions);
+route.get("/capitalcommitted/", create_Funds_Transactions);
 
 module.exports = route;

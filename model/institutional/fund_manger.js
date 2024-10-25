@@ -19,17 +19,34 @@ const Institutional_Schema = new Schema({
         ref: "transaction",
       }
       ],
-      properties: [{
-        // type: SchemaTypes.ObjectId,
-        type: String,
-        ref: "properties",
-      }
-      ],
-      funds: [{
-        type: SchemaTypes.ObjectId,
-        ref: "fund",
-      }
-      ],
+      // properties: [{
+      //   // type: SchemaTypes.ObjectId,
+      //   type: String,
+      //   ref: "properties",
+      // }
+      // ],
+      // funds: [{
+      //   type: SchemaTypes.ObjectId,
+      //   ref: "fund",
+      // }
+      // ],
+
+      limitedpartners: [{
+        type: Schema.Types.ObjectId,
+        ref: "transaction",
+      }],
+  
+      funds_holdings: {
+        project_investments: [{
+          type: Schema.Types.ObjectId,
+          ref: "properties",
+        }],
+        funds_investments: [{
+          type: Schema.Types.ObjectId,
+          ref: "fund",
+        }],
+  
+      },
     
     kyc: {
         type: SchemaTypes.ObjectId,
