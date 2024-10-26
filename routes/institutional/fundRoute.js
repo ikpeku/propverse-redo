@@ -32,6 +32,8 @@ route.get('/submit/funds', AllUserSubmitFunds, getAllFunds);
 route.get('/fund/:id', getSingleFund);
 route.get('/fundtransationdatail/:fundId', fundtransationdatail);
 route.get('/capitalcommitted/:fundId/:userId', capitalcommitted);
-route.get('/limitedpartners', getLimitedPartners);
+route.get('/limitedpartners/:fundId', getLimitedPartners);
+route.get('/fundholding/project/:fundId', getLimitedPartners);
+route.get('/fundholding/funds/:fundId', getLimitedPartners);
 
 module.exports = route;

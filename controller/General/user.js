@@ -6,7 +6,7 @@ const properties = require("../../model/developer/properties");
 const Funds = require("../../model/institutional/fund");
 const Limited_partners = require("../../model/institutional/limitedpartners");
 const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
-const Institutional_Investor = require("../../model/institutional/primaryContactDetails");
+// const Institutional_Investor = require("../../model/institutional/primaryContactDetails");
 const PayInTransaction = require("../../model/transaction/transactions");
 const Due_deligence = require("../../model/developer/due_deligence");
 const { ObjectId } = require("mongodb");
@@ -786,7 +786,18 @@ exports.get_Transactions = async (req, res, next) => {
     )
   }
 
-
+//   name: 1,
+//   description: 1,
+//   date: "$createdAt",
+//   amount_paid: "$paid.amount",
+//   total_amount : "$property_amount.amount",
+//   payment_status: "$status",
+//   transaction_type: 1,
+//   transaction_method: "$payment_method",
+//   transaction_status: "$payment_status",
+// "user.username": 1,
+// "user.phone_number": 1,
+// "user.email": 1
 
 
 
@@ -802,8 +813,6 @@ exports.get_Transactions = async (req, res, next) => {
           ]
         }
       })
-
-      
     }
     
     if(country){
@@ -983,11 +992,11 @@ exports.create_Property_Transactions = async (req, res, next) => {
     
     await Funds.findByIdAndUpdate(
       fundInvestment.funds,
-      { $push: { investments: fundInvestment._id } },
+      { $push: { investments: fundInvestment._id , "funds_holdings.project_investments": fundInvestment.property} },
       { new: true, useFindAndModify: false }
     );
 
-
+    
   } else {
    const txnProperty = await PayInTransaction.create({
       isVerify: true,
@@ -1203,7 +1212,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
         
       await Funds.findByIdAndUpdate(
         fundInvestment.funds,
-        { $push: { investments: fundInvestment._id , limitedpartners: Limited_partnersresponse._id} },
+        { $push: { investments: fundInvestment._id , limitedpartners: Limited_partnersresponse._id, "funds_holdings.funds_investments": fundId} },
         { new: true, useFindAndModify: false }
       );
 
@@ -1335,19 +1344,6 @@ exports.create_Funds_Transactions = async (req, res, next) => {
 }
 
 
-// exports. = async (req, res, next) => {
- 
-
-//   try {
-//     const response =  await Limited_partners.findOne({user: userId,  fund:fundId})
- 
-//     return res.status(200).json({ status: "success", data:response});
-
-//   } catch (error) {
-//     next(error)
-    
-//   }
-// }
 exports.capitalcommitted = async (req, res, next) => {
   const {userId, fundId} = req.params;
 
@@ -1400,14 +1396,14 @@ exports.capitalcommitted = async (req, res, next) => {
 
 exports.getLimitedPartners = async (req, res, next) => {
  
-
+const {fundId} = req.params
   const page = parseInt(req?.query?.page) || 1;
 
   const limit = parseInt(req?.query?.limit) || 10;
   const searchText = req?.query?.searchText;
-  const country = req?.query?.country;
-  const status = req?.query?.status;
-  const name = req?.query?.name;
+  // const country = req?.query?.country;
+  // const status = req?.query?.status;
+  // const name = req?.query?.name;
 
 
   const myCustomLabels = {
@@ -1422,9 +1418,9 @@ exports.getLimitedPartners = async (req, res, next) => {
 
 
   const query = [
-    // {
-    //   $match: {...req.body}
-    // },
+    {
+      $match: {fund: fundId}
+    },
     {
       $lookup: {
         from: "users",
@@ -1452,6 +1448,18 @@ exports.getLimitedPartners = async (req, res, next) => {
     },
    
   ]
+
+  if(searchText){
+    query.push({
+      $match: {
+        $or: [
+          { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+          { remaining_balance: { $regex: ".*" + searchText + ".*", $options: "i" } },
+         
+        ]
+      }
+    })
+  }
 
 
 // if(req?.query?.user){
