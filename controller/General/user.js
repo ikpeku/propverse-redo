@@ -1168,6 +1168,13 @@ exports.create_Funds_Transactions = async (req, res, next) => {
 
 
   if(fundId){
+
+    const responseFunds = await Funds.findById(fundId);
+    if (!responseFunds) {
+      return next(errorHandler(400, "invalid fundId"));
+    }
+
+    
    const fundInvestment =  await PayInTransaction.create({
       isVerify: true,
       investor: investorId,
@@ -1204,7 +1211,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     //   { new: true, useFindAndModify: false }
     // );
 
-    const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
+    const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:fundId})
 
 
     if(!dataLimited){
@@ -1212,7 +1219,10 @@ exports.create_Funds_Transactions = async (req, res, next) => {
         
       await Funds.findByIdAndUpdate(
         fundInvestment.funds,
-        { $push: { investments: fundInvestment._id , limitedpartners: Limited_partnersresponse._id, "funds_holdings.funds_investments": fundId} },
+        { $push: { 
+          "investments": fundInvestment._id , 
+          "limitedpartners": Limited_partnersresponse._id, 
+          "funds_holdings.funds_investments": fundId} },
         { new: true, useFindAndModify: false }
       );
 
@@ -1442,11 +1452,11 @@ const {fundId} = req.params
         username: "$user.username",
         capital_committed: 1,
         capital_deploy: 1,
+        date_join: "$user.createdAt",
         remaining_balance: {$subtract :["$capital_committed.amount", "$capital_deploy.amount"]},
         _id: "$_id",
       },
     },
-   
   ]
 
   if(searchText){

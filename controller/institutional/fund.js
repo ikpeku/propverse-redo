@@ -2,6 +2,7 @@ const Fund = require('../../model/institutional/fund');
 const InstitutionalUser = require('../../model/institutional/primaryContactDetails');
 const { errorHandler } = require('../../utils/error');
 const { ObjectId } = require("mongodb");
+const Limited_partners = require("../../model/institutional/limitedpartners");
 
 exports.submitFund = async (req, res, next) => {
   req.body.isSubmitted = true
@@ -332,3 +333,272 @@ exports.fundtransationdatail = async(req, res) => {
 }
 
 
+exports.getHoldingsProject = async (req, res, next) => {
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+  const searchText = req?.query?.searchText;
+  const country = req?.query?.country;
+  const status = req?.query?.status;
+  const name = req?.query?.name;
+
+
+  // console.log("data: ",req.body)
+  // console.log("user: ",req.query.user)
+  // console.log("payload: ",req.payload)
+
+
+  const myCustomLabels = {
+    docs: 'data',
+  };
+
+  const options = {
+    page,
+    limit,
+    customLabels: myCustomLabels
+  };
+
+
+  const query = [
+    {
+      $match: {...req.body}
+    },
+    {
+      $sort: {
+        updatedAt: -1
+      }
+    }
+  ]
+
+
+if(req?.query?.user){
+  query.unshift({
+    $match: {user: new ObjectId(req?.query?.user)}
+  })
+}
+
+
+
+  
+  try {
+    const allFunds = Fund.aggregate(query);
+
+    const paginationResult = await Fund.aggregatePaginate(
+      allFunds,
+      options
+    );
+
+    res.status(200).json({
+      success: true,
+      count: allFunds.length,
+       ...paginationResult,
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+
+
+};
+
+// exports.getHoldingsFunds = async (req, res, next) => {
+//   const page = parseInt(req?.query?.page) || 1;
+//   const {fundId} = req.params;
+
+//   const limit = parseInt(req?.query?.limit) || 10;
+//   // const searchText = req?.query?.searchText;
+//   // const country = req?.query?.country;
+//   // const status = req?.query?.status;
+//   // const name = req?.query?.name;
+
+
+//   // console.log("data: ",req.body)
+//   // console.log("user: ",req.query.user)
+//   // console.log("payload: ",req.payload)
+
+
+//   const myCustomLabels = {
+//     docs: 'data',
+//   };
+
+//   const options = {
+//     page,
+//     limit,
+//     customLabels: myCustomLabels
+//   };
+
+
+//   // const query = 
+
+
+// // if(req?.query?.user){
+// //   query.unshift({
+// //     $match: {user: new ObjectId(req?.query?.user)}
+// //   })
+// // }
+
+
+
+  
+//   try {
+//     const allFunds = Fund.aggregate([
+//       {
+//         // $match: {...req.body}
+//         // $match: {_id: new ObjectId(fundId)}
+//         $match: {_id: fundId}
+//       },
+//       // {
+//       //   $lookup: {
+//       //        from: "limited_partners",
+//       //        localField: "limitedpartners",
+//       //        foreignField: "_id",
+//       //        as: "limited_partner",
+//       //      },
+//       //    },
+//         //  {
+//         //   $unwind: "$user"
+//         //  },
+//          {
+//         $lookup: {
+//              from: "funds",
+//              localField: "funds_holdings.funds_investments",
+//              foreignField: "_id",
+//              as: "funds_investments",
+//            },
+//          },
+//       {
+//         $sort: {
+//           updatedAt: -1
+//         }
+//       }
+//     ]);
+
+//     const paginationResult = await Fund.aggregatePaginate(
+//       allFunds,
+//       options
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       // count: allFunds.length,
+//        ...paginationResult,
+//     });
+//   } catch (error) {
+//     next(errorHandler(500, "server error"));
+//   }
+
+
+// };
+
+
+exports.getHoldingsFunds = async (req, res, next) => {
+const {fundId} = req.params
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+
+  const myCustomLabels = {
+    docs: 'data',
+  };
+
+  const options = {
+    page,
+    limit,
+    customLabels: myCustomLabels
+  };
+
+
+  const query = [
+    {
+      $match: {fund: fundId}
+    },
+    {
+      $lookup: {
+        from: "funds",
+        localField: "fund",
+        foreignField: "_id",
+        as: "fund",
+      },
+    },
+    {
+      $unwind: "$fund",
+    },
+     {
+      $sort: {
+        updatedAt: -1
+      }
+    },
+    {
+      $addFields: {
+        invested_capital_diff: { $divide: ["$capital_deploy.amount", "$capital_deploy.amount"] }
+      }
+    },
+    
+    {
+      $project: {
+        fundname: "$fund.name",
+        property_type: "$fund.property_type",
+        invested_capital: "$capital_deploy",
+        current_fund_value: "$capital_deploy.amount",
+        annual_yield: "$fund.annual_yield",
+        investment_date: "$updatedAt",
+        fundId: "$fund._id",
+        userId: "$fund.user",
+        thumbnails: "$fund.thumbnails",
+        invested_capital_percentage: {$multiply :["$invested_capital_diff", 0.1]},
+      },
+    },
+   
+  ]
+
+ 
+
+
+  
+  try {
+    const limitedPartners =  Limited_partners.aggregate(query);
+
+    const paginationResult = await Limited_partners.aggregatePaginate(
+      limitedPartners,
+      options
+    );
+
+
+    const alluserFunds = await Fund.aggregate([
+      {
+        $match: {isAdmin_Approved : "approved", user: paginationResult.data[0].userId},
+      },
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "investments",
+          foreignField: "_id",
+          as: "investmenttxn",
+        },
+      },
+
+      { $group : { _id : "$investmenttxn.name", txn: { $push: "$$ROOT" } } }
+    ]);
+
+    let totalInvestment = 0;
+    // $push: "$$ROOT"
+
+    paginationResult.data.forEach(data => {
+      totalInvestment += data.invested_capital.amount 
+    })
+
+    res.status(200).json({
+      success: true,
+     ...paginationResult,
+    //  portfolio_overview: {totalInvestment, alluserFunds}
+
+  //    "paid": {
+  //     "amount": 200,
+  //     "currency": "$"
+  // },
+      // count: limitedPartners.length,
+       
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+}

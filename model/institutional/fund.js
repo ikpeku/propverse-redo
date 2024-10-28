@@ -21,11 +21,13 @@ const fundSchema = new Schema(
   
     funds_holdings: {
       project_investments: [{
-        type: Schema.Types.ObjectId,
+        // type: Schema.Types.ObjectId,
+        type: String,
         ref: "properties",
       }],
       funds_investments: [{
-        type: Schema.Types.ObjectId,
+        // type: Schema.Types.ObjectId,
+        type: String,
         ref: "fund",
       }],
   

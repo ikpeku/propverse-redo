@@ -11,8 +11,6 @@ const limited_partners_Schema = new Schema(
         ref: "user",
         required: true,
       },
-      
-    
     fund: {
         // type: SchemaTypes.ObjectId,
         type: String,
