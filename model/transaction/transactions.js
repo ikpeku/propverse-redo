@@ -37,6 +37,12 @@ const transaction_Schema = new Schema(
       ref: "fund",
       // required: true,
     },
+    funder: {
+      // type: SchemaTypes.ObjectId,
+      type: String,
+      ref: "fund",
+      // required: true,
+    },
     name: String,
     status: {
       type: String,
@@ -44,6 +50,16 @@ const transaction_Schema = new Schema(
       required: true,
     },
     paid: {
+      amount: {
+        type: Number,
+        default: 0,
+      },
+      currency: {
+        type: String,
+        default: "",
+      },
+    },
+    capital_commited: {
       amount: {
         type: Number,
         default: 0,

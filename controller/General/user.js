@@ -613,8 +613,6 @@ exports.set_User_Avatar = async (req, res, next) => {
 }
 
 
-// referrals
-
 /**
  * Account Section
  */
@@ -675,8 +673,6 @@ exports.customise_Referral = async (req, res, next) => {
   }
 }
 
-
-
 exports.get_Transactions = async (req, res, next) => {
   const page = parseInt(req?.query?.page) || 1;
 
@@ -686,52 +682,42 @@ exports.get_Transactions = async (req, res, next) => {
   const status = req?.query?.status;
   const name = req?.query?.name;
 
-
-
   const options = {
     page,
     limit,
   };
 
-
-
-  let query =  [
+  let query = [
     {
       $sort: {
         updatedAt: 1,
       },
     },
-  ]
+  ];
   // 'Institutional Investor',
   // 'Developer',
   // 'Non-Institutional Investor',
   // 'Admin',
 
-
-  if(req.payload.status !== 'Admin'){
-  query.push(
-    {
-      $match: { investor:  new ObjectId(req.payload.userId)}
-    }
-  )
+  if (req.payload.status !== "Admin") {
+    query.push({
+      $match: { investor: new ObjectId(req.payload.userId) },
+    });
   }
 
   query.push(
     {
       $lookup: {
-           from: "users",
-           localField: "investor",
-           foreignField: "_id",
-           as: "user",
-         },
-       },
-       {
-        $unwind: "$user"
-       }
-  )
-
-
-
+        from: "users",
+        localField: "investor",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    }
+  );
 
    
     if(req.payload.status == 'Non-Institutional Investor'){
@@ -743,103 +729,103 @@ exports.get_Transactions = async (req, res, next) => {
             paid: 1,
             transaction_type: 1,
             paymentDate: 1,
+            updatedAt: 1,
             status: 1,
-            _id: 1
+            _id: 1,
+            
           },
         }
     )
     }
 
- if(req.payload.status == 'Developer'){  
+ if (req.payload.status == "Developer") {
+   query.push({
+     $project: {
+       investorname: "$user.username",
+       projectname: "$name",
+       transaction_type: 1,
+       paid: 1,
+       paymentDate: 1,
+       updatedAt: 1,
+       status: 1,
+       _id: 1,
+     },
+   });
+ }
+
+ if (req.payload.status == "Admin") {
    query.push(
+     {
+       $lookup: {
+         from: "funds",
+         localField: "funds",
+         foreignField: "_id",
+         as: "fund",
+       },
+     },
+     {
+       $unwind: "$fund",
+     },
 
-        {
-            $project: {
-              investorname: "$user.username",
-              projectname:  "$name",
-              transaction_type: 1,
-              paid: 1,
-              paymentDate: 1,
-              status: 1,
-              _id: 1
-            },
-          }
-      )
-    }
-
-
-
-  if(req.payload.status == 'Admin'){
-  query.push(
-      {
-                    $project: {
-                      investorname: "$user.username",
-                      country: "$user.country",
-                      projectname:  "$name",
-                      transaction_type: 1,
-                      paid: 1,
-                      paymentDate: 1,
-                      status: 1,
-                      _id: 1
-                    },
-                  }
-    )
-  }
-
-//   name: 1,
-//   description: 1,
-//   date: "$createdAt",
-//   amount_paid: "$paid.amount",
-//   total_amount : "$property_amount.amount",
-//   payment_status: "$status",
-//   transaction_type: 1,
-//   transaction_method: "$payment_method",
-//   transaction_status: "$payment_status",
-// "user.username": 1,
-// "user.phone_number": 1,
-// "user.email": 1
+     {
+       $project: {
+         investorname: "$user.username",
+         country: "$user.country",
+         projectname: "$name",
+         transaction_type: 1,
+         description: 1,
+         paid: 1,
+         paymentDate: 1,
+         updatedAt: 1,
+         status: 1,
+         _id: 1,
+         fund_name: "$fund.name",
+         capital_commited: 1,
+       },
+     }
+   );
+ }
 
 
-
-    if(searchText){
-
+    if (searchText) {
       query.push({
         $match: {
           $or: [
             { username: { $regex: ".*" + searchText + ".*", $options: "i" } },
+            {
+              investorname: { $regex: ".*" + searchText + ".*", $options: "i" },
+            },
             { country: { $regex: ".*" + searchText + ".*", $options: "i" } },
-            { verify_type: { $regex: ".*" + searchText + ".*", $options: "i" } },
-            { status: searchText}
-          ]
-        }
-      })
-    }
-    
-    if(country){
-      query.push({
-        $match: { country: { $regex: ".*" + country + ".*", $options: "i" } }
-      })
-    }
-    if(status){
-      query.push({
-        $match: {status}
-      })
-    }
-    if(name){
-      query.push({
-        $match: {username: { $regex: name, $options: "i" } }
-      })
-    }
-
-
-     query.push(
-     
-        {
-          $sort: {
-            updatedAt: 1,
-          },
+            {
+              verify_type: { $regex: ".*" + searchText + ".*", $options: "i" },
+            },
+            { status: searchText },
+          ],
         },
-    )
+      });
+    }
+
+    if (country) {
+      query.push({
+        $match: { country: { $regex: ".*" + country + ".*", $options: "i" } },
+      });
+    }
+    if (status) {
+      query.push({
+        $match: { status },
+      });
+    }
+    if (name) {
+      query.push({
+        $match: { username: { $regex: name, $options: "i" } },
+      });
+    }
+
+    query.push({
+      $sort: {
+        updatedAt: -1,
+      },
+    });
 
   try {
     const myAggregate =  PayInTransaction.aggregate(query);
@@ -962,7 +948,7 @@ exports.create_Property_Transactions = async (req, res, next) => {
       investor: investorId,
       company: response.user,
       transaction_type: "property",
-      // funds: fundId,
+      funder: fundId,
       property: prodId,
       name: response.property_detail.property_overview.property_name,
       status: "Success",
@@ -974,24 +960,13 @@ exports.create_Property_Transactions = async (req, res, next) => {
         amount: response.property_detail.property_overview.price.amount,
         currency: response.property_detail.property_overview.price.currency,
       },
-      // proof_of_payment: {
-      //   location,
-      //   originalname,
-      //   mimetype,
-      //   size,
-      //   key,
-      // },
       payment_method: "bank  transfer",
       payment_status,
       description,
       paymentDate
     });
 
-    // await Non_Institutional_Investor.findByIdAndUpdate(
-    //   fundInvestment.investor,
-    //   { $push: { transactions: fundInvestment._id, funds: fundInvestment.funds } },
-    //   { new: true, useFindAndModify: false }
-    // );
+   
     await properties.findByIdAndUpdate(
       fundInvestment.property,
       { $push: { transactions: fundInvestment._id } },
@@ -1003,7 +978,7 @@ exports.create_Property_Transactions = async (req, res, next) => {
       { $push: { investments: fundInvestment._id , "funds_holdings.project_investments": fundInvestment.property} },
       { new: true, useFindAndModify: false }
     );
-// "funds_holdings.funds_investments": fundId
+
     
   } else {
    const txnProperty = await PayInTransaction.create({
@@ -1022,13 +997,6 @@ exports.create_Property_Transactions = async (req, res, next) => {
         amount: response.property_detail.property_overview.price.amount,
         currency: response.property_detail.property_overview.price.currency,
       },
-      // proof_of_payment: {
-      //   location,
-      //   originalname,
-      //   mimetype,
-      //   size,
-      //   key,
-      // },
       payment_method: "bank  transfer",
       payment_status,
       description,
@@ -1049,16 +1017,11 @@ exports.create_Property_Transactions = async (req, res, next) => {
   }
 
 
-
-
-
   return res.status(200).json({ status: "success"});
-  // return res.status(200).json({ status: "success", data:  investment});
 
 
   } catch (error) {
-    next(error);
-    // next(errorHandler(500, "network error"));
+    next(errorHandler(500, "network error"));
     
   }
 
@@ -1069,13 +1032,7 @@ exports.create_Property_Transactions = async (req, res, next) => {
 
 exports.create_Funds_Transactions = async (req, res, next) => {
 
-  const {description, investorId, fundId, invested_fund,payment_status, paymentDate,
-    paid: {
-      amount,
-      currency,
-    },
-    capital_committed
-  } = req.body;
+  const { description, investorId, fundId, invested_fund,payment_status, paymentDate, capital_committed, paid: { amount, currency} } = req.body;
 
   if(req.payload.status !== 'Admin') return next(errorHandler(403, "Admin operation only"));
   
@@ -1108,6 +1065,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       company: response.user,
       // property: prodId,
       transaction_type: "funds",
+      funder: fundId,
       funds: invested_fund,
       name: response.name,
       status: "Success",
@@ -1119,13 +1077,6 @@ exports.create_Funds_Transactions = async (req, res, next) => {
         amount: capital_committed.amount,
         currency: capital_committed.currency,
       },
-      // proof_of_payment: {
-      //   location,
-      //   originalname,
-      //   mimetype,
-      //   size,
-      //   key,
-      // },
       payment_method: "bank  transfer",
       payment_status,
       description,
@@ -1167,8 +1118,6 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     );
 
     }
-
-
 
 
     const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
@@ -1265,16 +1214,12 @@ exports.create_Funds_Transactions = async (req, res, next) => {
 
   }
 
-
   return res.status(200).json({ status: "success"});
 
   } catch (error) {
     next(errorHandler(500, "network error"));
     
   }
-
-
-
   
 }
 
@@ -1320,7 +1265,7 @@ exports.capitalcommitted = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-       data: allFunds[0],
+       data: allFunds[0] || null,
     });
   } catch (error) {
     next(errorHandler(500, "server error"));
@@ -1414,6 +1359,160 @@ const {fundId} = req.params
   } catch (error) {
     next(errorHandler(500, "server error"));
   }
+}
+
+
+exports.update_Transactions = async (req, res, next) => {
+
+  const {description, investorId, fundId, prodId,payment_status, paymentDate,
+    paid: {
+      amount,
+      currency,
+    }, invested_fund, capital_committed
+  } = req.body;
+  const {txnId} = req.params;
+
+
+  if(req.payload.status !== 'Admin') return next(errorHandler(403, "Admin operation only"));
+
+
+  
+  try {
+  
+
+    const isUser = await User.findById(investorId)
+    if (!isUser) {
+      return next(errorHandler(400, "invalid user id"));
+    }
+
+    const transaction =  await PayInTransaction.findById(txnId);
+
+
+    if (transaction.transaction_type == "property"){
+      const response = await properties.findById(prodId);
+    
+      if (!response) {
+        return next(errorHandler(400, "confirm transact failed"));
+      }
+    
+    
+      if(fundId) {
+        await properties.findByIdAndUpdate(
+          transaction.property,
+          { $pull: { transactions: transaction._id } },
+          { new: true, useFindAndModify: false }
+        );
+        
+        await Funds.findByIdAndUpdate(
+          fundId,
+          { $pull: { investments: transaction._id , "funds_holdings.project_investments": transaction.property} },
+          { new: true, useFindAndModify: false }
+        );
+      } else {
+        await Non_Institutional_Investor.findByIdAndUpdate(
+          transaction.investor,
+          { $pull: { transactions: transaction._id, properties: transaction.property } },
+          { new: true, useFindAndModify: false }
+        );
+      
+        await properties.findByIdAndUpdate(
+          transaction.property,
+          { $pull: { transactions: transaction._id } },
+          { new: true, useFindAndModify: false }
+        );
+        
+    
+      }
+            
+    
+      if(fundId){
+    
+        const responseFunds = await Funds.findById(fundId);
+        if (!responseFunds) {
+          return next(errorHandler(400, "invalid fundId"));
+        }
+    
+        transaction.investor = investorId;
+        transaction.company = response.user;
+        transaction.transaction_type = "property";
+        transaction.property = prodId;
+        transaction.name = response.property_detail.property_overview.property_name;
+        transaction.status = "Success";
+        transaction.paid.amount = amount;
+        transaction.paid.currency = currency;
+        transaction.property_amount.amount = response.property_detail.property_overview.price.amount;
+        transaction.property_amount.currency = response.property_detail.property_overview.price.currency;
+        transaction.payment_method = "bank  transfer";
+        transaction.payment_status =  payment_status;
+        transaction.description = description;
+        transaction.paymentDate = paymentDate;
+    
+        transaction.save()
+    
+       
+        await properties.findByIdAndUpdate(
+          transaction.property,
+          { $push: { transactions: transaction._id } },
+          { new: true, useFindAndModify: false }
+        );
+        
+        await Funds.findByIdAndUpdate(
+          fundId,
+          { $push: { investments: transaction._id , "funds_holdings.project_investments": transaction.property} },
+          { new: true, useFindAndModify: false }
+        );
+    
+        
+      } else {
+    
+        transaction.investor = investorId;
+        transaction.company = response.user;
+        transaction.transaction_type = "property";
+        transaction.property = prodId;
+        transaction.name = response.property_detail.property_overview.property_name;
+        transaction.status = "Success";
+        transaction.paid.amount = amount;
+        transaction.paid.currency = currency;
+        transaction.property_amount.amount = response.property_detail.property_overview.price.amount;
+        transaction.property_amount.currency = response.property_detail.property_overview.price.currency;
+        transaction.payment_method = "bank  transfer";
+        transaction.payment_status =  payment_status;
+        transaction.description = description;
+        transaction.paymentDate = paymentDate;
+    
+        transaction.save()
+    
+    
+        await Non_Institutional_Investor.findByIdAndUpdate(
+          transaction.investor,
+          { $push: { transactions: transaction._id, properties: transaction.property } },
+          { new: true, useFindAndModify: false }
+        );
+      
+        await properties.findByIdAndUpdate(
+          transaction.property,
+          { $push: { transactions: transaction._id } },
+          { new: true, useFindAndModify: false }
+        );
+      }
+
+    }
+   
+    if (transaction.transaction_type == "funds"){
+
+    }
+
+
+
+  return res.status(200).json({ status: "success"});
+
+  } catch (error) {
+    next(errorHandler(500, "network error"));
+  }
+
+
+
+  
 }
 
 
