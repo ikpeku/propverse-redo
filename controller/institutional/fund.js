@@ -333,21 +333,111 @@ exports.fundtransationdatail = async(req, res) => {
 }
 
 
+exports.getFundOverview = async (req, res, next) => {
+  const {fundId} = req.params;
+
+
+  const query = [
+    {
+      $match: {_id: fundId}
+    },
+
+    {
+      $lookup: {
+           from: "transactions",
+           localField: "investments",
+           foreignField: "_id",
+           as: "payin",
+         },
+       },
+       {
+         $addFields: {
+           fund_size: {
+           "$sum": { $sum: "$payin.paid.amount"}
+           }
+
+         },
+       },
+    {
+      $lookup: {
+           from: "transactions",
+           localField: "payout",
+           foreignField: "_id",
+           as: "payout",
+         },
+       },
+       {
+         $addFields: {
+           capital_invested: {
+           "$sum": { $sum: "$payout.paid.amount"}
+           }
+
+         },
+       },
+
+       {
+        $addFields: {
+          number_of_properties: "$funds_holdings.project_investments"
+        }
+       },
+      //  {
+      //   $addFields: {
+      //     number_of_properties: {$count: "$funds_holdings.project_investments"} 
+      //   }
+      //  },
+
+      {
+        $project: {
+          fund_size: 1,
+          capital_invested: 1,
+          // number_of_properties: {$count: {"$number_of_properties"}}
+        },
+      },
+
+    {
+      $sort: {
+        updatedAt: -1
+      }
+    }
+  ]
+
+
+// if(req?.query?.user){
+//   query.unshift({
+//     $match: {user: new ObjectId(req?.query?.user)}
+//   })
+// }
+
+
+
+  
+  try {
+    const data = await Fund.aggregate(query);
+
+    // const paginationResult = await Fund.aggregatePaginate(
+    //   allFunds,
+    //   options
+    // );
+
+    res.status(200).json({
+      success: true,
+      data
+      // count: allFunds.length,
+      //  ...paginationResult,
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+
+
+};
+
 exports.getHoldingsProject = async (req, res, next) => {
   const page = parseInt(req?.query?.page) || 1;
+  const {fundId} = req.params;
 
   const limit = parseInt(req?.query?.limit) || 10;
-  const searchText = req?.query?.searchText;
-  const country = req?.query?.country;
-  const status = req?.query?.status;
-  const name = req?.query?.name;
-
-
-  // console.log("data: ",req.body)
-  // console.log("user: ",req.query.user)
-  // console.log("payload: ",req.payload)
-
-
+ 
   const myCustomLabels = {
     docs: 'data',
   };
@@ -359,29 +449,62 @@ exports.getHoldingsProject = async (req, res, next) => {
   };
 
 
-  const query = [
-    {
-      $match: {...req.body}
-    },
-    {
-      $sort: {
-        updatedAt: -1
-      }
-    }
-  ]
-
-
-if(req?.query?.user){
-  query.unshift({
-    $match: {user: new ObjectId(req?.query?.user)}
-  })
-}
-
-
-
   
   try {
-    const allFunds = Fund.aggregate(query);
+    const allFunds = Fund.aggregate([
+      {
+
+        $match: {_id: fundId}
+      },
+
+      {
+        $lookup: {
+             from: "properties",
+             localField: "funds_holdings.project_investments",
+             foreignField: "_id",
+             pipeline: [{
+               $lookup: {
+                 from: "due_deligences",
+                 localField: "company",
+                 foreignField: "user",
+                 as: "company",
+               }},
+               {
+                 "$unwind": "$company"
+               },
+              
+             ],
+             as: "project_investments",
+           },
+                    
+         },
+  
+         {
+          $unwind: "$project_investments"
+         },
+      {
+        $sort: {
+          updatedAt: -1
+        }
+      },
+      {
+        $project: {
+          // product: "$company",
+          propertyId: "$project_investments._id",
+          property_location: "$project_investments.property_detail.property_location",
+          property_type: "$project_investments.property_detail.property_overview.property_type",
+
+          thumbnail: "$project_investments.property_detail.property_images",
+          property_name: "$project_investments.property_detail.property_overview.property_name",
+          property_progress: "$project_investments.property_progress",
+
+          property_amount: "$project_investments.property_detail.property_overview.price",
+          property_dates: "$project_investments.property_detail.property_overview.date",
+         
+          company: "$project_investments.company.company_information.name" || ""
+        },
+      },
+    ]);
 
     const paginationResult = await Fund.aggregatePaginate(
       allFunds,
@@ -390,7 +513,7 @@ if(req?.query?.user){
 
     res.status(200).json({
       success: true,
-      count: allFunds.length,
+      // count: allFunds.length,
        ...paginationResult,
     });
   } catch (error) {
@@ -399,95 +522,6 @@ if(req?.query?.user){
 
 
 };
-
-// exports.getHoldingsFunds = async (req, res, next) => {
-//   const page = parseInt(req?.query?.page) || 1;
-//   const {fundId} = req.params;
-
-//   const limit = parseInt(req?.query?.limit) || 10;
-//   // const searchText = req?.query?.searchText;
-//   // const country = req?.query?.country;
-//   // const status = req?.query?.status;
-//   // const name = req?.query?.name;
-
-
-//   // console.log("data: ",req.body)
-//   // console.log("user: ",req.query.user)
-//   // console.log("payload: ",req.payload)
-
-
-//   const myCustomLabels = {
-//     docs: 'data',
-//   };
-
-//   const options = {
-//     page,
-//     limit,
-//     customLabels: myCustomLabels
-//   };
-
-
-//   // const query = 
-
-
-// // if(req?.query?.user){
-// //   query.unshift({
-// //     $match: {user: new ObjectId(req?.query?.user)}
-// //   })
-// // }
-
-
-
-  
-//   try {
-//     const allFunds = Fund.aggregate([
-//       {
-//         // $match: {...req.body}
-//         // $match: {_id: new ObjectId(fundId)}
-//         $match: {_id: fundId}
-//       },
-//       // {
-//       //   $lookup: {
-//       //        from: "limited_partners",
-//       //        localField: "limitedpartners",
-//       //        foreignField: "_id",
-//       //        as: "limited_partner",
-//       //      },
-//       //    },
-//         //  {
-//         //   $unwind: "$user"
-//         //  },
-//          {
-//         $lookup: {
-//              from: "funds",
-//              localField: "funds_holdings.funds_investments",
-//              foreignField: "_id",
-//              as: "funds_investments",
-//            },
-//          },
-//       {
-//         $sort: {
-//           updatedAt: -1
-//         }
-//       }
-//     ]);
-
-//     const paginationResult = await Fund.aggregatePaginate(
-//       allFunds,
-//       options
-//     );
-
-//     res.status(200).json({
-//       success: true,
-//       // count: allFunds.length,
-//        ...paginationResult,
-//     });
-//   } catch (error) {
-//     next(errorHandler(500, "server error"));
-//   }
-
-
-// };
 
 
 exports.getHoldingsFunds = async (req, res, next) => {
@@ -563,40 +597,32 @@ const {fundId} = req.params
     );
 
 
-    const alluserFunds = await Fund.aggregate([
-      {
-        $match: {isAdmin_Approved : "approved", user: paginationResult.data[0].userId},
-      },
-      {
-        $lookup: {
-          from: "transactions",
-          localField: "investments",
-          foreignField: "_id",
-          as: "investmenttxn",
-        },
-      },
+    // const alluserFunds = await Fund.aggregate([
+    //   {
+    //     $match: {isAdmin_Approved : "approved", user: paginationResult.data[0].userId},
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "transactions",
+    //       localField: "investments",
+    //       foreignField: "_id",
+    //       as: "investmenttxn",
+    //     },
+    //   },
 
-      { $group : { _id : "$investmenttxn.name", txn: { $push: "$$ROOT" } } }
-    ]);
+    //   { $group : { _id : "$investmenttxn.name", txn: { $push: "$$ROOT" } } }
+    // ]);
 
-    let totalInvestment = 0;
-    // $push: "$$ROOT"
+    // let totalInvestment = 0;
+    // // $push: "$$ROOT"
 
-    paginationResult.data.forEach(data => {
-      totalInvestment += data.invested_capital.amount 
-    })
+    // paginationResult.data.forEach(data => {
+    //   totalInvestment += data.invested_capital.amount 
+    // })
 
     res.status(200).json({
       success: true,
-     ...paginationResult,
-    //  portfolio_overview: {totalInvestment, alluserFunds}
-
-  //    "paid": {
-  //     "amount": 200,
-  //     "currency": "$"
-  // },
-      // count: limitedPartners.length,
-       
+     ...paginationResult,     
     });
   } catch (error) {
     next(errorHandler(500, "server error"));

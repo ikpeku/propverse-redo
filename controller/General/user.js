@@ -698,7 +698,7 @@ exports.get_Transactions = async (req, res, next) => {
   let query =  [
     {
       $sort: {
-        updatedAt: -1,
+        updatedAt: 1,
       },
     },
   ]
@@ -742,7 +742,7 @@ exports.get_Transactions = async (req, res, next) => {
             description: 1,
             paid: 1,
             transaction_type: 1,
-            createdAt: 1,
+            paymentDate: 1,
             status: 1,
             _id: 1
           },
@@ -759,7 +759,7 @@ exports.get_Transactions = async (req, res, next) => {
               projectname:  "$name",
               transaction_type: 1,
               paid: 1,
-              createdAt: 1,
+              paymentDate: 1,
               status: 1,
               _id: 1
             },
@@ -778,7 +778,7 @@ exports.get_Transactions = async (req, res, next) => {
                       projectname:  "$name",
                       transaction_type: 1,
                       paid: 1,
-                      createdAt: 1,
+                      paymentDate: 1,
                       status: 1,
                       _id: 1
                     },
@@ -836,7 +836,7 @@ exports.get_Transactions = async (req, res, next) => {
      
         {
           $sort: {
-            updatedAt: -1,
+            updatedAt: 1,
           },
         },
     )
@@ -950,12 +950,20 @@ exports.create_Property_Transactions = async (req, res, next) => {
   }
 
   if(fundId){
+
+    const responseFunds = await Funds.findById(fundId);
+    if (!responseFunds) {
+      return next(errorHandler(400, "invalid fundId"));
+    }
+
+
   const fundInvestment =  await PayInTransaction.create({
       isVerify: true,
       investor: investorId,
       company: response.user,
       transaction_type: "property",
-      funds: fundId,
+      // funds: fundId,
+      property: prodId,
       name: response.property_detail.property_overview.property_name,
       status: "Success",
       paid: {
@@ -991,11 +999,11 @@ exports.create_Property_Transactions = async (req, res, next) => {
     );
     
     await Funds.findByIdAndUpdate(
-      fundInvestment.funds,
+      fundId,
       { $push: { investments: fundInvestment._id , "funds_holdings.project_investments": fundInvestment.property} },
       { new: true, useFindAndModify: false }
     );
-
+// "funds_holdings.funds_investments": fundId
     
   } else {
    const txnProperty = await PayInTransaction.create({
@@ -1040,87 +1048,6 @@ exports.create_Property_Transactions = async (req, res, next) => {
     );
   }
 
-
-  // if(type === "reject"){
-  //   response.status = "Failed"
-  //   if(response.transaction_type == "property purchase"){
-       
-  //     await Non_Institutional_Investor.findByIdAndUpdate(
-  //      response.investor,
-  //      { $pull: { transactions: response._id, properties: response.property } },
-  //      { new: true, useFindAndModify: false }
-  //    );
-   
-  //    await Property.findByIdAndUpdate(
-  //    response.property,
-  //      { $push: { transactions: response._id } },
-  //      { new: true, useFindAndModify: false }
-  //    );
-
-  //   }
-  //   if(response.transaction_type == "funds"){
-  //    await Non_Institutional_Investor.findByIdAndUpdate(
-  //      response.investor,
-  //      { $pull: { transactions: response._id, funds: response.funds } },
-  //      { new: true, useFindAndModify: false }
-  //    );
-     
-  //    await Funds.findByIdAndUpdate(
-  //      response.funds,
-  //      { $pull: { investments: response._id } },
-  //      { new: true, useFindAndModify: false }
-  //    );
-
-  //   }
-
-
-  //   mailerController(
-  //     GeneralMailOption({
-  //       email: response?.investor?.email,
-  //       text: rejectreason,
-  //       title: "Propsverse transaction Rejection",
-  //     })
-  //   );
-  //  } 
-   
-  //  if(type === "approve") {
-  //      response.status = "Success"
-
-      //  if(response.transaction_type == "property purchase"){
-       
-      //    await Non_Institutional_Investor.findByIdAndUpdate(
-      //     response.investor,
-      //     { $push: { transactions: response._id, properties: response.property } },
-      //     { new: true, useFindAndModify: false }
-      //   );
-      
-      //   await Property.findByIdAndUpdate(
-      //   response.property,
-      //     { $push: { transactions: response._id } },
-      //     { new: true, useFindAndModify: false }
-      //   );
-
-      //  }
-
-      //  if(response.transaction_type == "funds"){
-      //   await Non_Institutional_Investor.findByIdAndUpdate(
-      //     response.investor,
-      //     { $push: { transactions: response._id, funds: response.funds } },
-      //     { new: true, useFindAndModify: false }
-      //   );
-        
-      //   await Funds.findByIdAndUpdate(
-      //     response.funds,
-      //     { $push: { investments: response._id } },
-      //     { new: true, useFindAndModify: false }
-      //   );
-
-      //  }
-
-    
-
-
-  //  }
 
 
 
@@ -1181,7 +1108,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       company: response.user,
       // property: prodId,
       transaction_type: "funds",
-      funds: fundId,
+      funds: invested_fund,
       name: response.name,
       status: "Success",
       paid: {
@@ -1205,59 +1132,72 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       paymentDate
     });
 
-    // await Non_Institutional_Investor.findByIdAndUpdate(
-    //   fundInvestment.investor,
-    //   { $push: { transactions: fundInvestment._id, funds: fundInvestment.funds } },
-    //   { new: true, useFindAndModify: false }
-    // );
+   const removebln =  await Funds.findByIdAndUpdate(
+      fundId,
+      { $push: { 
+        "payout": fundInvestment._id 
+      } },
+      { new: true, useFindAndModify: false }
+    );
 
-    const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:fundId})
+    if(removebln) {
+      console.log(removebln)
+    }
+
+    const item =   await Funds.findOne({_id:fundInvestment.funds,  "funds_holdings.funds_investments": fundId})
+
+    console.log(item)
+    if(item) {
+       //   await Funds.findByIdAndUpdate(
+    //     fundInvestment.funds,
+    //     { $push: { 
+    //       "investments": fundInvestment._id , 
+    //       "limitedpartners": Limited_partnersresponse._id, 
+    //       "funds_holdings.funds_investments": fundId} },
+    //     { new: true, useFindAndModify: false }
+    //   );
+
+    await Funds.findByIdAndUpdate(
+      invested_fund,
+      { $push: { 
+        "investments": fundInvestment._id , 
+        "limitedpartners": Limited_partnersresponse._id, 
+        "funds_holdings.funds_investments": invested_fund} },
+      { new: true, useFindAndModify: false }
+    );
+
+    }
+
+
+
+
+    const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
 
 
     if(!dataLimited){
-      const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:fundId, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
-        
-      await Funds.findByIdAndUpdate(
-        fundInvestment.funds,
-        { $push: { 
-          "investments": fundInvestment._id , 
-          "limitedpartners": Limited_partnersresponse._id, 
-          "funds_holdings.funds_investments": fundId} },
-        { new: true, useFindAndModify: false }
-      );
+      const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })      
+      // check already txn
+  
+      // await Funds.findByIdAndUpdate(
+      //   invested_fund,
+      //   { $push: { 
+      //     "investments": fundInvestment._id , 
+      //     "limitedpartners": Limited_partnersresponse._id, 
+      //     "funds_holdings.funds_investments": invested_fund} },
+      //   { new: true, useFindAndModify: false }
+      // );
+
 
     } else {
       dataLimited.capital_deploy.amount += amount;
       dataLimited.save();
 
-      await Funds.findByIdAndUpdate(
-        fundInvestment.funds,
-        { $push: { investments: fundInvestment._id,} },
-        { new: true, useFindAndModify: false }
-      );
+      // await Funds.findByIdAndUpdate(
+      //   fundInvestment.funds,
+      //   { $push: { investments: fundInvestment._id,} },
+      //   { new: true, useFindAndModify: false }
+      // );
     }
-
-    // investments: [{
-    //   type: Schema.Types.ObjectId,
-    //   ref: "transaction",
-    // }],
-
-    // limitedpartners: [{
-    //   type: Schema.Types.ObjectId,
-    //   ref: "limited_partner",
-    // }],
-  
-    // funds_holdings: {
-    //   project_investments: [{
-    //     type: Schema.Types.ObjectId,
-    //     ref: "properties",
-    //   }],
-    //   funds_investments: [{
-    //     type: Schema.Types.ObjectId,
-    //     ref: "fund",
-    //   }],
-  
-    // },
 
 
   } else {
@@ -1292,8 +1232,6 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     });
 
 
-    // console.log(txnProperty)
-
     await Non_Institutional_Investor.findByIdAndUpdate(
       txnProperty.investor,
       { $push: { transactions: txnProperty._id, funds: txnProperty.funds } },
@@ -1325,26 +1263,13 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     }
 
 
-
-
-
-
-    // await properties.findByIdAndUpdate(
-    //   txnProperty.property,
-    //   { $push: { transactions: txnProperty._id } },
-    //   { new: true, useFindAndModify: false }
-    // );
-
-    // await Institutional_Investor.findByIdAndUpdate()
-
   }
 
 
   return res.status(200).json({ status: "success"});
 
   } catch (error) {
-    next(error);
-    // next(errorHandler(500, "network error"));
+    next(errorHandler(500, "network error"));
     
   }
 
@@ -1470,24 +1395,6 @@ const {fundId} = req.params
       }
     })
   }
-
-
-// if(req?.query?.user){
-//   query.unshift({
-//     $match: {user: new ObjectId(req?.query?.user)}
-//   })
-// }
-
-
-// "capital_committed": {
-//   "amount": 3100,
-//   "currency": "$"
-// },
-// "capital_deploy": {
-//   "amount": 1100,
-//   "currency": "$"
-// },
-
 
   
   try {

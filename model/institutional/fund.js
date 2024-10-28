@@ -13,6 +13,10 @@ const fundSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "transaction",
     }],
+    payout: [{
+      type: Schema.Types.ObjectId,
+      ref: "transaction",
+    }],
 
     limitedpartners: [{
       type: Schema.Types.ObjectId,
