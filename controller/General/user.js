@@ -900,7 +900,7 @@ exports.get_Transaction_by_Id = async (req, res, next) => {
 
   
 
-    return res.status(200).json({ status: "success", data: myAggregate[0] });
+    return res.status(200).json({ status: "success", data: myAggregate[0] || null});
   } catch (error) {
     next(errorHandler(500, "network error"));
     
