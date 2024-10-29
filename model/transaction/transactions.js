@@ -24,6 +24,11 @@ const transaction_Schema = new Schema(
       ref: "due_deligence",
       // required: true,
     },
+    limited_partner: {
+      type: SchemaTypes.ObjectId,
+      ref: "limited_partner",
+      // required: true,
+    },
 
     property: {
       // type: SchemaTypes.ObjectId,
@@ -59,16 +64,16 @@ const transaction_Schema = new Schema(
         default: "",
       },
     },
-    capital_commited: {
-      amount: {
-        type: Number,
-        default: 0,
-      },
-      currency: {
-        type: String,
-        default: "",
-      },
-    },
+    // capital_commited: {
+    //   amount: {
+    //     type: Number,
+    //     default: 0,
+    //   },
+    //   currency: {
+    //     type: String,
+    //     default: "",
+    //   },
+    // },
 
     property_amount: {
       amount: {

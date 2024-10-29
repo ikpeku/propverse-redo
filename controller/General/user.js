@@ -766,6 +766,17 @@ exports.get_Transactions = async (req, res, next) => {
      {
        $unwind: "$fund",
      },
+     {
+       $lookup: {
+         from: "limited_partners",
+         localField: "limited_partner",
+         foreignField: "_id",
+         as: "limited_partner",
+       },
+     },
+     {
+       $unwind: "$limited_partner",
+     },
 
      {
        $project: {
@@ -780,7 +791,12 @@ exports.get_Transactions = async (req, res, next) => {
          status: 1,
          _id: 1,
          fund_name: "$fund.name",
-         capital_commited: 1,
+         capital_committed: "$limited_partner.capital_committed",
+         capital_deploy: "$limited_partner.capital_deploy",
+    transaction_type: 1,
+    invested_fund: "$funds",
+    investorId: "$investor",
+    fundId: "$funder"
        },
      }
    );
@@ -1091,14 +1107,35 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       { new: true, useFindAndModify: false }
     );
 
-    if(removebln) {
-      console.log(removebln)
+
+    if(!removebln) {
+      return next(errorHandler(400, "confirm transact failed"));
     }
 
-    const item =   await Funds.findOne({_id:fundInvestment.funds,  "funds_holdings.funds_investments": fundId})
 
-    console.log(item)
+    const item =   await Funds.findOne({_id:invested_fund,  "funds_holdings.funds_investments": fundId})
+
     if(item) {
+           await Funds.findByIdAndUpdate(
+            invested_fund,
+        { $push: { 
+          "investments": fundInvestment._id
+        } },
+        { new: true, useFindAndModify: false }
+      );
+       // "limitedpartners": Limited_partnersresponse._id, 
+    } else {
+      await Funds.findByIdAndUpdate(
+        invested_fund,
+    { $push: { 
+      "investments": fundInvestment._id , 
+      "funds_holdings.funds_investments": fundId} },
+    { new: true, useFindAndModify: false }
+  );
+
+    }
+
+    
        //   await Funds.findByIdAndUpdate(
     //     fundInvestment.funds,
     //     { $push: { 
@@ -1108,16 +1145,16 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     //     { new: true, useFindAndModify: false }
     //   );
 
-    await Funds.findByIdAndUpdate(
-      invested_fund,
-      { $push: { 
-        "investments": fundInvestment._id , 
-        "limitedpartners": Limited_partnersresponse._id, 
-        "funds_holdings.funds_investments": invested_fund} },
-      { new: true, useFindAndModify: false }
-    );
+    // await Funds.findByIdAndUpdate(
+    //   invested_fund,
+    //   { $push: { 
+    //     "investments": fundInvestment._id , 
+    //     "limitedpartners": Limited_partnersresponse._id, 
+    //     "funds_holdings.funds_investments": invested_fund} },
+    //   { new: true, useFindAndModify: false }
+    // );
 
-    }
+
 
 
     const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
@@ -1125,17 +1162,16 @@ exports.create_Funds_Transactions = async (req, res, next) => {
 
     if(!dataLimited){
       const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })      
-      // check already txn
-  
-      // await Funds.findByIdAndUpdate(
-      //   invested_fund,
-      //   { $push: { 
-      //     "investments": fundInvestment._id , 
-      //     "limitedpartners": Limited_partnersresponse._id, 
-      //     "funds_holdings.funds_investments": invested_fund} },
-      //   { new: true, useFindAndModify: false }
-      // );
 
+      await Funds.findByIdAndUpdate(invested_fund,
+        { $push: { 
+          "limitedpartners": Limited_partnersresponse._id, 
+        } },
+        { new: true, useFindAndModify: false }
+      );
+      // "funds_holdings.funds_investments": invested_fund
+      fundInvestment.limited_partner = Limited_partnersresponse._id;
+      fundInvestment.save()
 
     } else {
       dataLimited.capital_deploy.amount += amount;
@@ -1149,7 +1185,10 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     }
 
 
+
+
   } else {
+
    const txnProperty = await PayInTransaction.create({
       isVerify: true,
       investor: investorId,
@@ -1217,7 +1256,8 @@ exports.create_Funds_Transactions = async (req, res, next) => {
   return res.status(200).json({ status: "success"});
 
   } catch (error) {
-    next(errorHandler(500, "network error"));
+    // next(errorHandler(500, "network error"));
+    next(error)
     
   }
   
