@@ -628,3 +628,45 @@ const {fundId} = req.params
     next(errorHandler(500, "server error"));
   }
 }
+
+exports.getFundPortfolio = async (req, res, next) => {
+  const {fundId} = req.params;
+
+
+  const query = [
+    {
+      $match: {_id: fundId}
+    },
+
+    {
+      $lookup: {
+           from: "transactions",
+           localField: "investments",
+           foreignField: "_id",
+           as: "payin",
+         },
+       },
+       {$unwind: "$payin"},
+
+       {
+        $group: {
+          _id: "$payin.name",
+          accumulated_price: { $sum: "$payin.paid.amount"}
+        }
+       }
+  ]
+
+  
+  try {
+    const data = await Fund.aggregate(query);
+
+    res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+
+
+};
