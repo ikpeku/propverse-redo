@@ -756,8 +756,6 @@ exports.get_Transactions = async (req, res, next) => {
  if (req.payload.status == "Admin") {
    query.push(
 
-
-
      {
        $lookup: {
          from: "funds",
@@ -766,9 +764,16 @@ exports.get_Transactions = async (req, res, next) => {
          as: "fund",
        },
      },
+
      {
-       $unwind: "$fund",
+      $addFields: {
+        fund_detail: {
+          $arrayElemAt: ["$fund", 0]
+        }
+      }
      },
+
+
      {
        $lookup: {
          from: "limited_partners",
@@ -778,7 +783,11 @@ exports.get_Transactions = async (req, res, next) => {
        },
      },
      {
-       $unwind: "$limited_partner",
+      $addFields: {
+        limited_partner_detail: {
+          $arrayElemAt: ["$limited_partner", 0]
+        }
+      }
      },
 
      {
@@ -793,9 +802,9 @@ exports.get_Transactions = async (req, res, next) => {
          updatedAt: 1,
          status: 1,
          _id: 1,
-         fund_name: "$fund.name",
-         capital_committed: "$limited_partner.capital_committed",
-         capital_deploy: "$limited_partner.capital_deploy",
+         fund_name: "$fund_detail.name",
+         capital_committed: "$limited_partner_detail.capital_committed",
+         capital_deploy: "$limited_partner_detail.capital_deploy",
     transaction_type: 1,
     invested_fund: "$funds",
     investorId: "$investor",
