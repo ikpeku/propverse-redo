@@ -1540,6 +1540,242 @@ exports.update_Transactions = async (req, res, next) => {
    
     if (transaction.transaction_type == "funds"){
 
+  
+      const response = await Funds.findById(invested_fund);
+    
+      if (!response) {
+        return next(errorHandler(400, "confirm transact failed"));
+      }
+    
+    
+      if(fundId){
+    
+        const responseFunds = await Funds.findById(fundId);
+        if (!responseFunds) {
+          return next(errorHandler(400, "invalid fundId"));
+        }
+    
+        
+      //  const fundInvestment =  await PayInTransaction.create({
+      //     isVerify: true,
+      //     investor: investorId,
+      //     company: response.user,
+      //     // property: prodId,
+      //     transaction_type: "funds",
+      //     funder: fundId,
+      //     funds: invested_fund,
+      //     name: response.name,
+      //     status: "Success",
+      //     paid: {
+      //       amount,
+      //       currency,
+      //     },
+      //     property_amount: {
+      //       amount: capital_committed.amount,
+      //       currency: capital_committed.currency,
+      //     },
+      //     payment_method: "bank  transfer",
+      //     payment_status,
+      //     description,
+      //     paymentDate
+      //   });
+
+      await Funds.findByIdAndUpdate(
+        transaction.funder,
+        { $pull: { 
+          "payout": transaction._id 
+        } },
+        { new: true, useFindAndModify: false }
+      );
+
+
+        transaction.isVerify = true,
+transaction.investor = investorId,
+transaction.company = response.user,
+
+transaction.transaction_type = "funds",
+transaction.funder = fundId,
+transaction.funds = invested_fund,
+transaction.name = response.name,
+transaction.status = "Success",
+transaction.paid.amount = amount
+transaction.paid.currency = currency
+          
+transaction.property_amount.amount =  capital_committed.amount, 
+transaction.property_amount.currency =  capital_committed.currency, 
+transaction.payment_status = payment_status,
+transaction.description = description,
+transaction.paymentDate = paymentDate
+transaction.save()
+
+
+
+
+
+    
+       const removebln =  await Funds.findByIdAndUpdate(
+          fundId,
+          { $push: { 
+            "payout": transaction._id 
+          } },
+          { new: true, useFindAndModify: false }
+        );
+    
+    
+        if(!removebln) {
+          return next(errorHandler(400, "confirm transact failed"));
+        }
+    
+    
+        const item =   await Funds.findOne({_id:invested_fund,  "funds_holdings.funds_investments": fundId})
+    
+        if(item) {
+               await Funds.findByIdAndUpdate(
+                invested_fund,
+            { $push: { 
+              "investments": fundInvestment._id
+            } },
+            { new: true, useFindAndModify: false }
+          );
+           // "limitedpartners": Limited_partnersresponse._id, 
+        } else {
+          await Funds.findByIdAndUpdate(
+            invested_fund,
+        { $push: { 
+          "investments": fundInvestment._id , 
+          "funds_holdings.funds_investments": fundId} },
+        { new: true, useFindAndModify: false }
+      );
+    
+        }
+    
+        
+           //   await Funds.findByIdAndUpdate(
+        //     fundInvestment.funds,
+        //     { $push: { 
+        //       "investments": fundInvestment._id , 
+        //       "limitedpartners": Limited_partnersresponse._id, 
+        //       "funds_holdings.funds_investments": fundId} },
+        //     { new: true, useFindAndModify: false }
+        //   );
+    
+        // await Funds.findByIdAndUpdate(
+        //   invested_fund,
+        //   { $push: { 
+        //     "investments": fundInvestment._id , 
+        //     "limitedpartners": Limited_partnersresponse._id, 
+        //     "funds_holdings.funds_investments": invested_fund} },
+        //   { new: true, useFindAndModify: false }
+        // );
+    
+    
+    
+    
+        const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
+    
+    
+        if(!dataLimited){
+          const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })      
+    
+          await Funds.findByIdAndUpdate(invested_fund,
+            { $push: { 
+              "limitedpartners": Limited_partnersresponse._id, 
+            } },
+            { new: true, useFindAndModify: false }
+          );
+          // "funds_holdings.funds_investments": invested_fund
+          fundInvestment.limited_partner = Limited_partnersresponse._id;
+          fundInvestment.save()
+    
+        } else {
+          dataLimited.capital_deploy.amount += amount;
+          dataLimited.save();
+    
+          // await Funds.findByIdAndUpdate(
+          //   fundInvestment.funds,
+          //   { $push: { investments: fundInvestment._id,} },
+          //   { new: true, useFindAndModify: false }
+          // );
+        }
+    
+    
+    
+    
+      } else {
+
+        const partners =  await Limited_partners.findOne({user: transaction.investor,  fund: transaction.funds})
+
+        if(partners){
+          partners.capital_deploy.amount -= transaction.capital_deploy.amount;
+          partners.save();
+        }
+
+
+
+        await Non_Institutional_Investor.findByIdAndUpdate(
+          transaction.investor,
+          { $pull: {transactions: transaction._id, funds: transaction.funds } },
+          { new: true, useFindAndModify: false }
+        );
+    
+transaction.isVerify = true,
+transaction.investor = investorId,
+transaction.company = response.user,
+transaction.transaction_type = "funds",
+transaction.funds = invested_fund,
+transaction.name = response.name,
+transaction.status = "Success",
+transaction.paid.amount = amount
+transaction.paid.currency = currency
+          
+transaction.property_amount.amount =  capital_committed.amount, 
+transaction.property_amount.currency =  capital_committed.currency, 
+transaction.payment_status = payment_status,
+transaction.description = description,
+transaction.paymentDate = paymentDate
+transaction.save()
+       
+    
+    
+await Non_Institutional_Investor.findByIdAndUpdate(
+  transaction.investor,
+  { $push: {transactions: transaction._id, funds: transaction.funds } },
+  { new: true, useFindAndModify: false }
+);
+        
+
+    
+        const dataLimited_partners =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
+    
+        if(!dataLimited_partners){
+          const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
+        
+      
+          await Funds.findByIdAndUpdate(
+            txnProperty.funds,
+            { $push: { investments: transaction._id , limitedpartners: Limited_partnersresponse._id} },
+            { new: true, useFindAndModify: false }
+          );
+    
+        } else {
+          dataLimited_partners.capital_deploy.amount += amount;
+          dataLimited_partners.save();
+    
+          await Funds.findByIdAndUpdate(
+            transaction.funds,
+            { $push: { investments: transaction._id} },
+            { new: true, useFindAndModify: false }
+          );
+    
+        }
+    
+    
+      }
+    
+      return res.status(200).json({ status: "success"});
+    
+      
+
     }
 
 
