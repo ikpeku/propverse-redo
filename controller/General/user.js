@@ -755,6 +755,9 @@ exports.get_Transactions = async (req, res, next) => {
 
  if (req.payload.status == "Admin") {
    query.push(
+
+
+
      {
        $lookup: {
          from: "funds",
@@ -1633,7 +1636,7 @@ transaction.save()
                await Funds.findByIdAndUpdate(
                 invested_fund,
             { $push: { 
-              "investments": fundInvestment._id
+              "investments": transaction._id
             } },
             { new: true, useFindAndModify: false }
           );
@@ -1642,7 +1645,7 @@ transaction.save()
           await Funds.findByIdAndUpdate(
             invested_fund,
         { $push: { 
-          "investments": fundInvestment._id , 
+          "investments": transaction._id , 
           "funds_holdings.funds_investments": fundId} },
         { new: true, useFindAndModify: false }
       );
@@ -1684,8 +1687,8 @@ transaction.save()
             { new: true, useFindAndModify: false }
           );
           // "funds_holdings.funds_investments": invested_fund
-          fundInvestment.limited_partner = Limited_partnersresponse._id;
-          fundInvestment.save()
+          transaction.limited_partner = Limited_partnersresponse._id;
+          transaction.save()
     
         } else {
           dataLimited.capital_deploy.amount += amount;
@@ -1783,7 +1786,8 @@ await Non_Institutional_Investor.findByIdAndUpdate(
   return res.status(200).json({ status: "success"});
 
   } catch (error) {
-    next(errorHandler(500, "network error"));
+    // next(errorHandler(500, "network error"));
+    next(error)
   }
 
 
