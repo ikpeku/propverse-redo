@@ -801,15 +801,15 @@ exports.get_Transactions = async (req, res, next) => {
          paymentDate: 1,
          updatedAt: 1,
          status: 1,
-         _id: 1,
-         fund_name: "$fund_detail.name",
-         capital_committed: "$limited_partner_detail.capital_committed",
-         capital_deploy: "$limited_partner_detail.capital_deploy",
-    transaction_type: 1,
-    invested_fund: "$funds",
-    investorId: "$investor",
-    fundId: "$funder",
-    propertyId: "$property"
+        _id: 1,
+        fund_name: "$fund_detail.name",
+        capital_committed: "$limited_partner_detail.capital_committed",
+        capital_deploy: "$limited_partner_detail.capital_deploy",
+        transaction_type: 1,
+        invested_fund: "$funds",
+        investorId: "$investor",
+        fundId: "$funder",
+        propertyId: "$property"
        },
      }
    );
@@ -1247,13 +1247,6 @@ exports.create_Funds_Transactions = async (req, res, next) => {
         amount: capital_committed.amount,
         currency: capital_committed.currency,
       },
-      // proof_of_payment: {
-      //   location,
-      //   originalname,
-      //   mimetype,
-      //   size,
-      //   key,
-      // },
       payment_method: "bank  transfer",
       payment_status,
       description,
@@ -1261,33 +1254,38 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     });
 
 
-    await Non_Institutional_Investor.findByIdAndUpdate(
+
+  const investor = await Non_Institutional_Investor.findByIdAndUpdate(
       txnProperty.investor,
       { $push: { transactions: txnProperty._id, funds: txnProperty.funds } },
       { new: true, useFindAndModify: false }
     );
 
-    const dataLimited_partners =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
+
+    const dataLimited_partners =  await Limited_partners.findOne({user: investorId,  fund:invested_fund});
+
+    
 
     if(!dataLimited_partners){
-      const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })
-    
+      const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} });
   
-      await Funds.findByIdAndUpdate(
+    const funding =  await Funds.findByIdAndUpdate(
         txnProperty.funds,
         { $push: { investments: txnProperty._id , limitedpartners: Limited_partnersresponse._id} },
         { new: true, useFindAndModify: false }
       );
+      
 
     } else {
       dataLimited_partners.capital_deploy.amount += amount;
       dataLimited_partners.save();
 
-      await Funds.findByIdAndUpdate(
+      const funding =   await Funds.findByIdAndUpdate(
         txnProperty.funds,
         { $push: { investments: txnProperty._id} },
         { new: true, useFindAndModify: false }
       );
+
 
     }
 
