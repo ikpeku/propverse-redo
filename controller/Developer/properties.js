@@ -152,33 +152,28 @@ exports.updatePropertyProgress = async (req, res, next) => {
   try {
     if(!property_progress) return
 
-    console.log(req.payload)
-
-
-    // req.payload.status == "Developer"
-
     const response = await properties.findById(prodId);
 
-    console.log(response.user.toString())
+    if (!response) {
+      return next(errorHandler(401, "invalid property"));
+    } 
+    
+    if(req.payload.status === "Admin") {
+      response.property_progress = property_progress;
+      response.save()
+      return res.status(200).json({ status: "success" });
+    }
 
-    if(req.payload.userId !== response.user.toString()) {
+    if(req.payload.userId === response.user.toString()) {
+     
+      response.property_progress = property_progress;
+      response.save()
+    } else {
       return next(errorHandler(401, "forbidden"));
     }
 
 
-  
-    // if (!response) {
-    //   return next(errorHandler(401, "invalid property"));
-    // } 
-    
-    if(req.payload.status === "Admin") {
-      console.log("admin")
-      // response.property_progress = property_progress;
-      // response.save()
-    }
-
-
-    return res.status(200).json({ status: "success" , response, });
+    return res.status(200).json({ status: "success" });
   } catch (error) {
     // next(errorHandler(500, "failed"))
     next(error);
@@ -490,37 +485,54 @@ exports.uploadActivities = async(req,res,next) => {
 
   try {
     if (!req.payload.userId) return next(errorHandler(401, "forbidden"));
+    if (!title) return next(errorHandler(401, "title is required"));
+    if (!activity) return next(errorHandler(401, "activity is required"));
 
     const project  = await properties.findById(prodId);
 
-// console.log(req.payload.status)
 
-// if(req.payload.status){
-  if (req.payload.userId !== project.user) return next(errorHandler(401, "unauthorise user"));
+if(req.payload.status === "Admin") {
 
-// }
+ const productActivity = await Activities.create({
+    property:prodId,
+    title,
+    activity,
+    documents,
+})
 
-      // await Activities.create({
-      //     property:prodId,
-      //     title,
-      //     activity,
-      //     documents,
-      //     // documents_type: documents[0].mimetype || ""
-      // })
-      // title: String,
-      // activity: String,
-      // // documents_type: String,
-      // property: {
-      //     // type: SchemaTypes.ObjectId,
-      //     type: String,
-      //     ref: "properties",
-      //     required: true,
-      //   },
-      // documents: 
 
-      res.status(200).json({
-        message: "success",project
-      })
+project.activities.push(productActivity._id)
+project.save()
+
+return  res.status(200).json({
+  message: "success"
+})
+ 
+} 
+
+
+
+
+if(req.payload.userId === project.user.toString()) {
+  const productActivity = await Activities.create({
+    property:prodId,
+    title,
+    activity,
+    documents,
+});
+
+project.activities.push(productActivity._id)
+project.save()
+
+
+
+} else {
+  return next(errorHandler(401, "forbidden"));
+}
+
+return  res.status(200).json({
+  message: "success"
+})
 
   } catch (error) {
     next(error)

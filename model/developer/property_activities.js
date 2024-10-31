@@ -14,15 +14,7 @@ const property_activities_Schema = new Schema(
         ref: "properties",
         required: true,
       },
-    documents: [
-      {
-        location: String,
-        originalname: String,
-        mimetype: String,
-        size: String,
-        key: String,
-      },
-    ],
+    documents: Array,
   },
   {
     timestamps: true,

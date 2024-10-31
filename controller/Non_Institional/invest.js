@@ -279,6 +279,17 @@ exports.getInvestmentById = async (req, res, next) => {
                as: "property_invested",
              },
            },
+        {
+          $lookup: {
+               from: "property_activities",
+               localField: "activities",
+               foreignField: "_id",
+              //  pipeline: [
+              //   { $project : {paid:1 , description: 1, paymentDate: {$ifNull: ["$paymentDate", "$createdAt"]}} }
+              //  ],
+               as: "property_activities",
+             },
+           },
   
       {
         $sort: {
@@ -300,7 +311,7 @@ exports.getInvestmentById = async (req, res, next) => {
           property_size: "$property_detail.property_overview.size",
           property_document: "$property_detail.property_documents",
           payment_update : "$property_invested",
-          activitiees_update : "$activities"
+          activities_update : "$property_activities"
 
         },
       },

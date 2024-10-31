@@ -17,10 +17,8 @@ const propertiesSchema = new Schema(
       required: true,
     },
     activities: [{
-      // type: SchemaTypes.ObjectId,
-      type: String,
+      type: SchemaTypes.ObjectId,
       ref: "property_activities",
-      required: true,
     }],
     transactions: [
       {
