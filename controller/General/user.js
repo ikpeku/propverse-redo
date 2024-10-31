@@ -799,13 +799,19 @@ exports.get_Transactions = async (req, res, next) => {
       },
     },
 
-    {$unwind: "$property_detail"},
+    {
+      $addFields: {
+        property: {
+          $arrayElemAt: ["$property_detail", 0]
+        }
+      }
+     },
      
      {
        $project: {
          investorname: "$user.username",
          country: "$user.country",
-         projectname: "$property_detail.property_detail.property_overview.property_name",
+         projectname: "$property.property_detail.property_overview.property_name",
          transaction_type: 1,
          description: 1,
          paid: 1,
@@ -820,7 +826,7 @@ exports.get_Transactions = async (req, res, next) => {
         invested_fund: "$funds",
         investorId: "$investor",
         fundId: "$funder",
-        propertyId: "$property"
+        propertyId: "$property._id"
        },
      }
    );
