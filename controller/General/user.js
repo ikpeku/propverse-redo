@@ -808,7 +808,8 @@ exports.get_Transactions = async (req, res, next) => {
     transaction_type: 1,
     invested_fund: "$funds",
     investorId: "$investor",
-    fundId: "$funder"
+    fundId: "$funder",
+    propertyId: "$property"
        },
      }
    );
