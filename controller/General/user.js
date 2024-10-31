@@ -790,29 +790,29 @@ exports.get_Transactions = async (req, res, next) => {
       }
      },
 
-     {
-      $lookup: {
-        from: "properties",
-        localField: "property",
-        foreignField: "_id",
-        as: "property_detail",
-      },
-    },
+    //  {
+    //   $lookup: {
+    //     from: "properties",
+    //     localField: "property",
+    //     foreignField: "_id",
+    //     as: "property_detail",
+    //   },
+    // },
 
-    {
-      $addFields: {
-        investedproperty: {
-          $arrayElemAt: ["$property_detail", 0]
-        }
-      }
-     },
+    // {
+    //   $addFields: {
+    //     investedproperty: {
+    //       $arrayElemAt: ["$property_detail", 0]
+    //     }
+    //   }
+    //  },
      
      {
        $project: {
          investorname: "$user.username",
          country: "$user.country",
         //  projectname: "$property.property_detail.property_overview.property_name",
-        //  projectname: "$name",
+         projectname: "$name",
          projectname: "$investedproperty.property_detail.property_overview.property_name",
          transaction_type: 1,
          description: 1,
@@ -828,7 +828,7 @@ exports.get_Transactions = async (req, res, next) => {
         invested_fund: "$funds",
         investorId: "$investor",
         fundId: "$funder",
-        propertyId: "$investedproperty._id"
+        propertyId: "$property"
        },
      }
    );
@@ -909,6 +909,22 @@ exports.get_Transaction_by_Id = async (req, res, next) => {
        {
         $unwind: "$user"
        },
+
+      //  {
+      //   $lookup: {
+      //     from: "properties",
+      //     localField: "property",
+      //     foreignField: "_id",
+      //     as: "property_detail",
+      //   },
+      // },
+      // {
+      //   $addFields: {
+      //     investedproperty: {
+      //       $arrayElemAt: ["$property_detail", 0]
+      //     }
+      //   }
+      //  },
     {
       $project: {
         name: 1,
