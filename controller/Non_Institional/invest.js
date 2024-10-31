@@ -250,25 +250,9 @@ exports.getUserInvestment = async (req, res, next) => {
 
 exports.getInvestmentById = async (req, res, next) => {
   const { prodId } = req.params;
-
-  const page = parseInt(req?.query?.page) || 1;
-
-  const limit = parseInt(req?.query?.limit) || 10;
- 
-  const myCustomLabels = {
-    docs: 'data',
-  };
-
-  const options = {
-    page,
-    limit,
-    customLabels: myCustomLabels
-  };
-
-
   
   try {
-    const investoredProperty = Property.aggregate([
+    const investoredProperty = await Property.aggregate([
       {
 
         $match: {_id: prodId}
@@ -322,14 +306,9 @@ exports.getInvestmentById = async (req, res, next) => {
       },
     ]);
 
-    const paginationResult = await Property.aggregatePaginate(
-      investoredProperty,
-      options
-    );
-
     res.status(200).json({
       success: true,
-       ...paginationResult,
+      data: investoredProperty[0] || null,
     });
   } catch (error) {
     next(errorHandler(500, "server error"));

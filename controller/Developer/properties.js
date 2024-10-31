@@ -151,17 +151,34 @@ exports.updatePropertyProgress = async (req, res, next) => {
 
   try {
     if(!property_progress) return
+
+    console.log(req.payload)
+
+
+    // req.payload.status == "Developer"
+
     const response = await properties.findById(prodId);
-  
-    if (!response) {
-      return next(errorHandler(401, "invalid property"));
-    } else {
-      response.property_progress = property_progress;
-      response.save()
+
+    console.log(response.user.toString())
+
+    if(req.payload.userId !== response.user.toString()) {
+      return next(errorHandler(401, "forbidden"));
     }
 
 
-    return res.status(200).json({ status: "success" });
+  
+    // if (!response) {
+    //   return next(errorHandler(401, "invalid property"));
+    // } 
+    
+    if(req.payload.status === "Admin") {
+      console.log("admin")
+      // response.property_progress = property_progress;
+      // response.save()
+    }
+
+
+    return res.status(200).json({ status: "success" , response, });
   } catch (error) {
     // next(errorHandler(500, "failed"))
     next(error);
