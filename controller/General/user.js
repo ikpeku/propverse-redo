@@ -1230,7 +1230,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     }
 
 
-
+    return res.status(200).json({ status: "success"});
 
   } else {
 
