@@ -791,7 +791,20 @@ exports.get_Transactions = async (req, res, next) => {
      },
 
      {
+      $lookup: {
+        from: "properties",
+        localField: "property",
+        foreignField: "_id",
+        as: "property_detail",
+      },
+    },
+
+
+     
+
+     {
        $project: {
+        property_detail: 1,
          investorname: "$user.username",
          country: "$user.country",
          projectname: "$name",
@@ -1503,6 +1516,10 @@ exports.update_Transactions = async (req, res, next) => {
           { $pull: { transactions: transaction._id } },
           { new: true, useFindAndModify: false }
         );
+
+        await PayInTransaction.findByIdAndUpdate(txnId, { $pull: { transactions: transaction._id } },);
+
+
         
     
       }
@@ -1548,6 +1565,7 @@ exports.update_Transactions = async (req, res, next) => {
         
       } else {
     
+        transaction.funder = ""
         transaction.investor = investorId;
         transaction.company = response.user;
         transaction.transaction_type = "property";
