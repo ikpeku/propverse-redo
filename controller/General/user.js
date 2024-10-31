@@ -994,21 +994,36 @@ exports.create_Property_Transactions = async (req, res, next) => {
       paymentDate
     });
 
+
+    if(fundInvestment){
+console.log("fundInvestment")
+    }
+
    
-    await properties.findByIdAndUpdate(
+ const isPropery =   await properties.findByIdAndUpdate(
       fundInvestment.property,
       { $push: { transactions: fundInvestment._id } },
       { new: true, useFindAndModify: false }
     );
+
+    if(isPropery){
+      console.log("isPropery")
+          }
     
-    await Funds.findByIdAndUpdate(
+
+     const isFund =  await Funds.findByIdAndUpdate(
       fundId,
       { $push: { investments: fundInvestment._id , "funds_holdings.project_investments": fundInvestment.property} },
       { new: true, useFindAndModify: false }
     );
 
+    if(isFund){
+      console.log("isPropery")
+          }
+
     
   } else {
+
    const txnProperty = await PayInTransaction.create({
       isVerify: true,
       investor: investorId,
@@ -1031,17 +1046,30 @@ exports.create_Property_Transactions = async (req, res, next) => {
       paymentDate
     });
 
-    await Non_Institutional_Investor.findByIdAndUpdate(
+    if(txnProperty){
+      console.log("txnProperty")
+          }
+
+   const investorAcct = await Non_Institutional_Investor.findByIdAndUpdate(
       txnProperty.investor,
       { $push: { transactions: txnProperty._id, properties: txnProperty.property } },
       { new: true, useFindAndModify: false }
     );
+
+    if(investorAcct){
+      console.log("investorAcct")
+          }
   
-    await properties.findByIdAndUpdate(
+          const investorProperties =  await properties.findByIdAndUpdate(
       txnProperty.property,
       { $push: { transactions: txnProperty._id } },
       { new: true, useFindAndModify: false }
     );
+
+    if(investorProperties){
+      console.log("investorProperties")
+          }
+
   }
 
 

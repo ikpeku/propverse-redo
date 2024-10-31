@@ -2,8 +2,9 @@
 const Transactions = require("../../model/transaction/transactions");
 const Property = require("../../model/developer/properties");
 const Funds = require("../../model/institutional/fund");
+const Non_Institiutional_Investor = require("../../model/non_institional/non_institutional");
+const { ObjectId } = require("mongodb");
 
-// const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const { errorHandler } = require("../../utils/error");
 
 
@@ -156,20 +157,95 @@ exports.makeInvestmentFunds = async (req, res, next) => {
 
 exports.getUserInvestment = async (req, res, next) => {
   const { userId } = req.params;
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+ 
+  const myCustomLabels = {
+    docs: 'data',
+  };
+
+  const options = {
+    page,
+    limit,
+    customLabels: myCustomLabels
+  };
+
+
+  
   try {
+    const allFunds = Non_Institiutional_Investor.aggregate([
+      {
 
-    const data = await Transactions.find({ investor: userId })
+        $match: {_id: new ObjectId(userId)}
+      },
 
+      {
+        $lookup: {
+             from: "properties",
+             localField: "properties",
+             foreignField: "_id",
+             pipeline: [{
+               $lookup: {
+                 from: "due_deligences",
+                 localField: "company",
+                 foreignField: "user",
+                 as: "company",
+               }},
+               {
+                 "$unwind": "$company"
+               },
+              
+             ],
+             as: "project_investments",
+           },
+                    
+         },
+  
+         {
+          $unwind: "$project_investments"
+         },
+      {
+        $sort: {
+          updatedAt: -1
+        }
+      },
+      {
+        $project: {
+          // product: "$company",
+          propertyId: "$project_investments._id",
+          property_location: "$project_investments.property_detail.property_location",
+          property_type: "$project_investments.property_detail.property_overview.property_type",
 
-    // .populate(
-    //   "property funds  "
-    // );
+          thumbnail: "$project_investments.property_detail.property_images",
+          property_name: "$project_investments.property_detail.property_overview.property_name",
+          property_progress: "$project_investments.property_progress",
 
-    return res.status(200).json({ status: "success", data });
+          property_amount: "$project_investments.property_detail.property_overview.price",
+          property_dates: "$project_investments.property_detail.property_overview.date",
+         
+          company: "$project_investments.company.company_information.name" || ""
+        },
+      },
+    ]);
+
+    const paginationResult = await Non_Institiutional_Investor.aggregatePaginate(
+      allFunds,
+      options
+    );
+
+    res.status(200).json({
+      success: true,
+      // count: allFunds.length,
+       ...paginationResult,
+    });
   } catch (error) {
-    next(errorHandler(400, error));
-    // next(errorHandler(400, "failed"));
+    next(errorHandler(500, "server error"));
   }
+
+
+
+
 };
 
 exports.getInvestmentById = async (req, res, next) => {
