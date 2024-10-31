@@ -799,15 +799,13 @@ exports.get_Transactions = async (req, res, next) => {
       },
     },
 
-
+    {$unwind: "$property_detail"},
      
-
      {
        $project: {
-        property_detail: 1,
          investorname: "$user.username",
          country: "$user.country",
-         projectname: "$name",
+         projectname: "$property_detail.property_detail.property_overview.property_name",
          transaction_type: 1,
          description: 1,
          paid: 1,
