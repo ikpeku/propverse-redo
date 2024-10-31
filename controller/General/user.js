@@ -801,7 +801,7 @@ exports.get_Transactions = async (req, res, next) => {
 
     {
       $addFields: {
-        property: {
+        investedproperty: {
           $arrayElemAt: ["$property_detail", 0]
         }
       }
@@ -811,7 +811,9 @@ exports.get_Transactions = async (req, res, next) => {
        $project: {
          investorname: "$user.username",
          country: "$user.country",
-         projectname: "$property.property_detail.property_overview.property_name",
+        //  projectname: "$property.property_detail.property_overview.property_name",
+        //  projectname: "$name",
+         projectname: "$investedproperty.property_detail.property_overview.property_name",
          transaction_type: 1,
          description: 1,
          paid: 1,
@@ -826,7 +828,7 @@ exports.get_Transactions = async (req, res, next) => {
         invested_fund: "$funds",
         investorId: "$investor",
         fundId: "$funder",
-        propertyId: "$property._id"
+        propertyId: "$investedproperty._id"
        },
      }
    );
