@@ -1596,6 +1596,7 @@ exports.update_Transactions = async (req, res, next) => {
         transaction.company = response.user;
         transaction.transaction_type = "property";
         transaction.property = prodId;
+        transaction.funder = fundId,
         // transaction.name = response.property_detail.property_overview.property_name;
         transaction.status = "Success";
         transaction.paid.amount = amount;
@@ -1800,6 +1801,7 @@ transaction.investor = investorId,
 transaction.company = response.user,
 transaction.transaction_type = "funds",
 transaction.funds = invested_fund,
+transaction.funder = "",
 // transaction.name = response.name,
 transaction.status = "Success",
 transaction.paid.amount = amount
