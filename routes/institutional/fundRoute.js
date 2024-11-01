@@ -13,6 +13,8 @@ const {
   getHoldingsProject,
   getFundOverview,
   getFundPortfolio,
+  fundHoldingFunds,
+  userHoldingFunds,
 } = require('../../controller/institutional/fund');
 
 const {
@@ -38,7 +40,8 @@ route.get('/fundtransationdatail/:fundId', fundtransationdatail);
 route.get('/capitalcommitted/:fundId/:userId', capitalcommitted);
 route.get('/limitedpartners/:fundId', getLimitedPartners);
 route.get('/fundholding/project/:fundId', getHoldingsProject);
-route.get('/fundholding/funds/:fundId', getHoldingsFunds);
+route.get('/fundholding/funds', userHoldingFunds, getHoldingsFunds);
+route.get('/fundholding/funds/:fundId',fundHoldingFunds, getHoldingsFunds);
 route.get('/fundoverview/:fundId', getFundOverview);
 route.get('/fundportfolio/:fundId', getFundPortfolio);
 

@@ -48,7 +48,7 @@ const transaction_Schema = new Schema(
       ref: "fund",
       // required: true,
     },
-    name: String,
+    // name: String,
     status: {
       type: String,
       enum: ["Success", "Failed", "Pending"],

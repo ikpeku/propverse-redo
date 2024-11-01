@@ -1573,7 +1573,7 @@ exports.update_Transactions = async (req, res, next) => {
         transaction.company = response.user;
         transaction.transaction_type = "property";
         transaction.property = prodId;
-        transaction.name = response.property_detail.property_overview.property_name;
+        // transaction.name = response.property_detail.property_overview.property_name;
         transaction.status = "Success";
         transaction.paid.amount = amount;
         transaction.paid.currency = currency;
@@ -1607,7 +1607,7 @@ exports.update_Transactions = async (req, res, next) => {
         transaction.company = response.user;
         transaction.transaction_type = "property";
         transaction.property = prodId;
-        transaction.name = response.property_detail.property_overview.property_name;
+        // transaction.name = response.property_detail.property_overview.property_name;
         transaction.status = "Success";
         transaction.paid.amount = amount;
         transaction.paid.currency = currency;
@@ -1653,30 +1653,6 @@ exports.update_Transactions = async (req, res, next) => {
           return next(errorHandler(400, "invalid fundId"));
         }
     
-        
-      //  const fundInvestment =  await PayInTransaction.create({
-      //     isVerify: true,
-      //     investor: investorId,
-      //     company: response.user,
-      //     // property: prodId,
-      //     transaction_type: "funds",
-      //     funder: fundId,
-      //     funds: invested_fund,
-      //     name: response.name,
-      //     status: "Success",
-      //     paid: {
-      //       amount,
-      //       currency,
-      //     },
-      //     property_amount: {
-      //       amount: capital_committed.amount,
-      //       currency: capital_committed.currency,
-      //     },
-      //     payment_method: "bank  transfer",
-      //     payment_status,
-      //     description,
-      //     paymentDate
-      //   });
 
       await Funds.findByIdAndUpdate(
         transaction.funder,
@@ -1694,7 +1670,7 @@ transaction.company = response.user,
 transaction.transaction_type = "funds",
 transaction.funder = fundId,
 transaction.funds = invested_fund,
-transaction.name = response.name,
+// transaction.name = response.name,
 transaction.status = "Success",
 transaction.paid.amount = amount
 transaction.paid.currency = currency
@@ -1746,26 +1722,6 @@ transaction.save()
       );
     
         }
-    
-        
-           //   await Funds.findByIdAndUpdate(
-        //     fundInvestment.funds,
-        //     { $push: { 
-        //       "investments": fundInvestment._id , 
-        //       "limitedpartners": Limited_partnersresponse._id, 
-        //       "funds_holdings.funds_investments": fundId} },
-        //     { new: true, useFindAndModify: false }
-        //   );
-    
-        // await Funds.findByIdAndUpdate(
-        //   invested_fund,
-        //   { $push: { 
-        //     "investments": fundInvestment._id , 
-        //     "limitedpartners": Limited_partnersresponse._id, 
-        //     "funds_holdings.funds_investments": invested_fund} },
-        //   { new: true, useFindAndModify: false }
-        // );
-    
     
     
     
@@ -1821,7 +1777,7 @@ transaction.investor = investorId,
 transaction.company = response.user,
 transaction.transaction_type = "funds",
 transaction.funds = invested_fund,
-transaction.name = response.name,
+// transaction.name = response.name,
 transaction.status = "Success",
 transaction.paid.amount = amount
 transaction.paid.currency = currency

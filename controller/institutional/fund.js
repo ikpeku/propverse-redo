@@ -524,6 +524,20 @@ exports.getHoldingsProject = async (req, res, next) => {
 };
 
 
+
+
+
+exports.userHoldingFunds = async (req, res, next) => {
+  req.query.type = "userHolding"
+  next()
+
+}
+exports.fundHoldingFunds = async (req, res, next) => {
+  req.query.type = "fundHolding"
+  next()
+}
+
+
 exports.getHoldingsFunds = async (req, res, next) => {
 const {fundId} = req.params
   const page = parseInt(req?.query?.page) || 1;
@@ -541,10 +555,26 @@ const {fundId} = req.params
   };
 
 
-  const query = [
-    {
-      $match: {fund: fundId}
-    },
+  const query = []
+
+  if(req.query.type == "fundHolding"){
+    query.push(
+      {
+        $match: {fund: fundId}
+      },
+    )
+  }
+
+  if(req.query.type = "userHolding"){
+    query.push(
+      {
+        $match: { user:  new ObjectId(req.payload.userId)}
+      },
+    )
+  }
+
+ 
+  query.push(
     {
       $lookup: {
         from: "funds",
@@ -581,10 +611,7 @@ const {fundId} = req.params
         invested_capital_percentage: {$multiply :["$invested_capital_diff", 0.1]},
       },
     },
-   
-  ]
-
- 
+  )
 
 
   
@@ -628,6 +655,7 @@ const {fundId} = req.params
     next(errorHandler(500, "server error"));
   }
 }
+
 
 exports.getFundPortfolio = async (req, res, next) => {
   const {fundId} = req.params;
