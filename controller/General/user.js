@@ -1230,27 +1230,6 @@ exports.create_Funds_Transactions = async (req, res, next) => {
 
     }
 
-    
-       //   await Funds.findByIdAndUpdate(
-    //     fundInvestment.funds,
-    //     { $push: { 
-    //       "investments": fundInvestment._id , 
-    //       "limitedpartners": Limited_partnersresponse._id, 
-    //       "funds_holdings.funds_investments": fundId} },
-    //     { new: true, useFindAndModify: false }
-    //   );
-
-    // await Funds.findByIdAndUpdate(
-    //   invested_fund,
-    //   { $push: { 
-    //     "investments": fundInvestment._id , 
-    //     "limitedpartners": Limited_partnersresponse._id, 
-    //     "funds_holdings.funds_investments": invested_fund} },
-    //   { new: true, useFindAndModify: false }
-    // );
-
-
-
 
     const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
 
@@ -1271,12 +1250,6 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     } else {
       dataLimited.capital_deploy.amount += amount;
       dataLimited.save();
-
-      // await Funds.findByIdAndUpdate(
-      //   fundInvestment.funds,
-      //   { $push: { investments: fundInvestment._id,} },
-      //   { new: true, useFindAndModify: false }
-      // );
     }
 
 
@@ -1315,33 +1288,61 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       { new: true, useFindAndModify: false }
     );
 
-
-    const dataLimited_partners =  await Limited_partners.findOne({user: investorId,  fund:invested_fund});
-
-    
-
-    if(!dataLimited_partners){
-      const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} });
-  
-    const funding =  await Funds.findByIdAndUpdate(
-        txnProperty.funds,
-        { $push: { investments: txnProperty._id , limitedpartners: Limited_partnersresponse._id} },
-        { new: true, useFindAndModify: false }
-      );
-      
-
-    } else {
-      dataLimited_partners.capital_deploy.amount += amount;
-      dataLimited_partners.save();
-
-      const funding =   await Funds.findByIdAndUpdate(
+       const funding =   await Funds.findByIdAndUpdate(
         txnProperty.funds,
         { $push: { investments: txnProperty._id} },
         { new: true, useFindAndModify: false }
       );
 
 
+    // const dataLimited_partners =  await Limited_partners.findOne({user: investorId,  fund:invested_fund});
+
+    
+
+    // if(!dataLimited_partners){
+    //   const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} });
+  
+    // const funding =  await Funds.findByIdAndUpdate(
+    //     txnProperty.funds,
+    //     { $push: { investments: txnProperty._id , limitedpartners: Limited_partnersresponse._id} },
+    //     { new: true, useFindAndModify: false }
+    //   );
+      
+
+    // } else {
+    //   dataLimited_partners.capital_deploy.amount += amount;
+    //   dataLimited_partners.save();
+
+    //   const funding =   await Funds.findByIdAndUpdate(
+    //     txnProperty.funds,
+    //     { $push: { investments: txnProperty._id} },
+    //     { new: true, useFindAndModify: false }
+    //   );
+
+    // }
+    // strat here
+    const dataLimited =  await Limited_partners.findOne({user: investorId,  fund:invested_fund})
+
+
+    if(!dataLimited){
+      const Limited_partnersresponse =  await Limited_partners.create({user: investorId,  fund:invested_fund, capital_committed:{amount:capital_committed.amount,currency: capital_committed.currency}, capital_deploy:{amount,currency} })      
+
+      await Funds.findByIdAndUpdate(invested_fund,
+        { $push: { 
+          "limitedpartners": Limited_partnersresponse._id, 
+        } },
+        { new: true, useFindAndModify: false }
+      );
+  
+      txnProperty.limited_partner = Limited_partnersresponse._id;
+      txnProperty.save()
+
+    } else {
+      dataLimited.capital_deploy.amount += amount;
+      dataLimited.save();
     }
+
+    // end here
 
 
   }
