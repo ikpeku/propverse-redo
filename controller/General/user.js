@@ -1250,6 +1250,9 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     } else {
       dataLimited.capital_deploy.amount += amount;
       dataLimited.save();
+
+      fundInvestment.limited_partner = dataLimited._id;
+      fundInvestment.save()
     }
 
 
@@ -1340,6 +1343,9 @@ exports.create_Funds_Transactions = async (req, res, next) => {
     } else {
       dataLimited.capital_deploy.amount += amount;
       dataLimited.save();
+
+      txnProperty.limited_partner = dataLimited._id;
+      txnProperty.save()
     }
 
     // end here
