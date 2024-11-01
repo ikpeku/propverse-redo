@@ -761,14 +761,14 @@ exports.get_Transactions = async (req, res, next) => {
          from: "funds",
          localField: "funds",
          foreignField: "_id",
-         as: "fund",
+         as: "funding",
        },
      },
 
      {
       $addFields: {
         fund_detail: {
-          $arrayElemAt: ["$fund", 0]
+          $arrayElemAt: ["$funding", 0]
         }
       }
      },
@@ -779,56 +779,54 @@ exports.get_Transactions = async (req, res, next) => {
          from: "limited_partners",
          localField: "limited_partner",
          foreignField: "_id",
-         as: "limited_partner",
+         as: "limited_partnerItem",
        },
      },
      {
       $addFields: {
         limited_partner_detail: {
-          $arrayElemAt: ["$limited_partner", 0]
+          $arrayElemAt: ["$limited_partnerItem", 0]
         }
       }
      },
+     {
+      $lookup: {
+        from: "properties",
+        localField: "property",
+        foreignField: "_id",
+        as: "property_detail",
+      },
+    },
 
-    //  {
-    //   $lookup: {
-    //     from: "properties",
-    //     localField: "property",
-    //     foreignField: "_id",
-    //     as: "property_detail",
-    //   },
-    // },
-
-    // {
-    //   $addFields: {
-    //     investedproperty: {
-    //       $arrayElemAt: ["$property_detail", 0]
-    //     }
-    //   }
-    //  },
-     
+    {
+      $addFields: {
+        investedproperty: {
+          $arrayElemAt: ["$property_detail", 0]
+        }
+      }
+     },
+   
      {
        $project: {
+        // root: "$$ROOT",
          investorname: "$user.username",
          country: "$user.country",
-        //  projectname: "$property.property_detail.property_overview.property_name",
-         projectname: "$name",
-         projectname: "$investedproperty.property_detail.property_overview.property_name",
+          projectname: {$cond : [  {$eq: ["$transaction_type", "property"]}  ,"$investedproperty.property_detail.property_overview.property_name", "$fund_detail.name"]},
          transaction_type: 1,
          description: 1,
          paid: 1,
-         paymentDate: 1,
+         paymentDate: {$ifNull : ["$paymentDate", "$createdAt"]},
          updatedAt: 1,
          status: 1,
         _id: 1,
-        fund_name: "$fund_detail.name",
-        capital_committed: "$limited_partner_detail.capital_committed",
-        capital_deploy: "$limited_partner_detail.capital_deploy",
-        transaction_type: 1,
-        invested_fund: "$funds",
+        // fund_name: "$fund_detail.name",
+        capital_committed: {$ifNull : ["$limited_partner_detail.capital_committed", null]},
+        capital_deploy: {$ifNull : ["$limited_partner_detail.capital_deploy",null]},
+
+        invested_fund: {$ifNull : ["$fund_detail._id",null]},
         investorId: "$investor",
         fundId: "$funder",
-        propertyId: "$property"
+        propertyId: {$ifNull : ["$investedproperty._id",null]},
        },
      }
    );
@@ -910,24 +908,41 @@ exports.get_Transaction_by_Id = async (req, res, next) => {
         $unwind: "$user"
        },
 
-      //  {
-      //   $lookup: {
-      //     from: "properties",
-      //     localField: "property",
-      //     foreignField: "_id",
-      //     as: "property_detail",
-      //   },
-      // },
-      // {
-      //   $addFields: {
-      //     investedproperty: {
-      //       $arrayElemAt: ["$property_detail", 0]
-      //     }
-      //   }
-      //  },
+       {
+        $lookup: {
+          from: "funds",
+          localField: "funds",
+          foreignField: "_id",
+          as: "funding",
+        },
+      },
+ 
+      {
+       $addFields: {
+         fund_detail: {
+           $arrayElemAt: ["$funding", 0]
+         }
+       }
+      },
+
+       {
+        $lookup: {
+          from: "properties",
+          localField: "property",
+          foreignField: "_id",
+          as: "property_detail",
+        },
+      },
+      {
+        $addFields: {
+          investedproperty: {
+            $arrayElemAt: ["$property_detail", 0]
+          }
+        }
+       },
     {
       $project: {
-        name: 1,
+        name: {$cond : [  {$eq: ["$transaction_type", "property"]}  ,"$investedproperty.property_detail.property_overview.property_name", "$fund_detail.name"]},
         description: 1,
         date: "$createdAt",
         amount_paid: "$paid.amount",
@@ -1006,7 +1021,6 @@ exports.create_Property_Transactions = async (req, res, next) => {
       return next(errorHandler(400, "invalid fundId"));
     }
 
-
   const fundInvestment =  await PayInTransaction.create({
       isVerify: true,
       investor: investorId,
@@ -1014,7 +1028,8 @@ exports.create_Property_Transactions = async (req, res, next) => {
       transaction_type: "property",
       funder: fundId,
       property: prodId,
-      name: response.property_detail.property_overview.property_name,
+      // name: response.property_detail.property_overview.property_name,
+      // name: responseFunds.name,
       status: "Success",
       paid: {
         amount,
@@ -1070,7 +1085,7 @@ console.log("fundInvestment")
       company: response.user,
       transaction_type: "property",
       property: prodId,
-      name: response.property_detail.property_overview.property_name,
+      // name: response.property_detail.property_overview.property_name,
       status: "Success",
       paid: {
         amount,
@@ -1163,7 +1178,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       transaction_type: "funds",
       funder: fundId,
       funds: invested_fund,
-      name: response.name,
+      // name: response.name,
       status: "Success",
       paid: {
         amount,
@@ -1276,7 +1291,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       transaction_type: "funds",
       // property: prodId,
       funds: invested_fund,
-      name: response.name,
+      // name: response.name,
       status: "Success",
       paid: {
         amount,
