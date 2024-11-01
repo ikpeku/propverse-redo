@@ -772,6 +772,22 @@ exports.get_Transactions = async (req, res, next) => {
         }
       }
      },
+     {
+       $lookup: {
+         from: "funds",
+         localField: "funder",
+         foreignField: "_id",
+         as: "funderparam",
+       },
+     },
+
+     {
+      $addFields: {
+        funder_detail: {
+          $arrayElemAt: ["$funderparam", 0]
+        }
+      }
+     },
 
 
      {
@@ -819,13 +835,13 @@ exports.get_Transactions = async (req, res, next) => {
          updatedAt: 1,
          status: 1,
         _id: 1,
-        // fund_name: "$fund_detail.name",
+        fund_name: {$ifNull : ["$funder_detail.name",null]},
         capital_committed: {$ifNull : ["$limited_partner_detail.capital_committed", null]},
         capital_deploy: {$ifNull : ["$limited_partner_detail.capital_deploy",null]},
 
         invested_fund: {$ifNull : ["$fund_detail._id",null]},
         investorId: "$investor",
-        fundId: "$funder",
+        fundId: {$ifNull : ["$funder_detail._id", null]},
         propertyId: {$ifNull : ["$investedproperty._id",null]},
        },
      }
