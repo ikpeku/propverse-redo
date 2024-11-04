@@ -6,7 +6,7 @@ const TransactionsPayIn = require("../../model/transaction/transactions")
 const Non_Institutional_Investor = require("../../model/non_institional/non_institutional");
 const Property = require("../../model/developer/properties");
 const Funds = require("../../model/institutional/fund");
-
+const Limited_partners = require("../../model/institutional/limitedpartners");
 
 
 const Compliance = require("../../model/compliance/accreditation");
@@ -230,32 +230,50 @@ exports.VerifyPayIn = async(req,res,next) => {
 
   exports.AdminDashbroad = async(req,res,next) => {
 
-    // let today = new Date()
-    // console.log("enter")
+    const days = parseInt(req?.query?.days) || 7;
+    const funddays = parseInt(req?.query?.funddays) || 356;
+
+    
+
+    const numberOfWeeks = Math.floor(days/7); 
+    const funddays_numberOfWeeks = Math.floor(funddays/7); 
+    
+
+    const addWeeksToDate = (dateObj,numberOfWeeks) => {
+      dateObj.setDate(dateObj.getDate() - numberOfWeeks * 7);
+      return dateObj;
+    }
+
+   
+    // console.log(addWeeksToDate(new Date(), numberOfWeeks).toISOString());
+ 
+const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
+const graph_days = addWeeksToDate(new Date(), funddays_numberOfWeeks);
 
 
-//         'Institutional Investor',
-//         'Developer',
-//         ,
-//         'Admin',
-//       ],
+
+
+
+
     try {
 
-      const non_institional = await User.aggregate([
-        {
-          $group: {
-            _id: "$account_type",
-            numbersOfUsers: {
-              $count: {}
-            },
-            date: {
-              $addToSet: "$createdAt"
-            },
-          },
-          $sort: {
-            date: -1
-          },
-        },
+      const admindashbroad = await User.aggregate(
+        
+        [
+        // {
+        //   $group: {
+        //     _id: "$account_type",
+        //     numbersOfUsers: {
+        //       $count: {}
+        //     },
+        //     date: {
+        //       $addToSet: "$createdAt"
+        //     },
+        //   },
+        //   $sort: {
+        //     date: -1
+        //   },
+        // },
       //   {
       //     $setWindowFields: {
       //       sortBy: { day: 1 },
@@ -275,14 +293,250 @@ exports.VerifyPayIn = async(req,res,next) => {
       //   $set: {thirtyDayChange: {$divide: [{$subtract: ['$totalValue','$thirtyDaysAgoValue']}, '$totalValue']}}
       // }
 
-      ])
+      // 'Institutional Investor',
+      //   'Developer',
+      //   'Non-Institutional Investor',
+      //   'Admin',
 
+      {
+        $match: { verify_account: true, isSuspended: false }
+      },
+      {
+        $set: {
+          addedDate: "$createdAt"
+        }
+      },
+      
+
+      {
+        $facet: {
+          Institutional_Investor: [
+            {$match: {account_type: "Institutional Investor"}},
+            {$count: "count"}
+          ],
+          Developer: [
+            {$match: {account_type: "Developer"}},
+            {$count: "count"}
+          ],
+          Non_Institutional_Investor: [
+            {$match: {account_type: "Non-Institutional Investor"}},
+            {$count: "count"}
+          ],
+          Institutional_Investor_Activity: [
+            {$match: {account_type: "Institutional Investor", addedDate: {$gte: activity_days}}},
+            {$count: "count"}
+          ],
+          Developer_Activity: [
+            {$match: {account_type: "Developer", addedDate: {$gte: activity_days}}},
+            {$count: "count"}
+          ],
+          Non_Institutional_Investor_Activity: [
+            {$match: {account_type: "Non-Institutional Investor", addedDate: {$gte: activity_days}}},
+            // {$match: {createdAt: {$gte: activity_days}}},
+            {$count: "count"}
+          ],
+          
+
+        }
+      },
+
+
+      {
+        $addFields: {
+          totalUser: {$add: [{$arrayElemAt: ['$Institutional_Investor.count', 0]},{ $arrayElemAt: ['$Developer.count', 0] }, { $arrayElemAt: ['$Non_Institutional_Investor.count', 0] } ]}
+        }
+      },
+      {
+        $addFields: {
+          totalUser_Activity: {$add: [{$arrayElemAt: ['$Institutional_Investor_Activity.count', 0]},{ $arrayElemAt: ['$Developer_Activity.count', 0] }, { $arrayElemAt: ['$Non_Institutional_Investor_Activity.count', 0] } ]}
+        }
+      },
+
+      {
+        $project: {
+         investor_data: {
+          Institutional_Investor: { $arrayElemAt: ['$Institutional_Investor.count', 0] },
+          Institutional_Investor_percentage:  {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Institutional_Investor.count', 0] }, "$totalUser"]}, 100]}},
+          developers_percentage:  {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Developer.count', 0] }, "$totalUser"]}, 100]}},
+          Non_Institutional_Investor_percentage:  {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Non_Institutional_Investor.count', 0] }, "$totalUser"]}, 100]}},
+          developers: { $arrayElemAt: ['$Developer.count', 0] },
+          private_investors: { $arrayElemAt: ['$Non_Institutional_Investor.count', 0] },
+         },
+
+
+        activities: {
+          Institutional_Investor: {$ifNull: [{ $arrayElemAt: ['$Institutional_Investor_Activity.count', 0] }, 0]},
+          Institutional_Investor_percentage:  {$ifNull: [{$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Institutional_Investor_Activity.count', 0] }, "$totalUser_Activity"]}, 100]}}, 0]},
+          developers_percentage:  {$ifNull: [{$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Developer_Activity.count', 0] }, "$totalUser_Activity"]}, 100]}}, 0]},
+          Non_Institutional_Investor_percentage:  {$ifNull: [{$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Non_Institutional_Investor_Activity.count', 0] }, "$totalUser_Activity"]}, 100]}}, 0]},
+        developers: {$ifNull: [{ $arrayElemAt: ['$Developer_Activity.count', 0] }, 0]},
+        private_investors: {$ifNull: [{ $arrayElemAt: ['$Non_Institutional_Investor_Activity.count', 0] }, 0]},
+        }
+
+
+
+
+
+        }
+    }]
+  )
+
+
+  const funds = await Limited_partners.aggregate([
+    {
+      $lookup: {
+        from: "funds",
+        localField: "fund",
+        foreignField: "_id",
+        as: "fund",
+      },
+    },
+    
+
+    {
+      $facet: {
+        table: [
+          {
+            $set: {
+              addedDate: "$createdAt"
+            }
+          },
+          {$match:{addedDate: {$gte: graph_days}}},
+        //   {
+        //     $setWindowFields: {
+        //        partitionBy: { $month: "$createdAt" },
+        //        sortBy: { updateAt: -1 },
+        //        output: {
+        //           cumulative_capital_committed: {
+        //              $sum: "$capital_committed.amount",
+        //              window: {
+        //                 documents: [ "unbounded", "current" ]
+        //              }
+        //           },
+        //           cumulative_capital_raise: {
+        //              $sum: "$capital_deploy.amount",
+        //              window: {
+        //               documents: [ "unbounded", "current" ]
+        //              }
+        //           }
+        //        }
+        //     }
+        //  },
+        { 
+          $group: {
+              // _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+              _id: {month: {$month: "$createdAt"}},
+              cumulative_capital_committed: { $sum: "$capital_committed.amount" },
+              cumulative_capital_raise: { $sum: "$capital_deploy.amount" }
+          }
+      },
+        {
+          $project: {
+            cumulative_capital_committed: 1,
+            cumulative_capital_raise: 1,
+            // createdAt: {$month: "$createdAt"}
+          }
+         }
+         
+        ],
+        account: [
+          {
+            $project: {
+              fund_raise: { $sum: "$capital_deploy.amount" },
+              funds_committed: { $sum: "$capital_committed.amount" },
+            },
+          },
+        ],
+        Institutional_Investor: [
+          {
+            $unwind: "$fund",
+          },
+          {
+            $group: {
+              _id: "$fund.user",
+            }
+          }
+        ],
+        Investor: [
+          {
+            $group: {
+              _id: "$user",
+            }
+          }
+        ],
+        
+      },
+    },
+
+    {
+      $project: {
+        Institutional_Investor_that_raise: {
+          $size: "$Institutional_Investor",
+        },
+        Institutional_Investor_that_committed: {
+          $size: "$Investor",
+        },
+
+        fund_raise: {
+          $sum: "$account.fund_raise",
+        },
+        funds_committed: {
+          $sum: "$account.funds_committed",
+        },
+        table: 1
+      },
+    },
+  ]);
+
+  const properties = await Property.aggregate([
+    // {
+    //   // $match: { isSubmitted: true, isAdminAproved: "Approved" }
+    // }
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    // { $unset: ["user.password"] },
+    // {
+    //   $unwind: "$user",
+    // },
+    {
+      $lookup: {
+        from: "transactions",
+        localField: "transactions",
+        foreignField: "_id",
+        as: "transaction_invested",
+      },
+    },
+    {
+      $addFields: {
+        amount_invested: {
+          $sum: { $sum: "$transaction_invested.paid.amount" },
+        },
+      },
+    },
+
+    {
+      $project: {
+        total_revenue: {$sum: "$amount_invested"}
+      }
+    }
+  ]);
 
       res.status(200).json({
-        data: non_institional
+        data: {
+          ...admindashbroad[0],
+           ...funds[0],
+          ...properties[0]
+          }
       })
       
     } catch (error) {
+      next(error)
       
     }
 
