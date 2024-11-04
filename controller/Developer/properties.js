@@ -3,6 +3,8 @@ const properties = require("../../model/developer/properties");
 const { errorHandler } = require("../../utils/error");
 const Due_Deligence = require("../../model/developer/due_deligence");
 const Activities = require("../../model/developer/property_activities");
+const PayInTransaction = require("../../model/transaction/transactions");
+
 
 exports.isSubmmited = (req, res, next) => {
   req.body.isSubmitted = true;
@@ -546,61 +548,137 @@ exports.getPropertyInvestors = async (req, res, next) => {
   const { prodId } = req.params;
 
 
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+
+  const myCustomLabels = {
+    docs: 'data',
+  };
+
+  const options = {
+    page,
+    limit,
+    customLabels: myCustomLabels
+  };
+
+
   try {
-    let query = [
-      {
-        $match: { _id: prodId },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      { $unset: ["user.password"] },
-      {
-        $unwind: "$user",
-      },
-      {
-        $lookup: {
-          from: "transactions",
-          localField: "transactions",
-          foreignField: "_id",
-          as: "transaction_invested",
-        },
-      },
-      {
-        $addFields: {
-          amount_invested: {
-            $sum: { $sum: "$transaction_invested.paid.amount" },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: "due_deligences",
-          localField: "company",
-          foreignField: "user",
-          as: "company",
-        },
-      },
-      {
-        $unwind: "$company",
-      },
+    // let query = [
+    //   {
+    //     $match: { _id: prodId },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "users",
+    //       localField: "user",
+    //       foreignField: "_id",
+    //       as: "user",
+    //     },
+    //   },
+    //   { $unset: ["user.password"] },
+    //   {
+    //     $unwind: "$user",
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "transactions",
+    //       localField: "transactions",
+    //       foreignField: "_id",
+    //       as: "transaction_invested",
+    //     },
+    //   },
+    //   {
+    //     $addFields: {
+    //       amount_invested: {
+    //         $sum: { $sum: "$transaction_invested.paid.amount" },
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "due_deligences",
+    //       localField: "company",
+    //       foreignField: "user",
+    //       as: "company",
+    //     },
+    //   },
+    //   {
+    //     $unwind: "$company",
+    //   },
 
-      {
-        $lookup: {
-          from: "property_activities",
-          localField: "activities",
-          foreignField: "property",
-          as: "activities",
-        },
-      },
-    ];
+    //   {
+    //     $lookup: {
+    //       from: "property_activities",
+    //       localField: "activities",
+    //       foreignField: "property",
+    //       as: "activities",
+    //     },
+    //   },
+    // ];
 
-    const myAggregate = await properties.aggregate(query);
+    // const myAggregate = await properties.aggregate(query);
+    
+    const allInvestors = await PayInTransaction.aggregate([
+    {
+      $match: {transaction_type: "property", property: prodId}
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "investor",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+
+    {
+      $group: {
+        _id: "$user.username",
+     }
+     },
+     {
+      $project: {
+        investors: {$size: "$_id"}
+      }
+     }
+
+
+    ]);
+
+    const myAggregate =  PayInTransaction.aggregate([
+    {
+      $match: {transaction_type: "property", property: prodId}
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "investor",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $addFields: {
+        user_detail: {
+          $arrayElemAt: ["$user", 0]
+        }
+      }
+     },
+     {
+      $project: {
+        investor_name: "$user_detail.username",
+        email: "$user_detail.email",
+        property_amount: "$property_amount.amount",
+        paid: {$sum: "$paid.amount"},
+        status: "$status",
+        paymentDate: "$paymentDate",
+        
+      }
+     }
+
+
+    ]);
 
 
   //   const project  = await properties.findById(prodId);
@@ -618,8 +696,13 @@ exports.getPropertyInvestors = async (req, res, next) => {
   //  myAggregate[0].currentProject  = current_project.length;
   //  myAggregate[0].totalProject  = project.length;
 
+  const paginationResult = await PayInTransaction.aggregatePaginate(
+    myAggregate,
+    options
+  );
+
    
-    return res.status(200).json({ status: "success", data: myAggregate[0] });
+    return res.status(200).json({ status: "success", data: { investors : allInvestors[0]?.investors || 0, ...paginationResult} });
 
 
   } catch (error) {
@@ -627,3 +710,7 @@ exports.getPropertyInvestors = async (req, res, next) => {
     // next("failed to return data")
   }
 };
+
+// exports.getPropertyInvestors = async (req, res, next) => {
+
+// }

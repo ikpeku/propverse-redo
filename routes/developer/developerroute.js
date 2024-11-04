@@ -1,6 +1,6 @@
 const express = require("express");
 const { get_Due_deligence, update_Due_deligence,due_Deligence_Submit,  createDocs, docDetail, userUploadedDocs, update_Due_deligence_company_profile, due_Deligence_Draft, get_Developer_Info } = require("../../controller/Developer/developercontroller");
-const { createProperty , isNew, isNotSubmmited, isOld, isSubmmited, getPropertyById, updateProperty, getUserProperties, isPropertyCurrent, isUser, updatePropertyProgress, uploadActivities} = require("../../controller/Developer/properties");
+const { createProperty , isNew, isNotSubmmited, isOld, isSubmmited, getPropertyById, updateProperty, getUserProperties, isPropertyCurrent, isUser, updatePropertyProgress, uploadActivities, getPropertyInvestors} = require("../../controller/Developer/properties");
 const route = express.Router();
 
 
@@ -46,5 +46,9 @@ route.patch("/propertyprogress/:prodId", updatePropertyProgress)
 
 route.post("/property/draft/",  isNotSubmmited, createProperty)
 route.post("/create/activity/:prodId", uploadActivities)
+
+// investors
+route.get("/propertyinvestor/:prodId", getPropertyInvestors)
+
 
 module.exports = route;
