@@ -673,28 +673,13 @@ exports.getPropertyInvestors = async (req, res, next) => {
         paid: {$sum: "$paid.amount"},
         status: "$status",
         paymentDate: "$paymentDate",
+        investorId: "$user_detail._id",
         
       }
      }
 
-
     ]);
 
-
-  //   const project  = await properties.findById(prodId);
-
-
-  //   const due_deligence  = await Due_Deligence.findById(project.user);
-
-  //   myAggregate[0].company_information = due_deligence?.company_information;
-  //   myAggregate[0].verify =   due_deligence?.isAdminAproved;
-
-
-  //   const current_project = await properties.find({user: project.user, isAdminAproved: "Approved", investment_status: "Available"}).select("property_detail investment_status")
-  //  const past_project = await properties.find({user: project.user, isAdminAproved: "Approved", investment_status: "Sold"}).select("property_detail investment_status")
-  //  myAggregate[0].pastProject  = past_project.length;
-  //  myAggregate[0].currentProject  = current_project.length;
-  //  myAggregate[0].totalProject  = project.length;
 
   const paginationResult = await PayInTransaction.aggregatePaginate(
     myAggregate,
@@ -711,6 +696,55 @@ exports.getPropertyInvestors = async (req, res, next) => {
   }
 };
 
-// exports.getPropertyInvestors = async (req, res, next) => {
+exports.getPropertyInvestorbyId = async (req, res, next) => {
+  const { investorId } = req.params;
 
-// }
+
+
+  try {
+   
+
+    const myAggregate = await  PayInTransaction.aggregate([
+    {
+      $match: {user: investorId}
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "investor",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $addFields: {
+        user_detail: {
+          $arrayElemAt: ["$user", 0]
+        }
+      }
+     },
+    //  {
+    //   $project: {
+    //     investor_name: "$user_detail.username",
+    //     email: "$user_detail.email",
+    //     property_amount: "$property_amount.amount",
+    //     paid: {$sum: "$paid.amount"},
+    //     status: "$status",
+    //     paymentDate: "$paymentDate",
+        
+    //   }
+    //  }
+
+
+    ]);
+
+   
+    return res.status(200).json({ status: "success", data: myAggregate[0]});
+
+
+  } catch (error) {
+    next(error);
+    // next("failed to return data")
+  }
+};
+

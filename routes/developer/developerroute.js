@@ -48,7 +48,8 @@ route.post("/property/draft/",  isNotSubmmited, createProperty)
 route.post("/create/activity/:prodId", uploadActivities)
 
 // investors
-route.get("/propertyinvestor/:prodId", getPropertyInvestors)
+route.get("/propertyinvestors/:prodId", getPropertyInvestors)
+route.get("/propertyinvestor/:investId", getPropertyInvestors)
 
 
 module.exports = route;
