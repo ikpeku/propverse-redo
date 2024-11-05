@@ -49,7 +49,7 @@ route.post("/create/activity/:prodId", uploadActivities)
 
 // investors
 route.get("/propertyinvestors/:prodId", getPropertyInvestors)
-route.get("/propertyinvestor/:investId", getPropertyInvestorbyId)
+route.get("/propertyinvestordetail/:txnId", getPropertyInvestorbyId)
 
 
 module.exports = route;

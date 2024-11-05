@@ -674,6 +674,7 @@ exports.getPropertyInvestors = async (req, res, next) => {
         status: "$status",
         paymentDate: "$paymentDate",
         investorId: "$user_detail._id",
+        // txnId: "$_id"
         
       }
      }
@@ -697,49 +698,210 @@ exports.getPropertyInvestors = async (req, res, next) => {
 };
 
 exports.getPropertyInvestorbyId = async (req, res, next) => {
-  const { investorId } = req.params;
-
+  const { txnId } = req.params;
 
 
   try {
-   
 
+    const userDetail = await  PayInTransaction.aggregate([
+      {
+        $match: {_id: new ObjectId(txnId)}
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "investor",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $addFields: {
+          user_detail: {
+            $arrayElemAt: ["$user", 0]
+          }
+        }
+       },
+
+      //  {
+      //   $lookup: {
+      //     from: "properties",
+      //     localField: "property",
+      //     foreignField: "_id",
+      //     as: "property_detail",
+      //   },
+      // },
+  
+      
+       {
+        $lookup: {
+             from: "properties",
+             localField: "property",
+             foreignField: "_id",
+             pipeline: [{
+               $lookup: {
+                //  from: "due_deligences",
+                //  localField: "company",
+                  from: "transactions",
+                  localField: "transactions",
+                 foreignField: "_id",
+                 let: {invertorId : "$user_detail._id"},
+                 pipeline: [
+                  // {
+                  //   $match: {investor: "$$invertorId"}
+                  // }
+                ],
+
+                 as: "transactions",
+               }},
+              //  {
+              //    "$unwind": "$company"
+              //  },
+               
+             ],
+             as: "property_detail",
+           },
+           
+           
+           
+         },
+         {
+          $addFields: {
+            investedproperty: {
+              $arrayElemAt: ["$property_detail", 0]
+            }
+          }
+         },
+
+        {
+        $addFields: {
+          amount_invested: {
+            $sum: { $sum: "$investedproperty.transactions.paid.amount" },
+          },
+        },
+      },
+       {
+        $project: {
+          // root: "$$ROOT",
+          avatar: "$user_detail.avatar",
+          verify_account: "$user_detail.verify_account",
+          username: "$user_detail.username",
+          country: "$user_detail.country",
+          userhag: { $substr: [ "$user_detail.password", 0, 5 ] },
+          registrationDtate: "$user_detail.createdAt",
+          email: "$user_detail.createdAt",
+          phonenumber: "$user_detail.phone_number",
+          status: "Accredited",
+          investorId: "$investor",
+          propertyId: "$investedproperty._id",
+
+          payment:{
+            property_amount: "$property_amount",
+            paid: "$paid",
+            amount_remaining: {$subtract: ["$property_amount.amount", "$amount_invested"]},
+
+          numbers_of_units: "$investedproperty.property_detail.property_overview.unit_number",
+          property_configuration: "$investedproperty.property_detail.property_overview.room_configuration"
+
+
+          }
+
+
+
+          // investor_name: "$user_detail.username",
+          // email: "$user_detail.email",
+          
+         
+          // description: 1,
+          // paid: 1,
+          // paymentDate: "$paymentDate",
+          // status: 1,
+  
+          
+        }
+       }
+  
+  
+      ]);
+   
+// console.log()
+// console.log()
     const myAggregate = await  PayInTransaction.aggregate([
     {
-      $match: {user: investorId}
+      $match: {investor: userDetail[0].investorId, property: userDetail[0].propertyId}
     },
     {
       $lookup: {
-        from: "users",
-        localField: "investor",
-        foreignField: "_id",
-        as: "user",
+           from: "properties",
+           localField: "property",
+           foreignField: "_id",
+           pipeline: [{
+             $lookup: {
+              //  from: "due_deligences",
+              //  localField: "company",
+                from: "transactions",
+                localField: "transactions",
+               foreignField: "_id",
+              //  let: {invertorId : "$user_detail._id"},
+               pipeline: [
+                // {
+                //   $match: {investor: "$$invertorId"}
+                // }
+              ],
+
+               as: "transactions",
+             }},
+            //  {
+            //    "$unwind": "$company"
+            //  },
+             
+           ],
+           as: "property_detail",
+         },
+         
+         
+         
+       },
+       {
+        $addFields: {
+          investedproperty: {
+            $arrayElemAt: ["$property_detail", 0]
+          }
+        }
+       },
+
+      {
+      $addFields: {
+        amount_invested: {
+          $sum: { $sum: "$investedproperty.transactions.paid.amount" },
+        },
       },
     },
-    {
-      $addFields: {
-        user_detail: {
-          $arrayElemAt: ["$user", 0]
-        }
-      }
-     },
-    //  {
-    //   $project: {
-    //     investor_name: "$user_detail.username",
-    //     email: "$user_detail.email",
-    //     property_amount: "$property_amount.amount",
-    //     paid: {$sum: "$paid.amount"},
-    //     status: "$status",
-    //     paymentDate: "$paymentDate",
+     {
+      $project: {
+        // investor_name: "$user_detail.username",
+        // email: "$user_detail.email",
+        // property_amount: "$property_amount.amount",
+        // paid: {$sum: "$paid.amount"},
+        description: 1,
+        paid: 1,
+        intial_amount: {$subtract: ["$amount_invested", "$paid.amount"]},
+        paymentDate: 1,
+        status: 1,
+
         
-    //   }
-    //  }
+      }
+     }
 
 
     ]);
+ 
 
    
-    return res.status(200).json({ status: "success", data: myAggregate[0]});
+    return res.status(200).json({ status: "success", data: {
+      payment_timeline: myAggregate,
+      userDetail: userDetail[0]
+    }});
 
 
   } catch (error) {

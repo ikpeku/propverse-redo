@@ -393,19 +393,6 @@ exports.get_Non_Institutional = async (req, res, next) => {
                 "$unwind": "$company"
               },
               
-
-              // {$project: {
-              //         project_name: "$company.company_information.name",
-              //         properties: 1
-              //         // project_location: "$company.company_information.name",
-              //         // project_type: "$company.company_information.name",
-              //         // project_group: "$company.company_information.name",
-              //         // project_amount: "$company.company_information.name",
-              //         // project_open_date: "$company.company_information.name",
-              //         // project_close_date: "$company.company_information.name",
-              //         // project_progress: "$company.company_information.name",
-              //       }}
-
             ],
             as: "properties",
           },
