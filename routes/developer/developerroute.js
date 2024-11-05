@@ -4,18 +4,17 @@ const { createProperty , isNew, isNotSubmmited, isOld, isSubmmited, getPropertyB
 const route = express.Router();
 
 
-route.get("/:userId", get_Developer_Info)
-route.get("/due_deligence/:userId", get_Due_deligence)
+
+route.get("/due_deligence/:userId", get_Due_deligence);
+
+route.patch("/due_deligence/submit/:userId", due_Deligence_Submit, update_Due_deligence);
+route.patch("/due_deligence/draft/:userId",due_Deligence_Draft, update_Due_deligence);
+route.patch("/due_deligence/company_profile/:userId", update_Due_deligence_company_profile);
 
 
-route.patch("/due_deligence/submit/:userId", due_Deligence_Submit, update_Due_deligence)
-route.patch("/due_deligence/draft/:userId",due_Deligence_Draft, update_Due_deligence)
-route.patch("/due_deligence/company_profile/:userId", update_Due_deligence_company_profile)
-
-
-route.get("/doc/:docId", docDetail)
-route.get("/docs/:userId", userUploadedDocs)  
-route.post("/docs/:userId", createDocs)
+route.get("/doc/:docId", docDetail);
+route.get("/docs/:userId", userUploadedDocs); 
+route.post("/docs/:userId", createDocs);
 
 
 
@@ -23,41 +22,33 @@ route.post("/docs/:userId", createDocs)
  * properties
  */
 
-route.get("/property/:prodId/", getPropertyById)
+route.get("/property/:prodId/", getPropertyById);
 
-route.get("/properties/new/:userId/",isUser, isNew, isSubmmited, getUserProperties)
-route.get("/properties/old/:userId/", isUser,  isOld, isSubmmited, getUserProperties)
+route.get("/properties/new/:userId/",isUser, isNew, isSubmmited, getUserProperties);
+route.get("/properties/old/:userId/", isUser,  isOld, isSubmmited, getUserProperties);
 
-route.get("/properties/draft/:userId/",isUser,  isNotSubmmited, getUserProperties)
-route.get("/properties/:userId/", isUser, isSubmmited, getUserProperties)
+route.get("/properties/draft/:userId/",isUser,  isNotSubmmited, getUserProperties);
+route.get("/properties/:userId/", isUser, isSubmmited, getUserProperties);
 
-route.get("/current/properties/:userId",isUser, isSubmmited, isPropertyCurrent, getUserProperties)
-route.get("/current/properties/", isSubmmited, isPropertyCurrent, getUserProperties)
-
-// isPropertyCurrent,
-//  
-
-// isOld,isNotSubmmited,
-
-route.post("/property/create/", isSubmmited, createProperty)
-route.patch("/property/:prodId/", updateProperty)
-route.patch("/propertyprogress/:prodId", updatePropertyProgress)
+route.get("/current/properties/:userId",isUser, isSubmmited, isPropertyCurrent, getUserProperties);
+route.get("/current/properties/", isSubmmited, isPropertyCurrent, getUserProperties);
 
 
-route.post("/property/draft/",  isNotSubmmited, createProperty)
-route.post("/create/activity/:prodId", uploadActivities)
+route.post("/property/create/", isSubmmited, createProperty);
+route.patch("/property/:prodId/", updateProperty);
+route.patch("/propertyprogress/:prodId", updatePropertyProgress);
+
+
+route.post("/property/draft/",  isNotSubmmited, createProperty);
+route.post("/create/activity/:prodId", uploadActivities);
 
 // investors
-route.get("/propertyinvestors/:prodId", getPropertyInvestors)
-route.get("/propertyinvestordetail/:txnId", getPropertyInvestorbyId)
-route.get("/developerinvestors", 
-    (req,res) => {
-console.log("check ")
-        return
+route.get("/propertyinvestors/:prodId", getPropertyInvestors);
+route.get("/propertyinvestordetail/:txnId", getPropertyInvestorbyId);
 
-    },
-    // getDevelopersInvestors
-)
+route.get("/devinvestment", getDevelopersInvestors);
 
+// dev info
+route.get("/:userId", get_Developer_Info);
 
 module.exports = route;

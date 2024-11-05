@@ -1,7 +1,7 @@
 // const Investment = require("../../model/developer/property_investment")
-const Transactions = require("../../model/transaction/transactions");
+// const Transactions = require("../../model/transaction/transactions");
 const Property = require("../../model/developer/properties");
-const Funds = require("../../model/institutional/fund");
+// const Funds = require("../../model/institutional/fund");
 const Non_Institiutional_Investor = require("../../model/non_institional/non_institutional");
 const { ObjectId } = require("mongodb");
 

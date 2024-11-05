@@ -4,8 +4,6 @@ const {
   userKyc,
   getUserKyc,
   propertyInvestmentInfo,
-  fundInvestmentInfo,
-
 Accreditation1,
 Accreditation2,
 Accreditation3,
@@ -77,4 +75,5 @@ route.get("/referral", get_Rerral);
  route.get("/allproperties", AllProperties);
  route.get("/allfunds", AllFunds);
  route.get("/allusers", AllUsers);
+
 module.exports = route;
