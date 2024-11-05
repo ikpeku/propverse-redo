@@ -564,60 +564,6 @@ exports.getPropertyInvestors = async (req, res, next) => {
 
 
   try {
-    // let query = [
-    //   {
-    //     $match: { _id: prodId },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "users",
-    //       localField: "user",
-    //       foreignField: "_id",
-    //       as: "user",
-    //     },
-    //   },
-    //   { $unset: ["user.password"] },
-    //   {
-    //     $unwind: "$user",
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "transactions",
-    //       localField: "transactions",
-    //       foreignField: "_id",
-    //       as: "transaction_invested",
-    //     },
-    //   },
-    //   {
-    //     $addFields: {
-    //       amount_invested: {
-    //         $sum: { $sum: "$transaction_invested.paid.amount" },
-    //       },
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "due_deligences",
-    //       localField: "company",
-    //       foreignField: "user",
-    //       as: "company",
-    //     },
-    //   },
-    //   {
-    //     $unwind: "$company",
-    //   },
-
-    //   {
-    //     $lookup: {
-    //       from: "property_activities",
-    //       localField: "activities",
-    //       foreignField: "property",
-    //       as: "activities",
-    //     },
-    //   },
-    // ];
-
-    // const myAggregate = await properties.aggregate(query);
     
     const allInvestors = await PayInTransaction.aggregate([
     {
@@ -635,11 +581,13 @@ exports.getPropertyInvestors = async (req, res, next) => {
     {
       $group: {
         _id: "$user.username",
+        deposited: {$sum: "$paid.amount"}
      }
      },
      {
       $project: {
-        investors: {$size: "$_id"}
+        investors: {$size: "$_id"},
+        total_paid_by_investors: {$sum: "$deposited"}
       }
      }
 
@@ -669,8 +617,8 @@ exports.getPropertyInvestors = async (req, res, next) => {
       $project: {
         investor_name: "$user_detail.username",
         email: "$user_detail.email",
-        property_amount: "$property_amount.amount",
-        paid: {$sum: "$paid.amount"},
+        property_amount: "$property_amount",
+        paid: "$paid",
         status: "$status",
         paymentDate: "$paymentDate",
         investorId: "$user_detail._id",
@@ -688,7 +636,11 @@ exports.getPropertyInvestors = async (req, res, next) => {
   );
 
    
-    return res.status(200).json({ status: "success", data: { investors : allInvestors[0]?.investors || 0, ...paginationResult} });
+    return res.status(200).json({ status: "success", data: { 
+      investors : allInvestors[0]?.investors || 0,
+      total_paid_by_investors : allInvestors[0]?.total_paid_by_investors || 0,
+       ...paginationResult
+      } });
 
 
   } catch (error) {
@@ -887,4 +839,6 @@ exports.getPropertyInvestorbyId = async (req, res, next) => {
     // next("failed to return data")
   }
 };
+
+
 
