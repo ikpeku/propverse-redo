@@ -841,4 +841,127 @@ exports.getPropertyInvestorbyId = async (req, res, next) => {
 };
 
 
+exports.getDevelopersInvestors = async (req, res, next) => {
+  // const { prodId } = req.params;
+
+
+  // const page = parseInt(req?.query?.page) || 1;
+
+  // const limit = parseInt(req?.query?.limit) || 10;
+
+  // const myCustomLabels = {
+  //   docs: 'data',
+  // };
+
+  // const options = {
+  //   page,
+  //   limit,
+  //   customLabels: myCustomLabels
+  // };
+
+  // console.log(req.payload.userId)
+
+  // try {
+  
+  //   if(!req.payload.userId) {
+  //       return next(errorHandler(401,"user is not login"))
+  //     }
+    
+  //   const allInvestors = await PayInTransaction.aggregate([
+  //   {
+  //     // $match: {transaction_type: "property", property: prodId}
+  //     $match: {transaction_type: "property"}
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: "users",
+  //       localField: "investor",
+  //       foreignField: "_id",
+  //       as: "user",
+  //     },
+  //   },
+  //   // {
+  //   //   // $match: {"$user._id": new ObjectId(req.payload.userId)}
+  //   //   $match: {
+  //   //     // "$user._id": req.payload.userId
+  //   //     $eq: ["$user._id", req.payload.userId]
+  //   //   }
+  //   // },
+
+  //   {
+  //     $group: {
+  //       _id: "$user.username",
+  //       deposited: {$sum: "$paid.amount"}
+  //    }
+  //    },
+  //    {
+  //     $project: {
+  //       investors: {$size: "$_id"},
+  //       total_paid_by_investors: {$sum: "$deposited"}
+  //     }
+  //    }
+
+
+  //   ]);
+
+  //   const myAggregate =  PayInTransaction.aggregate([
+  //   {
+  //     $match: {transaction_type: "property"}
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: "users",
+  //       localField: "investor",
+  //       foreignField: "_id",
+  //       as: "user",
+  //     },
+  //   },
+  //   // {
+  //   //   // $match: {"$user._id": new ObjectId(req.payload.userId)}
+  //   //   $match: {
+  //   //     $eq: ["$user._id", req.payload.userId]
+  //   //   }
+  //   // },
+  //   {
+  //     $addFields: {
+  //       user_detail: {
+  //         $arrayElemAt: ["$user", 0]
+  //       }
+  //     }
+  //    },
+  //   //  {
+  //   //   $project: {
+  //   //     investor_name: "$user_detail.username",
+  //   //     email: "$user_detail.email",
+  //   //     property_amount: "$property_amount",
+  //   //     paid: "$paid",
+  //   //     status: "$status",
+  //   //     paymentDate: "$paymentDate",
+  //   //     investorId: "$user_detail._id",
+  //   //   }
+  //   //  }
+
+  //   ]);
+
+
+  // const paginationResult = await PayInTransaction.aggregatePaginate(
+  //   myAggregate,
+  //   options
+  // );
+
+   
+  //   return res.status(200).json({ status: "success", data: { 
+  //     investors : allInvestors[0]?.investors || 0,
+  //     total_paid_by_investors : allInvestors[0]?.total_paid_by_investors || 0,
+  //      ...paginationResult
+  //     } });
+
+
+  // } catch (error) {
+  //   next(error);
+  //   // next("failed to return data")
+  // }
+};
+
+
 

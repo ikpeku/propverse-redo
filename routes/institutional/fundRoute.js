@@ -15,6 +15,7 @@ const {
   getFundPortfolio,
   fundHoldingFunds,
   userHoldingFunds,
+  AllUserFunds,
 } = require('../../controller/institutional/fund');
 
 const {
@@ -30,6 +31,7 @@ route.post('/fund/draft/:fundId', checkInstitutionalUser, draftFund, createFund)
 route.post('/fund-inquiry', checkInstitutionalUser, fundPurposeInquiry);
 
 route.get('/funds', AllApprovedFunds, getAllFunds);
+route.get('/userfunds', AllUserFunds, getAllFunds);
 
 route.get('/draft/funds', AllUserDraftFunds, getAllFunds);
 route.get('/submit/funds', AllUserSubmitFunds, getAllFunds);

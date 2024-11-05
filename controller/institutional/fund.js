@@ -213,6 +213,13 @@ exports.AllUserDraftFunds = async (req, res, next) => {
   next()
 }
 
+exports.AllUserFunds = async (req, res, next) => {
+  req.query.user = req.payload.userId;
+  next()
+}
+
+
+
 
 
 exports.getAllFunds = async (req, res, next) => {
