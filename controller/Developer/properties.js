@@ -493,9 +493,8 @@ exports.uploadActivities = async(req,res,next) => {
 
     const project  = await properties.findById(prodId);
 
-    if(project){
+    if(!project){
       return next(errorHandler(401, "invalid project"))
-
     }
 
 
@@ -509,9 +508,16 @@ if(req.payload.status === "Admin") {
     documents,
 })
 
+const isPropery =   await properties.findByIdAndUpdate(
+  prodId,
+  { $push: { activities: productActivity._id } },
+  { new: true, useFindAndModify: false }
+);
 
-project.activities.push(productActivity._id)
-project.save()
+if(isPropery){
+
+}
+
 
 return  res.status(200).json({
   message: "success"
@@ -533,8 +539,16 @@ if(req.payload.userId !== project.user.toString()){
     documents,
 });
 
-project.activities.push(productActivity._id)
-project.save()
+
+const isPropery =   await properties.findByIdAndUpdate(
+  prodId,
+  { $push: { activities: productActivity._id } },
+  { new: true, useFindAndModify: false }
+);
+
+if(isPropery){
+
+}
 
 
 return  res.status(200).json({
