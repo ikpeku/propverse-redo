@@ -309,12 +309,11 @@ exports.getPropertyById = async (req, res, next) => {
       {
         $unwind: "$company",
       },
-
       {
         $lookup: {
           from: "property_activities",
           localField: "activities",
-          foreignField: "property",
+          foreignField: "_id",
           as: "activities",
         },
       },
@@ -525,12 +524,9 @@ return  res.status(200).json({
  
 } 
 
-
-
 if(req.payload.userId !== project.user.toString()){
   return next(errorHandler(401, "forbidden"));
 }
-
 
   const productActivity = await Activities.create({
     property:prodId,
