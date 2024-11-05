@@ -804,28 +804,14 @@ exports.getPropertyInvestorbyId = async (req, res, next) => {
           property_configuration: "$investedproperty.property_detail.property_overview.room_configuration"
 
 
-          }
-
-
-
-          // investor_name: "$user_detail.username",
-          // email: "$user_detail.email",
-          
-         
-          // description: 1,
-          // paid: 1,
-          // paymentDate: "$paymentDate",
-          // status: 1,
-  
-          
+          }          
         }
        }
   
   
       ]);
    
-// console.log()
-// console.log()
+
     const myAggregate = await  PayInTransaction.aggregate([
     {
       $match: {investor: userDetail[0].investorId, property: userDetail[0].propertyId}
@@ -879,21 +865,13 @@ exports.getPropertyInvestorbyId = async (req, res, next) => {
     },
      {
       $project: {
-        // investor_name: "$user_detail.username",
-        // email: "$user_detail.email",
-        // property_amount: "$property_amount.amount",
-        // paid: {$sum: "$paid.amount"},
         description: 1,
         paid: 1,
         intial_amount: {$subtract: ["$amount_invested", "$paid.amount"]},
         paymentDate: 1,
         status: 1,
-
-        
       }
      }
-
-
     ]);
  
 

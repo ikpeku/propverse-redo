@@ -290,12 +290,27 @@ exports.getInvestmentById = async (req, res, next) => {
                as: "property_activities",
              },
            },
+           {
+            $addFields: {
+              number_of_bathroom: {
+                $sum: { $sum: "$property_detail.property_units.number_of_bathroom" },
+              },
+            },
+          },
+           {
+            $addFields: {
+              number_of_bedroom: {
+                $sum: { $sum: "$property_detail.property_units.number_of_bedroom" },
+              },
+            },
+          },
   
       {
         $sort: {
           updatedAt: -1
         }
       },
+
       {
         $project: {
           // product: "$$ROOT",
@@ -307,7 +322,10 @@ exports.getInvestmentById = async (req, res, next) => {
           property_progress: {$ifNull:["$property_progress", 0]} ,
           property_amount: "$property_detail.property_overview.price",
           property_dates: "$property_detail.property_overview.date",
-          room_configuration: "$property_detail.property_overview.room_configuration",
+          // room_configuration: "$property_detail.property_overview.room_configuration",
+          room_configuration: "$number_of_bedroom",
+          bathrooms_configuration: "$number_of_bathroom",
+          // bathrooms_configuration: "$property_detail.property_overview.room_configuration",
           property_size: "$property_detail.property_overview.size",
           property_document: "$property_detail.property_documents",
           payment_update : "$property_invested",
@@ -316,7 +334,8 @@ exports.getInvestmentById = async (req, res, next) => {
         },
       },
     ]);
-
+    //
+    //
     res.status(200).json({
       success: true,
       data: investoredProperty[0] || null,
