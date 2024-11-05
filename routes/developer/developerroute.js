@@ -50,7 +50,14 @@ route.post("/create/activity/:prodId", uploadActivities)
 // investors
 route.get("/propertyinvestors/:prodId", getPropertyInvestors)
 route.get("/propertyinvestordetail/:txnId", getPropertyInvestorbyId)
-route.get("/developerinvestors", getDevelopersInvestors)
+route.get("/developerinvestors", 
+    (req,res) => {
+console.log("check ")
+        return
+
+    },
+    // getDevelopersInvestors
+)
 
 
 module.exports = route;

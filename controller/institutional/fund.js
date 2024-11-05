@@ -219,9 +219,6 @@ exports.AllUserFunds = async (req, res, next) => {
 }
 
 
-
-
-
 exports.getAllFunds = async (req, res, next) => {
   const page = parseInt(req?.query?.page) || 1;
 

@@ -485,12 +485,19 @@ exports.uploadActivities = async(req,res,next) => {
   const {title,activity, documents} = req.body;
   const {prodId} = req.params;
 
+
   try {
     if (!req.payload.userId) return next(errorHandler(401, "forbidden"));
     if (!title) return next(errorHandler(401, "title is required"));
     if (!activity) return next(errorHandler(401, "activity is required"));
 
     const project  = await properties.findById(prodId);
+
+    if(project){
+      return next(errorHandler(401, "invalid project"))
+
+    }
+
 
 
 if(req.payload.status === "Admin") {
@@ -514,8 +521,11 @@ return  res.status(200).json({
 
 
 
+if(req.payload.userId !== project.user.toString()){
+  return next(errorHandler(401, "forbidden"));
+}
 
-if(req.payload.userId === project.user.toString()) {
+
   const productActivity = await Activities.create({
     property:prodId,
     title,
@@ -526,11 +536,6 @@ if(req.payload.userId === project.user.toString()) {
 project.activities.push(productActivity._id)
 project.save()
 
-
-
-} else {
-  return next(errorHandler(401, "forbidden"));
-}
 
 return  res.status(200).json({
   message: "success"
