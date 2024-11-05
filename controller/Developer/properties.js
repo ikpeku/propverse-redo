@@ -493,7 +493,7 @@ exports.uploadActivities = async(req,res,next) => {
 
     const project  = await properties.findById(prodId);
 
-    if(project){
+    if(!project){
       return next(errorHandler(401, "invalid project"))
 
     }
