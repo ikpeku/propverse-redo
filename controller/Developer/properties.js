@@ -4,6 +4,112 @@ const { errorHandler } = require("../../utils/error");
 const Due_Deligence = require("../../model/developer/due_deligence");
 const Activities = require("../../model/developer/property_activities");
 const PayInTransaction = require("../../model/transaction/transactions");
+const { ExpressionType } = require("@aws-sdk/client-s3");
+
+
+exports.DeveloperDashbroad = async(req, res, next) => {
+
+  try {
+
+    let query = [
+      {
+        $match: {
+          user : new ObjectId(req.payload.userId) ,
+          investment_status: "Available"
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+
+      {
+        $project: {
+          propertyId: "$_id",
+          property_location: "$property_detail.property_location",
+          property_type: "$property_detail.property_overview.property_type",
+
+          thumbnail: "$property_detail.property_images",
+          property_name: "$property_detail.property_overview.property_name",
+          property_progress: "$property_progress",
+
+          property_amount: "$property_detail.property_overview.price",
+          property_dates: "$property_detail.property_overview.date",
+         
+          company: "$company.company_information.name" || ""
+        }
+      }
+
+
+    ];
+    let allquery = [
+      {
+        $match: {
+          user : new ObjectId(req.payload.userId) ,
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+
+      {
+        $project: {
+          propertyId: "$_id",
+          property_location: "$property_detail.property_location",
+          property_type: "$property_detail.property_overview.property_type",
+
+          thumbnail: "$property_detail.property_images",
+          property_name: "$property_detail.property_overview.property_name",
+          property_progress: "$property_progress",
+
+          property_amount: "$property_detail.property_overview.price",
+          property_dates: "$property_detail.property_overview.date",
+         
+          company: "$company.company_information.name" || ""
+        }
+      }
+
+
+    ];
+    const project = await properties.aggregate(query);
+
+    const allProject = await properties.aggregate(allquery);
+
+    const property_type = allProject.reduce(function(total, item) {
+      
+
+          if(total[item.property_type] ){
+             ++total[item.property_type]
+          }else {
+           total[item.property_type] = 1;
+          }
+          
+          return total;
+    }, {
+
+    }); 
+
+
+    return res.status(200).json({status:"success", data: {
+      ongoing_project: project,
+      property_type,
+      totalProject: allProject.length
+      
+
+
+
+    }})
+    
+  } catch (error) {
+    
+    
+  }
+
+   
+}
 
 
 exports.isSubmmited = (req, res, next) => {
@@ -375,7 +481,6 @@ exports.getPropertyById = async (req, res, next) => {
     //  myAggregate[0].
     return res.status(200).json({ status: "success", data: myAggregate[0] });
 
-    // return res.status(200).json({status:"success", data: txn})
   } catch (error) {
     next(error);
     // next("failed to return data")
@@ -580,34 +685,6 @@ exports.getPropertyInvestors = async (req, res, next) => {
 
   try {
     
-    // const allInvestors = await PayInTransaction.aggregate([
-    // {
-    //   $match: {transaction_type: "property", property: prodId}
-    // },
-    // {
-    //   $lookup: {
-    //     from: "users",
-    //     localField: "investor",
-    //     foreignField: "_id",
-    //     as: "user",
-    //   },
-    // },
-
-    // {
-    //   $group: {
-    //     _id: "$user.username",
-    //     deposited: {$sum: "$paid.amount"}
-    //  }
-    //  },
-    //  {
-    //   $project: {
-    //     investors: {$size: "$_id"},
-    //     total_paid_by_investors: {$sum: "$deposited"}
-    //   }
-    //  }
-
-
-    // ]);
 
     const query = [
       {
@@ -659,8 +736,6 @@ exports.getPropertyInvestors = async (req, res, next) => {
 
    
     return res.status(200).json({ status: "success", data: { 
-      // investors : allInvestors[0]?.investors || 0,
-      // total_paid_by_investors : allInvestors[0]?.total_paid_by_investors || 0,
       investors : project.length,
       total_paid_by_investors : total_paid_by_investors,
        ...paginationResult

@@ -1,10 +1,11 @@
 const express = require("express");
 const { get_Due_deligence, update_Due_deligence,due_Deligence_Submit,  createDocs, docDetail, userUploadedDocs, update_Due_deligence_company_profile, due_Deligence_Draft, get_Developer_Info } = require("../../controller/Developer/developercontroller");
-const { createProperty , isNew, isNotSubmmited, isOld, isSubmmited, getPropertyById, updateProperty, getUserProperties, isPropertyCurrent, isUser, updatePropertyProgress, uploadActivities, getPropertyInvestors, getPropertyInvestorbyId, getDevelopersInvestors} = require("../../controller/Developer/properties");
+const { createProperty , isNew, isNotSubmmited, isOld, isSubmmited, getPropertyById, updateProperty, getUserProperties, isPropertyCurrent, isUser, updatePropertyProgress, uploadActivities, getPropertyInvestors, getPropertyInvestorbyId, getDevelopersInvestors, DeveloperDashbroad} = require("../../controller/Developer/properties");
 const route = express.Router();
 
 
 
+route.get("/dashbroad", DeveloperDashbroad);
 route.get("/due_deligence/:userId", get_Due_deligence);
 
 route.patch("/due_deligence/submit/:userId", due_Deligence_Submit, update_Due_deligence);
