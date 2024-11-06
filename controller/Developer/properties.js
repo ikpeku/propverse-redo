@@ -705,7 +705,8 @@ exports.getPropertyInvestorbyId = async (req, res, next) => {
              from: "properties",
              localField: "property",
              foreignField: "_id",
-             pipeline: [{
+             pipeline: [
+              {
                $lookup: {
                 //  from: "due_deligences",
                 //  localField: "company",
@@ -1052,72 +1053,81 @@ exports.getDevelopersInvestors = async (req, res, next) => {
 
     // ]);
 
-    const myAggregate =  properties.aggregate([
-    // {
-    //   $match: {user:  new ObjectId(req.payload.userId)}
-    // },
-    {
-      $sort: {
-        createdAt: -1
-      }
-    },
-    {
-      $lookup: {
-        from: "transactions",
-        localField: "transactions",
-        foreignField: "_id",
-        as: "transactions",
-        pipeline: [
-          {
-            $lookup: {
-              from: "users",
-              localField: "investor",
-              foreignField: "_id",
-              as: "transactionuser",
+
+
+    const query =   [
+      {
+        $match: {user:  new ObjectId(req.payload.userId)}
+      },
+      {
+        $sort: {
+          createdAt: -1
+        }
+      },
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "transactions",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $lookup: {
+                from: "users",
+                localField: "investor",
+                foreignField: "_id",
+                as: "transactionuser",
+              },
             },
-          },
-          {
-      $addFields: {
-        transaction_user: {
-          $arrayElemAt: ["$transactionuser", 0]
+            {
+        $addFields: {
+          transaction_user: {
+            $arrayElemAt: ["$transactionuser", 0]
+          }
+        }
+            },
+            {
+              $project: {
+                transaction_user: 1,
+                paid: 1
+              }
+            }
+        //     {
+        //       $lookup: {
+        //         from: "properties",
+        //         localField: "property",
+        //         foreignField: "_id",
+        //         as: "investedproperty",
+        //       },
+        //     },
+        //     {
+        // $addFields: {
+        //   invested_property: {
+        //     $arrayElemAt: ["$investedproperty", 0]
+        //   }
+        // }
+        //     },
+          ],
+          as: "transactions",
+        },
+      },
+      {
+        $unwind: "$transactions"
+      },
+     
+      {
+        "$group": {
+          "_id": "$transactions.transaction_user._id",
+          "investor_name": {"$first" : "$transactions.transaction_user.username"},
+          "property_name": {"$first" : "$property_detail.property_overview.property_name"},
+          "property_type": {"$first" : "$property_detail.property_overview.property_type"},
+          "invested_amount": {$sum: "$transactions.paid.amount"},
+          "status": {"$first" : "$investment_status"},
         }
       }
-     },
-        ]
-      },
-    },
-    {
-      $unwind: "$transactions"
-    },
-   
+      ]
 
-
-    // {
-    //   $group: {
-    //     _id: "transactions.investor",
-    //   }
-    // }
-
-    // {
-    //   $addFields: {
-    //     user_detail: {
-    //       $arrayElemAt: ["$user", 0]
-    //     }
-    //   }
-    //  },
-    //  {
-    //   $project: {
-    //     investor_name: "$user_detail.username",
-    //     email: "$user_detail.email",
-    //     property_amount: "$property_amount",
-    //     paid: "$paid",
-    //     status: "$status",
-    //     paymentDate: "$paymentDate",
-    //     investorId: "$user_detail._id",
-    //   }
-    //  }
-
-    ]);
+    const myAggregate =  properties.aggregate(query);
+    const project =  await properties.aggregate(query);
 
 
   const paginationResult = await properties.aggregatePaginate(
@@ -1125,13 +1135,16 @@ exports.getDevelopersInvestors = async (req, res, next) => {
     options
   );
 
+  const total_paid_by_investors = project.reduce(function(total, item) {
+    return total + item.invested_amount
+  }, 0); 
+
+
    
     return res.status(200).json({ status: "success", 
-      // data: { 
-      // investors : allInvestors[0]?.investors || 0,
-      // total_paid_by_investors : allInvestors[0]?.total_paid_by_investors || 0,
+      number_of_investors : project.length || 0,
+      total_paid_by_investors,
        ...paginationResult
-      // }
     });
 
 
