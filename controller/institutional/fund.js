@@ -37,7 +37,8 @@ description,
     // Fund Pitch
     pitch_deck_desc,
     pitch_deck_image,
-    name_of_current_fund_investment,
+    // name_of_current_fund_investment,
+    current_fund_investment,
     key_fund_highlights,
     investment_strategy,
 
@@ -105,7 +106,7 @@ description,
            // Fund Pitch
            ...pitch_deck_desc && {pitch_deck_desc},
          ...pitch_deck_image && {pitch_deck_image},
-         ...name_of_current_fund_investment && {name_of_current_fund_investment},
+         ...current_fund_investment && {current_fund_investment},
          ...key_fund_highlights && {key_fund_highlights},
            ...investment_strategy && {investment_strategy},
        
@@ -157,7 +158,7 @@ description,
           // Fund Pitch
           ...pitch_deck_desc && {pitch_deck_desc},
         ...pitch_deck_image && {pitch_deck_image},
-        ...name_of_current_fund_investment && {name_of_current_fund_investment},
+        ...current_fund_investment && {current_fund_investment},
         ...key_fund_highlights && {key_fund_highlights},
           ...investment_strategy && {investment_strategy},
       

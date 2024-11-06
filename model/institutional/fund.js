@@ -211,11 +211,11 @@ const fundSchema = new Schema(
       },
     },
 
-    name_of_current_fund_investment: {
-      type: String,
-      // required: true,
-    },
-
+    // name_of_current_fund_investment: {
+    //   type: String,
+    //   // required: true,
+    // },
+    current_fund_investment: Array,
     key_fund_highlights: {
       type: [String],
       default: [],
