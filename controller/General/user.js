@@ -1515,6 +1515,120 @@ const {fundId} = req.params
   } catch (error) {
     next(errorHandler(500, "server error"));
   }
+};
+
+
+exports.getLimitedPartnerById = async (req, res, next) => {
+ 
+const {partnerId} = req.params
+  
+  const query = [
+    {
+      $match: {_id: new ObjectId(partnerId)}
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $addFields: {
+        user_detail: {
+          $arrayElemAt: ["$user", 0]
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: "funds",
+        localField: "fund",
+        foreignField: "_id",
+        let: {userId: "$user_detail._id"},
+        pipeline: [
+
+          {
+            $set: {userId: "$$userId"}
+          },
+
+        {
+        $lookup: {
+          from: "transactions",
+          localField: "investments",
+          foreignField: "_id",
+          pipeline: [
+            {
+               $project: {
+                investor: 1,
+                description: 1,
+                paymentDate: 1,
+                // funder: 1,
+                paid:1
+               }
+            }
+         ] ,
+          as: "investmenttxn",
+        },
+      },
+     
+          {
+            $project: {
+              funds_documents: 1,
+              transaction_items: {
+                $filter: {
+                   input: "$investmenttxn",
+                   as: "investmentitem",
+                   cond: { $eq: ["$$investmentitem.investor", "$userId" ] }
+                }
+             }
+            }
+          }
+        ],
+        as: "fund",
+      },
+    },
+    {
+      $addFields: {
+        fund_detail: {
+          $arrayElemAt: ["$fund", 0]
+        }
+      }
+    },
+
+
+    {
+      $project: {
+        username: "$user_detail.username",
+        avatar: "$user_detail.avatar",
+        verify: "$user_detail.verify_account",        
+        date_join: "$user_detail.createdAt",
+        phone_number: "$user_detail.phone_number",
+        email: "$user_detail.email",
+        remaining_balance: {$subtract :["$capital_committed.amount", "$capital_deploy.amount"]},
+        capital_committed: 1,
+        capital_deploy: 1,
+        documents: "$fund_detail.funds_documents",
+        transactions: "$fund_detail.transaction_items",
+
+      },
+    },
+  ]
+
+
+  
+  try {
+    const data = await Limited_partners.aggregate(query);
+
+
+    res.status(200).json({
+      success: true,
+      data: data[0] || null
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
 }
 
 
@@ -1870,9 +1984,3 @@ await Non_Institutional_Investor.findByIdAndUpdate(
 
   
 }
-
-
-
-
-
-
