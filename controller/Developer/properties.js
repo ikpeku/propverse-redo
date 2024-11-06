@@ -4,8 +4,6 @@ const { errorHandler } = require("../../utils/error");
 const Due_Deligence = require("../../model/developer/due_deligence");
 const Activities = require("../../model/developer/property_activities");
 const PayInTransaction = require("../../model/transaction/transactions");
-const { ExpressionType } = require("@aws-sdk/client-s3");
-
 
 exports.DeveloperDashbroad = async(req, res, next) => {
 
@@ -50,37 +48,118 @@ exports.DeveloperDashbroad = async(req, res, next) => {
         }
       },
       {
+        $lookup: {
+          from: "transactions",
+          localField: "transactions",
+          foreignField: "_id",
+          as: "transactionuser",
+        }
+      },
+      {
+        $unwind: "$transactionuser"
+      },
+      {
+        $addFields: {
+          capital_invested: {
+          "$sum": {$sum: "$transactionuser.paid.amount"}
+          }
+
+        },
+      },
+      {
         $sort: {
           createdAt: -1,
         },
       },
+     
 
       {
         $project: {
           propertyId: "$_id",
-          property_location: "$property_detail.property_location",
           property_type: "$property_detail.property_overview.property_type",
-
-          thumbnail: "$property_detail.property_images",
-          property_name: "$property_detail.property_overview.property_name",
-          property_progress: "$property_progress",
-
+          "invested_amount": {$sum: "$capital_invested"},
           property_amount: "$property_detail.property_overview.price",
-          property_dates: "$property_detail.property_overview.date",
-         
-          company: "$company.company_information.name" || ""
         }
       }
 
 
     ];
+    let investorsquery = [
+      {
+        $match: {
+          user : new ObjectId(req.payload.userId) ,
+        }
+      },
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "transactions",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $lookup: {
+                from: "users",
+                localField: "investor",
+                foreignField: "_id",
+                as: "transactionuser",
+              },
+            },
+            {
+        $addFields: {
+          transaction_user: {
+            $arrayElemAt: ["$transactionuser", 0]
+          }
+        }
+            },
+            {
+              $project: {
+                transaction_user: 1,
+                paid: 1
+              }
+            }
+
+          ],
+          as: "transactionuser",
+        }
+      },
+      {
+        $unwind: "$transactionuser"
+      },
+
+      {
+        $addFields: {
+          capital_invested: {
+          "$sum": {$sum: "$transactionuser.paid.amount"}
+          }
+
+        },
+      },
+
+      {
+        $group:{
+          _id: "$transactionuser.transaction_user._id",
+          investor_name: {$first: "$transactionuser.transaction_user.username"},
+          invested_amount: {$sum: "$capital_invested"},
+          currency: {$first: "$transactionuser.paid.currency"}
+        }
+      },
+      
+      {
+        $sort: {
+          invested_amount: -1,
+        },
+      },
+
+    ];
+
     const project = await properties.aggregate(query);
 
     const allProject = await properties.aggregate(allquery);
 
+    const top_Investors = await properties.aggregate(investorsquery);
+
     const property_type = allProject.reduce(function(total, item) {
       
-
           if(total[item.property_type] ){
              ++total[item.property_type]
           }else {
@@ -88,19 +167,27 @@ exports.DeveloperDashbroad = async(req, res, next) => {
           }
           
           return total;
-    }, {
+    }, {}); 
 
-    }); 
+    const total_paid_by_investors = allProject.reduce(function(total, item) {
+      return total + item.invested_amount
+    }, 0); 
+    const total_property_amount = allProject.reduce(function(total, item) {
+      return total + item.property_amount.amount
+    }, 0); 
+
+    const percentage = (total_paid_by_investors / total_property_amount) * 100 || 0;
 
 
     return res.status(200).json({status:"success", data: {
       ongoing_project: project,
       property_type,
-      totalProject: allProject.length
+      totalProject: allProject.length,
+      total_paid_by_investors,
+      total_property_amount,
+      percentage,
+      top_Investors
       
-
-
-
     }})
     
   } catch (error) {
