@@ -195,8 +195,6 @@ description,
   }
 };
 
-
-
 exports.AllApprovedFunds = async (req, res, next) => {
    req.body.isAdmin_Approved = "approved";
    req.body.funding_state = "Ongoing";

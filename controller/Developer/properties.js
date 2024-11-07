@@ -12,7 +12,7 @@ exports.DeveloperDashbroad = async(req, res, next) => {
     let query = [
       {
         $match: {
-          user : new ObjectId(req.payload.userId) ,
+          // user : new ObjectId(req.payload.userId) ,
           investment_status: "Available"
         }
       },
@@ -42,11 +42,11 @@ exports.DeveloperDashbroad = async(req, res, next) => {
 
     ];
     let allquery = [
-      {
-        $match: {
-          user : new ObjectId(req.payload.userId) ,
-        }
-      },
+      // {
+      //   $match: {
+      //     user : new ObjectId(req.payload.userId) ,
+      //   }
+      // },
       {
         $lookup: {
           from: "transactions",
@@ -85,11 +85,11 @@ exports.DeveloperDashbroad = async(req, res, next) => {
 
     ];
     let investorsquery = [
-      {
-        $match: {
-          user : new ObjectId(req.payload.userId) ,
-        }
-      },
+      // {
+      //   $match: {
+      //     user : new ObjectId(req.payload.userId) ,
+      //   }
+      // },
       {
         $lookup: {
           from: "transactions",
@@ -165,9 +165,12 @@ exports.DeveloperDashbroad = async(req, res, next) => {
           }else {
            total[item.property_type] = 1;
           }
-          
           return total;
-    }, {}); 
+    }, {
+      Residential: 0,
+      Commercial: 0,
+      Industrial: 0
+    }); 
 
     const total_paid_by_investors = allProject.reduce(function(total, item) {
       return total + item.invested_amount
@@ -176,7 +179,23 @@ exports.DeveloperDashbroad = async(req, res, next) => {
       return total + item.property_amount.amount
     }, 0); 
 
-    const percentage = (total_paid_by_investors / total_property_amount) * 100 || 0;
+    const percentagevalue = () => {
+
+      if(total_paid_by_investors < total_property_amount) {
+        return {
+          type: "ascending",
+          percentage: (total_paid_by_investors / total_property_amount) * 100 || 0
+        }
+      } else {
+        return {
+          type: "decending",
+          percentage: ( total_property_amount / total_paid_by_investors) * 100 || 0
+        }
+      }
+
+
+      
+    }
 
 
     return res.status(200).json({status:"success", data: {
@@ -185,7 +204,7 @@ exports.DeveloperDashbroad = async(req, res, next) => {
       totalProject: allProject.length,
       total_paid_by_investors,
       total_property_amount,
-      percentage,
+      percentage: percentagevalue(),
       top_Investors
       
     }})
