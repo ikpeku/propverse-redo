@@ -9,6 +9,38 @@ exports.DeveloperDashbroad = async(req, res, next) => {
 
   try {
 
+    let cumulativequery = [
+      {
+        $match: {
+          user : new ObjectId(req.payload.userId) 
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+
+      {
+        $project: {
+          propertyId: "$_id",
+          property_location: "$property_detail.property_location",
+          property_type: "$property_detail.property_overview.property_type",
+
+          thumbnail: "$property_detail.property_images",
+          property_name: "$property_detail.property_overview.property_name",
+          property_progress: "$property_progress",
+
+          property_amount: "$property_detail.property_overview.price",
+          property_dates: "$property_detail.property_overview.date",
+         
+          company: "$company.company_information.name" || ""
+        }
+      }
+
+
+    ];
+
     let query = [
       {
         $match: {
@@ -41,6 +73,8 @@ exports.DeveloperDashbroad = async(req, res, next) => {
 
 
     ];
+
+
     let allquery = [
       {
         $match: {
@@ -153,12 +187,13 @@ exports.DeveloperDashbroad = async(req, res, next) => {
     ];
 
     const project = await properties.aggregate(query);
+    const cumulativeproject = await properties.aggregate(cumulativequery);
 
     const allProject = await properties.aggregate(allquery);
 
     const top_Investors = await properties.aggregate(investorsquery);
 
-    const property_type = allProject.reduce(function(total, item) {
+    const property_type = cumulativeproject.reduce(function(total, item) {
       
           if(total[item.property_type] ){
              ++total[item.property_type]
@@ -201,7 +236,7 @@ exports.DeveloperDashbroad = async(req, res, next) => {
     return res.status(200).json({status:"success", data: {
       ongoing_project: project,
       property_type,
-      totalProject: allProject.length,
+      totalProject: cumulativeproject.length,
       total_paid_by_investors,
       total_amount_revenue,
       percentage: percentagevalue(),
