@@ -527,14 +527,16 @@ exports.getHoldingsProject = async (req, res, next) => {
 };
 
 
-
-
-
 exports.userHoldingFunds = async (req, res, next) => {
   req.query.type = "userHolding"
   next()
 
 }
+
+
+
+
+
 exports.fundHoldingFunds = async (req, res, next) => {
   req.query.type = "fundHolding"
   next()
@@ -626,30 +628,6 @@ const {fundId} = req.params
       options
     );
 
-
-    // const alluserFunds = await Fund.aggregate([
-    //   {
-    //     $match: {isAdmin_Approved : "approved", user: paginationResult.data[0].userId},
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "transactions",
-    //       localField: "investments",
-    //       foreignField: "_id",
-    //       as: "investmenttxn",
-    //     },
-    //   },
-
-    //   { $group : { _id : "$investmenttxn.name", txn: { $push: "$$ROOT" } } }
-    // ]);
-
-    // let totalInvestment = 0;
-    // // $push: "$$ROOT"
-
-    // paginationResult.data.forEach(data => {
-    //   totalInvestment += data.invested_capital.amount 
-    // })
-
     res.status(200).json({
       success: true,
      ...paginationResult,     
@@ -701,3 +679,55 @@ exports.getFundPortfolio = async (req, res, next) => {
 
 
 };
+
+exports.userIvestmentFundById = async (req, res, next) =>{
+  const {partnerId} = req.params;
+
+
+  const query = [
+    {
+      $match: {_id: partnerId}
+    },
+
+    // {
+    //   $lookup: {
+    //        from: "transactions",
+    //        localField: "investments",
+    //        foreignField: "_id",
+    //        as: "payin",
+    //      },
+    //    },
+
+      //  {$unwind: "$payin"},
+
+      //  {
+      //   $addFields: {
+      //     accumulated_price: { $sum: "$payin.paid.amount"}
+      //   }
+      //  },
+      // {
+      //   $project: {
+      //     root: "$$ROOT",
+      //     "property.name": "$name",
+      //     "property.property_type": "$property_type",
+      //     funds_documents: 1,
+      //     "property.distribution_period": "$distribution_period",
+      //     "property.investment_date": "$createdAt",
+      //     "earnings.annual_yield": "$annual_yield",
+      //     payment_plan: "$payin"
+      //   }
+      // }
+  ]
+
+  
+  try {
+    const data = await Limited_partners.aggregate(query);
+
+    res.status(200).json({
+      success: true,
+      data: data[0] || null
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+}
