@@ -688,31 +688,7 @@ exports.userIvestmentFundById = async (req, res, next) =>{
     {
       $match: {_id: new ObjectId(partnerId)}
     },
-    // {
-    //   $lookup: {
-    //     from: "funds",
-    //     localField: "fund",
-    //     foreignField: "_id",
-    //     pipeline: [
-    //       {
-    //         $lookup: {
-    //              from: "transactions",
-    //              localField: "investments",
-    //              foreignField: "_id",
-    //              as: "investments_detail",
-    //            },
-    //          },
-    //     ],
-    //     as: "fund",
-    //   },
-    // },
-    // {
-    //   $addFields: {
-    //     fund_detail: {
-    //       $arrayElemAt: ["$fund", 0]
-    //     }
-    //   }
-    // },
+   
     {
       $lookup: {
         from: "funds",
@@ -751,7 +727,6 @@ exports.userIvestmentFundById = async (req, res, next) =>{
               property_type: 1,
               distribution_period: 1,
               funds_documents: 1,
-              investmenttxn: 1,
               transaction_items: {
                 $filter: {
                    input: "$investmenttxn",
@@ -799,9 +774,6 @@ exports.userIvestmentFundById = async (req, res, next) =>{
       {
         $project: {
           transactions: "$fund_detail.transaction_items",
-          // transactions_investmenttxn: "$fund_detail.investmenttxn",
-          // root: "$$ROOT",
-          // payin: 1,
           "property.name": "$fund_detail.name",
           "property.property_type": "$fund_detail.property_type",
           "funds_documents": "$fund_detail.funds_documents",
@@ -828,3 +800,174 @@ exports.userIvestmentFundById = async (req, res, next) =>{
     // next(errorHandler(500, "server error"));
   }
 }
+
+exports.userIvestmentFundById_graph = async (req, res, next) =>{
+  const {partnerId} = req.params;
+  // const days = parseInt(req?.query?.year) || 7;
+
+
+  const query = [
+    {
+      $match: {_id: new ObjectId(partnerId)}
+    },
+   
+    {
+      $lookup: {
+        from: "funds",
+        localField: "fund",
+        foreignField: "_id",
+        let: {userId: "$user"},
+        pipeline: [
+
+          {
+            $set: {userId: "$$userId"}
+          },
+
+        {
+        $lookup: {
+          from: "transactions",
+          localField: "investments",
+          foreignField: "_id",
+          pipeline: [
+
+            // {
+            //   $set: {
+            //     addedDate: "$createdAt"
+            //   }
+            // },
+            // {$match:{addedDate: {$year: year}}},
+            {
+               $project: {
+                investor: 1,
+                // description: 1,
+                // paymentDate: {$month: "$paymentDate"},
+                paymentDate: 1,
+                // funder: 1,
+                // paid: {$sum: "$paid.amount"}
+                paid: 1
+               }
+            }
+         ] ,
+          as: "investmenttxn",
+        },
+      },
+     
+          {
+            $project: {
+              transaction_items: {
+                $filter: {
+                   input: "$investmenttxn",
+                   as: "investmentitem",
+                   cond: { $eq: ["$$investmentitem.investor", "$userId" ] }
+                }
+             }
+            }
+          }
+        ],
+        as: "fund",
+      },
+    },
+    {
+      $addFields: {
+        fund_detail: {
+          $arrayElemAt: ["$fund", 0]
+        }
+      }
+    },
+
+      {
+        $project: {
+          transactions: "$fund_detail.transaction_items",
+        }
+      }
+  ]
+
+  
+  try {
+    const data = await Limited_partners.aggregate(query);
+
+    
+    const chartData = data[0].transactions.reduce(function(total, item) {
+
+     
+
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      
+      const d = new Date(item.paymentDate);
+
+      const month = monthNames[d.getMonth()]
+      
+      if(total[month]){
+         total[month].amount += item.paid.amount
+         total[month].currency = item.paid.currency
+      }
+      // else {
+      //  total[month] = 1;
+      // }
+      return total;
+}, {
+  January :{
+    amount: 0,
+    currency: "$"
+  },
+  February :{
+    amount: 0,
+    currency: "$"
+  },
+  March :{
+    amount: 0,
+    currency: "$"
+  },
+  April :{
+    amount: 0,
+    currency: "$"
+  },
+  May :{
+    amount: 0,
+    currency: "$"
+  },
+  June :{
+    amount: 0,
+    currency: "$"
+  },
+  July :{
+    amount: 0,
+    currency: "$"
+  },
+  August :{
+    amount: 0,
+    currency: "$"
+  },
+  September :{
+    amount: 0,
+    currency: "$"
+  },
+  October :{
+    amount: 0,
+    currency: "$"
+  },
+  November : {
+    amount: 0,
+    currency: "$"
+  },
+  December : {
+    amount: 0,
+    currency: "$"
+  }
+
+}); 
+
+
+
+
+    res.status(200).json({
+      success: true,
+      data: chartData || null
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+}
+

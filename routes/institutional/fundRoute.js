@@ -17,6 +17,7 @@ const {
   userHoldingFunds,
   AllUserFunds,
   userIvestmentFundById,
+  userIvestmentFundById_graph,
 } = require('../../controller/institutional/fund');
 
 const {
@@ -49,5 +50,6 @@ route.get('/fundholding/funds/:fundId',fundHoldingFunds, getHoldingsFunds);
 route.get('/fundoverview/:fundId', getFundOverview);
 route.get('/fundportfolio/:fundId', getFundPortfolio);
 route.get('/investedfund/:partnerId', userIvestmentFundById);
+route.get('/investedfundchart/:partnerId', userIvestmentFundById_graph);
 
 module.exports = route;
