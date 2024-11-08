@@ -688,11 +688,80 @@ exports.userIvestmentFundById = async (req, res, next) =>{
     {
       $match: {_id: new ObjectId(partnerId)}
     },
+    // {
+    //   $lookup: {
+    //     from: "funds",
+    //     localField: "fund",
+    //     foreignField: "_id",
+    //     pipeline: [
+    //       {
+    //         $lookup: {
+    //              from: "transactions",
+    //              localField: "investments",
+    //              foreignField: "_id",
+    //              as: "investments_detail",
+    //            },
+    //          },
+    //     ],
+    //     as: "fund",
+    //   },
+    // },
+    // {
+    //   $addFields: {
+    //     fund_detail: {
+    //       $arrayElemAt: ["$fund", 0]
+    //     }
+    //   }
+    // },
     {
       $lookup: {
         from: "funds",
         localField: "fund",
         foreignField: "_id",
+        let: {userId: "$user"},
+        pipeline: [
+
+          {
+            $set: {userId: "$$userId"}
+          },
+
+        {
+        $lookup: {
+          from: "transactions",
+          localField: "investments",
+          foreignField: "_id",
+          pipeline: [
+            {
+               $project: {
+                investor: 1,
+                description: 1,
+                paymentDate: 1,
+                // funder: 1,
+                paid:1
+               }
+            }
+         ] ,
+          as: "investmenttxn",
+        },
+      },
+     
+          {
+            $project: {
+              name: 1,
+              property_type: 1,
+              distribution_period: 1,
+              funds_documents: 1,
+              investmenttxn: 1,
+              transaction_items: {
+                $filter: {
+                   input: "$investmenttxn",
+                   as: "investmentitem",
+                   cond: { $eq: ["$$investmentitem.investor", "$userId" ] }
+                }
+             }
+            }
+          }
+        ],
         as: "fund",
       },
     },
@@ -703,21 +772,6 @@ exports.userIvestmentFundById = async (req, res, next) =>{
         }
       }
     },
-
-    // {
-    //   $lookup: {
-    //        from: "transactions",
-    //        localField: "investments",
-    //        foreignField: "_id",
-    //        as: "payin",
-    //      },
-    //    },
-
-      //  {$unwind: "$payin"},
-
-
-      // {$substract: [, {$year: new Date()}]}
-
 
        {
         $addFields: {
@@ -744,18 +798,19 @@ exports.userIvestmentFundById = async (req, res, next) =>{
 
       {
         $project: {
+          transactions: "$fund_detail.transaction_items",
+          // transactions_investmenttxn: "$fund_detail.investmenttxn",
           // root: "$$ROOT",
-          invest_year: 1,
-          current_year: 1,
-          nos_invested_year: 1,
+          // payin: 1,
           "property.name": "$fund_detail.name",
           "property.property_type": "$fund_detail.property_type",
-          funds_documents: "$fund_detail.funds_documents",
+          "funds_documents": "$fund_detail.funds_documents",
           "property.distribution_period": "$fund_detail.distribution_period",
           "property.investment_date": "$updatedAt",
           "earnings.annual_yield": "$fund_detail.annual_yield",
           "earnings.capital_invested": "$capital_deploy",
           "earnings.current_value": {$cond:  [{$eq: ["$nos_invested_year", 0]}, "$capital_deploy.amount",   { $add: [{$multiply:  ["$investment_increase_percentage", "$nos_invested_year"]}, "$capital_deploy.amount"]} ]}
+       
         }
       }
   ]
