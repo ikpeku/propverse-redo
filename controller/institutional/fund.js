@@ -899,15 +899,18 @@ exports.userIvestmentFundById_graph = async (req, res, next) =>{
       
       const d = new Date(item.paymentDate);
 
-      const month = monthNames[d.getMonth()]
-      
-      if(total[month]){
-         total[month].amount += item.paid.amount
-         total[month].currency = item.paid.currency
+      const month = monthNames[d.getMonth()];
+
+
+      if(year == d.getFullYear()){
+
+        if(total[month]){
+          total[month].amount += item.paid.amount
+          total[month].currency = item.paid.currency
+       }
+
       }
-      // else {
-      //  total[month] = 1;
-      // }
+      
       return total;
 }, {
   January :{
