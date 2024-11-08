@@ -805,9 +805,6 @@ exports.userIvestmentFundById_graph = async (req, res, next) =>{
   const {partnerId} = req.params;
   const year = parseInt(req?.query?.year) || new Date().getFullYear();
 
-  // console.log(year)
-
-
   const query = [
     {
       $match: {_id: new ObjectId(partnerId)}
@@ -832,20 +829,10 @@ exports.userIvestmentFundById_graph = async (req, res, next) =>{
           foreignField: "_id",
           pipeline: [
 
-            // {
-            //   $set: {
-            //     addedDate: "$createdAt"
-            //   }
-            // },
-            // {$match:{addedDate: {$year: year}}},
             {
                $project: {
                 investor: 1,
-                // description: 1,
-                // paymentDate: {$month: "$paymentDate"},
                 paymentDate: 1,
-                // funder: 1,
-                // paid: {$sum: "$paid.amount"}
                 paid: 1
                }
             }
