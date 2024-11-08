@@ -716,21 +716,24 @@ exports.userIvestmentFundById = async (req, res, next) =>{
       //  {$unwind: "$payin"},
 
 
+      // {$substract: [, {$year: new Date()}]}
 
 
-
-      //  {
-      //   $addFields: {
-      //     year_diff: {$substract: [{$year: "$createdAt"}, {$year: new Date()}]}
-      //   }
-      //  },
+       {
+        $addFields: {
+          invest_year: {$year: "$createdAt"}
+        }
+       },
        {
         $addFields: {
           current_year:{$year: new Date()}
         }
        },
-
-
+       {
+        $addFields: {
+          nos_invested_year: {$subtract: ["$current_year", "$invest_year"]}
+        }
+       },
        {
         $addFields: {
           investment_increase_percentage:{$multiply:  [{ $divide: ["$fund_detail.annual_yield", 100]}, {$divide : ["$capital_deploy.amount", 100]} ]}
@@ -742,8 +745,9 @@ exports.userIvestmentFundById = async (req, res, next) =>{
       {
         $project: {
           // root: "$$ROOT",
-          // year_diff: 1,
-          // current_year: 1,
+          invest_year: 1,
+          current_year: 1,
+          nos_invested_year: 1,
           "property.name": "$fund_detail.name",
           "property.property_type": "$fund_detail.property_type",
           funds_documents: "$fund_detail.funds_documents",
@@ -751,7 +755,7 @@ exports.userIvestmentFundById = async (req, res, next) =>{
           "property.investment_date": "$updatedAt",
           "earnings.annual_yield": "$fund_detail.annual_yield",
           "earnings.capital_invested": "$capital_deploy",
-          "earnings.current_value": { $add: ["$investment_increase_percentage", "$capital_deploy.amount"]}
+          "earnings.current_value": {$cond:  [{$eq: ["$nos_invested_year", 0]}, "$capital_deploy.amount",   { $add: [{$multiply:  ["$investment_increase_percentage", "$nos_invested_year"]}, "$capital_deploy.amount"]} ]}
         }
       }
   ]
