@@ -803,7 +803,9 @@ exports.userIvestmentFundById = async (req, res, next) =>{
 
 exports.userIvestmentFundById_graph = async (req, res, next) =>{
   const {partnerId} = req.params;
-  // const days = parseInt(req?.query?.year) || 7;
+  const year = parseInt(req?.query?.year) || new Date().getFullYear();
+
+  // console.log(year)
 
 
   const query = [

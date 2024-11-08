@@ -454,10 +454,10 @@ ul.social li{
         message:
           "user account not verify. A verification mail has been sent to you.  please check your mail to verify email.",
         // status: "Pending",
-        // data: {
-        //   _id,
-        //   email,
-        // },
+        data: {
+          _id,
+          email,
+        },
       });
 
     } else {
@@ -466,10 +466,10 @@ ul.social li{
         message:
           "User was created successfully, please check your mail to verify email.",
         // status: "Pending",
-        // data: {
-        //   _id,
-        //   email,
-        // },
+        data: {
+          _id,
+          email,
+        },
       });
     }
   } catch (error) {
