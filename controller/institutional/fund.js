@@ -9,6 +9,7 @@ exports.submitFund = async (req, res, next) => {
   next()
 
 }
+
 exports.draftFund = async (req, res, next) => {
   req.body.isSubmitted = false
   next()
@@ -216,7 +217,6 @@ exports.AllUserFunds = async (req, res, next) => {
   req.query.user = req.payload.userId;
   next()
 }
-
 
 exports.getAllFunds = async (req, res, next) => {
   const page = parseInt(req?.query?.page) || 1;
@@ -532,9 +532,6 @@ exports.userHoldingFunds = async (req, res, next) => {
   next()
 
 }
-
-
-
 
 
 exports.fundHoldingFunds = async (req, res, next) => {

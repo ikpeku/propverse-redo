@@ -40,7 +40,7 @@ exports.loginUser = async (req, res, next) => {
     } 
 
     if(user.account_type === "Admin"){
-      return next(errorHandler(401, "forbidden"));
+      return next(errorHandler(401, "this is only for user login "));
     }
     
     // check of a verify user

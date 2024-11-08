@@ -450,7 +450,7 @@ ul.social li{
       // error.statusCode = 400
       // throw error
 
-      return res.status(200).json({
+      return res.status(400).json({
         message:
           "user account not verify. A verification mail has been sent to you.  please check your mail to verify email.",
         // status: "Pending",
