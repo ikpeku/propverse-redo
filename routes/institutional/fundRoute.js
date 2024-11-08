@@ -48,6 +48,6 @@ route.get('/fundholding/funds', userHoldingFunds, getHoldingsFunds);
 route.get('/fundholding/funds/:fundId',fundHoldingFunds, getHoldingsFunds);
 route.get('/fundoverview/:fundId', getFundOverview);
 route.get('/fundportfolio/:fundId', getFundPortfolio);
-route.get('/ivestedfund/:partnerId', userIvestmentFundById);
+route.get('/investedfund/:partnerId', userIvestmentFundById);
 
 module.exports = route;

@@ -686,7 +686,22 @@ exports.userIvestmentFundById = async (req, res, next) =>{
 
   const query = [
     {
-      $match: {_id: partnerId}
+      $match: {_id: new ObjectId(partnerId)}
+    },
+    {
+      $lookup: {
+        from: "funds",
+        localField: "fund",
+        foreignField: "_id",
+        as: "fund",
+      },
+    },
+    {
+      $addFields: {
+        fund_detail: {
+          $arrayElemAt: ["$fund", 0]
+        }
+      }
     },
 
     // {
@@ -700,23 +715,25 @@ exports.userIvestmentFundById = async (req, res, next) =>{
 
       //  {$unwind: "$payin"},
 
-      //  {
-      //   $addFields: {
-      //     accumulated_price: { $sum: "$payin.paid.amount"}
-      //   }
-      //  },
-      // {
-      //   $project: {
-      //     root: "$$ROOT",
-      //     "property.name": "$name",
-      //     "property.property_type": "$property_type",
-      //     funds_documents: 1,
-      //     "property.distribution_period": "$distribution_period",
-      //     "property.investment_date": "$createdAt",
-      //     "earnings.annual_yield": "$annual_yield",
-      //     payment_plan: "$payin"
-      //   }
-      // }
+       {
+        $addFields: {
+          investment_increase_percentage:{$multiply:  [{ $divide: ["$fund_detail.annual_yield", 100]}, {$divide : ["$capital_deploy.amount", 100]} ]}
+        }
+       },
+
+      {
+        $project: {
+          // root: "$$ROOT",
+          "property.name": "$fund_detail.name",
+          "property.property_type": "$fund_detail.property_type",
+          funds_documents: "$fund_detail.funds_documents",
+          "property.distribution_period": "$fund_detail.distribution_period",
+          "property.investment_date": "$updatedAt",
+          "earnings.annual_yield": "$fund_detail.annual_yield",
+          "earnings.capital_invested": "$capital_deploy",
+          "earningss.current_value": { $add: ["$investment_increase_percentage", "$capital_deploy.amount"]}
+        }
+      }
   ]
 
   

@@ -45,7 +45,10 @@ exports.DeveloperDashbroad = async(req, res, next) => {
       {
         $match: {
           user : new ObjectId(req.payload.userId) ,
-          investment_status: "Available"
+          investment_status: "Available",
+          isSubmitted: true,
+          isAdminAproved: "Approved"
+
         }
       },
       {
