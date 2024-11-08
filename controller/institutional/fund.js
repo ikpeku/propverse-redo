@@ -715,15 +715,35 @@ exports.userIvestmentFundById = async (req, res, next) =>{
 
       //  {$unwind: "$payin"},
 
+
+
+
+
+      //  {
+      //   $addFields: {
+      //     year_diff: {$substract: [{$year: "$createdAt"}, {$year: new Date()}]}
+      //   }
+      //  },
+       {
+        $addFields: {
+          current_year:{$year: new Date()}
+        }
+       },
+
+
        {
         $addFields: {
           investment_increase_percentage:{$multiply:  [{ $divide: ["$fund_detail.annual_yield", 100]}, {$divide : ["$capital_deploy.amount", 100]} ]}
         }
        },
 
+
+
       {
         $project: {
           // root: "$$ROOT",
+          // year_diff: 1,
+          // current_year: 1,
           "property.name": "$fund_detail.name",
           "property.property_type": "$fund_detail.property_type",
           funds_documents: "$fund_detail.funds_documents",
@@ -731,7 +751,7 @@ exports.userIvestmentFundById = async (req, res, next) =>{
           "property.investment_date": "$updatedAt",
           "earnings.annual_yield": "$fund_detail.annual_yield",
           "earnings.capital_invested": "$capital_deploy",
-          "earningss.current_value": { $add: ["$investment_increase_percentage", "$capital_deploy.amount"]}
+          "earnings.current_value": { $add: ["$investment_increase_percentage", "$capital_deploy.amount"]}
         }
       }
   ]
@@ -745,6 +765,7 @@ exports.userIvestmentFundById = async (req, res, next) =>{
       data: data[0] || null
     });
   } catch (error) {
-    next(errorHandler(500, "server error"));
+    next(error);
+    // next(errorHandler(500, "server error"));
   }
 }
