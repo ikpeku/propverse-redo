@@ -257,47 +257,7 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
 
     try {
 
-      const admindashbroad = await User.aggregate(
-        
-        [
-        // {
-        //   $group: {
-        //     _id: "$account_type",
-        //     numbersOfUsers: {
-        //       $count: {}
-        //     },
-        //     date: {
-        //       $addToSet: "$createdAt"
-        //     },
-        //   },
-        //   $sort: {
-        //     date: -1
-        //   },
-        // },
-      //   {
-      //     $setWindowFields: {
-      //       sortBy: { day: 1 },
-      //       output: {
-      //         thirtyDaysAgoDate: {
-      //           $last: "$date",
-      //           window: { range: [30 * 24, 31 * 24], unit: 'hour' }
-      //         },
-      //         thirtyDaysAgoValue: {
-      //           $last: "$expencel",
-      //           window: { range: [30 * 24, 31 * 24], unit: 'hour' }
-      //         }
-      //       }
-      //     }
-      //   },
-      // {
-      //   $set: {thirtyDayChange: {$divide: [{$subtract: ['$totalValue','$thirtyDaysAgoValue']}, '$totalValue']}}
-      // }
-
-      // 'Institutional Investor',
-      //   'Developer',
-      //   'Non-Institutional Investor',
-      //   'Admin',
-
+      const admindashbroad = await User.aggregate([
       {
         $match: { verify_account: true, isSuspended: false }
       },
@@ -310,10 +270,10 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
 
       {
         $facet: {
-          All_Investor: [
-            // {$match: {account_type: "Institutional Investor"}},
-            {$count: "count"}
-          ],
+          // All_Investor: [
+          //   // {$match: {account_type: "Institutional Investor"}},
+          //   {$count: "count"}
+          // ],
           Institutional_Investor: [
             {$match: {account_type: "Institutional Investor"}},
             {$count: "count"}
@@ -385,7 +345,7 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
 
 
         activities: {
-          number_of_investors: { $arrayElemAt: ['$All_Investor.count', 0] },
+          // number_of_investors: { $arrayElemAt: ['$All_Investor.count', 0] },
           Institutional_Investor: {$ifNull: [{ $arrayElemAt: ['$Institutional_Investor_Activity.count', 0] }, 0]},
           Institutional_Investor_percentage:  {$ifNull: [{$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Institutional_Investor_Activity.count', 0] }, "$totalUser_Activity"]}, 100]}}, 0]},
           developers_percentage:  {$ifNull: [{$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Developer_Activity.count', 0] }, "$totalUser_Activity"]}, 100]}}, 0]},
@@ -535,42 +495,7 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
   // ]);
 
   const properties = await TransactionsPayIn.aggregate([
-    
-    // {
-    //   $lookup: {
-    //     from: "users",
-    //     localField: "user",
-    //     foreignField: "_id",
-    //     as: "user",
-    //   },
-    // },
-    // { $unset: ["user.password"] },
-    // {
-    //   $unwind: "$user",
-    // },
-    // {
-    //   $lookup: {
-    //     from: "transactions",
-    //     localField: "transactions",
-    //     foreignField: "_id",
-    //     as: "transaction_invested",
-    //   },
-    // },
-    // {
-    //   $addFields: {
-    //     amount_invested: {
-    //       $sum: { $sum: "$transaction_invested.paid.amount" },
-    //     },
-    //   },
-    // },
-
-    // {
-    //   $project: {
-    //     property: {
-    //       total_revenue: {$sum: "$amount_invested"}
-    //     }
-    //   }
-    // }
+   
     {
       $match: { transaction_type: "property" }
     },
@@ -584,111 +509,101 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
               },
                ],
         developers: [
+             {
+           $lookup: {
+             from: "properties",
+             localField: "property",
+             foreignField: "_id",
+             as: "property_detail",
+           },
+         },
+     
+         {
+           $addFields: {
+             investedproperty: {
+               $arrayElemAt: ["$property_detail", 0]
+             }
+           }
+          },
+
+          {$unwind: "$property_detail"},
+
           {
-            $sort: {
-              createdAt: -1
+            $group: {
+              _id:  "$property_detail.user",
+              count: { "$first": 1 }
+            }
+           
+
+          },
+          {
+            $project: {
+              developer_count: "$count",  // Include only the 'funder' field
+              _id: 0      // Optionally exclude the '_id' field
+            }
+          }
+
+
+        ],
+        project_investors: [
+          {
+            $match: {
+              $or: [
+                { funder: null },
+                { funder: undefined },
+                { funder: "" },
+              ]
+            }
+          },
+          {
+            $group: {
+              _id:  "$investor",
+              count: { "$first": 1 }
+            }
+           
+
+          },
+          {
+            $project: {
+              investor_count: "$count",  // Include only the 'funder' field
+              _id: 0      // Optionally exclude the '_id' field
             }
           }
         ],
         insitutional_investors: [
-          // {
-          //   $lookup: {
-          //     from: "funds",
-          //     localField: "funds",
-          //     foreignField: "_id",
-          //     as: "funding",
-          //   },
-          // },
-     
-          // {
-          //  $addFields: {
-          //    fund_detail: {
-          //      $arrayElemAt: ["$funding", 0]
-          //    }
-          //  }
-          // },
 
-         
           {
-            $lookup: {
-              from: "funds",
-              localField: "funder",
-              foreignField: "_id",
-              as: "funderparam",
-            },
+            $match: {
+              funder: { $ne: null, $ne: "" , $ne: undefined}  // Match documents where 'funder' is not null or empty
+            }
           },
-     
           {
-           $addFields: {
-             funder_detail: {
-               $arrayElemAt: ["$funderparam", 0]
-             }
-           }
+            $group: {
+              _id:  "$funder",
+              count: { "$first": 1 }
+            }
+           
+
           },
-     
-     
-        //   {
-        //     $lookup: {
-        //       from: "limited_partners",
-        //       localField: "limited_partner",
-        //       foreignField: "_id",
-        //       as: "limited_partnerItem",
-        //     },
-        //   },
-        //   {
-        //    $addFields: {
-        //      limited_partner_detail: {
-        //        $arrayElemAt: ["$limited_partnerItem", 0]
-        //      }
-        //    }
-        //   },
-        //   {
-        //    $lookup: {
-        //      from: "properties",
-        //      localField: "property",
-        //      foreignField: "_id",
-        //      as: "property_detail",
-        //    },
-        //  },
-     
-        //  {
-        //    $addFields: {
-        //      investedproperty: {
-        //        $arrayElemAt: ["$property_detail", 0]
-        //      }
-        //    }
-        //   },
+          {
+            $project: {
+              funder_count: "$count",  // Include only the 'funder' field
+              _id: 0      // Optionally exclude the '_id' field
+            }
+          }
+          
         ]
         
            }
     },
-    //  {
-    //   $addFields: {
-    //     total_amount_invested: {
-    //       $sum: "$paid.amount" 
-    //     },
-    //   },
-    // },
-
-
-  //   {
-  //     $project: {
-  //        items: {
-  //           $filter: {
-  //              input: "$items",
-  //              as: "item",
-  //              cond: { $gte: [ "$$item.price", 100 ] }
-  //           }
-  //        }
-  //     }
-  //  }
+  
       {
       $project: {
         property: {
           total_revenue: {$sum: "$all_txn.revenue"},
-          developers: "$developers",
-          insitutional_investors: "$insitutional_investors"
-
+          developers_that_sold: {$sum: "$developers.developer_count"},
+          insitutional_investors_that_paid: {$sum: "$insitutional_investors.funder_count"},
+          investors_that_paid: {$sum: "$project_investors.investor_count"},
         }
       }
     },
@@ -698,8 +613,7 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
         data: {
           ...admindashbroad[0],
            ...funds[0],
-          // ...properties[0]
-          properties
+          ...properties[0]
           }
       })
       
