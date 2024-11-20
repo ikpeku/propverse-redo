@@ -296,7 +296,6 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
           ],
           Non_Institutional_Investor_Activity: [
             {$match: {account_type: "Non-Institutional Investor", addedDate: {$gte: activity_days}}},
-            // {$match: {createdAt: {$gte: activity_days}}},
             {$count: "count"}
           ],
           
@@ -315,8 +314,6 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
           totalUser_Activity: {$add: [{$arrayElemAt: ['$Institutional_Investor_Activity.count', 0]},{ $arrayElemAt: ['$Developer_Activity.count', 0] }, { $arrayElemAt: ['$Non_Institutional_Investor_Activity.count', 0] } ]}
         }
       },
-      // type: "ascending",
-      // percentage: (total_paid_by_investors / total_amount_revenue) * 100 || 0
 
       {
         $project: {
@@ -453,47 +450,6 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
     },
   ]);
 
-  // const properties = await Property.aggregate([
-  //   // {
-  //   //   // $match: { isSubmitted: true, isAdminAproved: "Approved" }
-  //   // }
-  //   {
-  //     $lookup: {
-  //       from: "users",
-  //       localField: "user",
-  //       foreignField: "_id",
-  //       as: "user",
-  //     },
-  //   },
-  //   // { $unset: ["user.password"] },
-  //   // {
-  //   //   $unwind: "$user",
-  //   // },
-  //   {
-  //     $lookup: {
-  //       from: "transactions",
-  //       localField: "transactions",
-  //       foreignField: "_id",
-  //       as: "transaction_invested",
-  //     },
-  //   },
-  //   {
-  //     $addFields: {
-  //       amount_invested: {
-  //         $sum: { $sum: "$transaction_invested.paid.amount" },
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     $project: {
-  //       property: {
-  //         total_revenue: {$sum: "$amount_invested"}
-  //       }
-  //     }
-  //   }
-  // ]);
-
   const properties = await TransactionsPayIn.aggregate([
    
     {
@@ -623,7 +579,211 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
     }
 
   }
+
+  exports.AdminDashbroadChart = async (req, res, next) =>{
+    const year = parseInt(req?.query?.year) || new Date().getFullYear();
   
+    const query = [
+      {
+        $lookup: {
+          from: "funds",
+          localField: "fund",
+          foreignField: "_id",
+          pipeline: [
+
+          {
+          $lookup: {
+            from: "transactions",
+            localField: "investments",
+            foreignField: "_id",
+            pipeline: [
+
+              {
+                $lookup: {
+                  from: "properties",
+                  localField: "property",
+                  foreignField: "_id",
+                  as: "property_detail",
+                },
+              },
+          
+              {
+                $addFields: {
+                  investedproperty: {
+                    $arrayElemAt: ["$property_detail", 0]
+                  }
+                }
+               },
+  
+              {
+                 $project: {
+                  investor: 1,
+                  // property_amount: "$investedproperty.property_detail.property_overview.price",
+                  property_amount: {$ifNull : ["$investedproperty.property_detail.property_overview.price",null]},
+                  paymentDate: 1,
+                  paid: 1
+                 }
+              }
+           ] ,
+            as: "investmenttxn",
+          },
+        },
+       
+            {
+              $project: {
+                transaction_items: "$investmenttxn"
+              }
+            }
+          ],
+          as: "fund",
+        },
+      },
+      {
+        $addFields: {
+          fund_detail: {
+            $arrayElemAt: ["$fund", 0]
+          }
+        }
+      },
+  
+        {
+          $project: {
+            transactions: "$fund_detail.transaction_items",
+          }
+        }
+    ]
+  
+    
+    try {
+      const data = await Limited_partners.aggregate(query);
+  
+      
+      const chartData = data[0].transactions.reduce(function(total, item) {
+  
+       
+  
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        
+        const d = new Date(item.paymentDate);
+  
+        const month = monthNames[d.getMonth()];
+  
+        if(year == d.getFullYear()){
+  
+          if(total[month]){
+            total[month].amount_raised += item.paid.amount;
+            total[month].currency = item.paid.currency;
+
+            if(item?.property_amount){
+              total[month].property_paid_for = item.property_amount.amount;
+              total[month].property_paid_for_currency = item.property_amount.currency;
+            }
+         }
+  
+        }
+        
+        return total;
+  }, {
+    January :{
+      date: 'Jan',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    February :{
+      ate: 'Feb',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    March :{
+      date: 'Mar',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    April :{
+      date: 'Apr',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    May :{
+      date: 'May',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    June :{
+      date: 'Jun',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    July :{
+      date: 'Jul',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    August :{
+      date: 'Aug',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    September :{
+      date: 'Sep',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    October :{
+      date: 'Oct',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    November : {
+      date: 'Nov',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    },
+    December : {
+      date: 'Dec',
+      amount_raised: 0,
+      property_paid_for_currency: "$",
+      property_paid_for: 0,
+      currency: "$"
+    }
+  
+  }); 
+  
+  
+      res.status(200).json({
+        success: true,
+        data: Object.values(chartData) || null,
+        // items: data
+      });
+    } catch (error) {
+      next(error)
+      // next(errorHandler(500, "server error"));
+    }
+  }
 
   /**
    * return all property without pagination
