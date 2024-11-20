@@ -18,6 +18,7 @@ const {
   AllUserFunds,
   userIvestmentFundById,
   userIvestmentFundById_graph,
+  institionalDashbroad,
 } = require('../../controller/institutional/fund');
 
 const {
@@ -26,6 +27,11 @@ const {
 const { fundPurposeInquiry } = require('../../controller/institutional/primaryContactDetails');
 const { capitalcommitted, getLimitedPartners, getLimitedPartnerById } = require('../../controller/General/user');
 const route = express.Router();
+
+route.get('/dashbroad', 
+  // checkInstitutionalUser, 
+  institionalDashbroad);
+
 
 route.post('/fund/submit/:fundId', checkInstitutionalUser, submitFund, createFund);
 route.post('/fund/draft/:fundId', checkInstitutionalUser, draftFund, createFund);

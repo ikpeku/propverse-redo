@@ -4,6 +4,301 @@ const { errorHandler } = require('../../utils/error');
 const { ObjectId } = require("mongodb");
 const Limited_partners = require("../../model/institutional/limitedpartners");
 
+
+
+exports.institionalDashbroad = async (req, res, next) => {
+  try {
+
+
+    let query = [
+      {
+        $match: {
+          // user : new ObjectId(req.payload.userId) ,
+          funding_state: "Ongoing",
+          isSubmitted: true,
+          isAdmin_Approved: "approved"
+
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+
+
+      // investments: [{
+      //   type: Schema.Types.ObjectId,
+      //   ref: "transaction",
+      // }],
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "investments",
+          foreignField: "_id",
+        //   pipeline: [
+
+        //     {
+        //        $project: {
+        //         investor: 1,
+        //         paymentDate: 1,
+        //         paid: 1
+        //        }
+        //     }
+        //  ] ,
+          as: "investmenttxn",
+        },
+      },
+
+      {
+        $addFields: {
+          fund_investment: {$sum: "$investmenttxn.paid.amount"}
+
+        }
+
+      },
+      {
+        $addFields: {
+          fund_investment_currency: {
+            $arrayElemAt: ["$investmenttxn", 0]
+          }
+        }
+
+      },
+
+      {
+        $addFields: {
+          invested_capital_diff: { $divide: ["$fund_investment", "$raise_goal.amount"] }
+        }
+      },
+
+      {
+        $project: {
+          name: 1,
+          thumbnails: 1,
+          property_type: 1,
+          raise_goal: 1,
+          fund_investment: 1,
+          fund_investment_currency: {$ifNull : ["$fund_investment_currency.paid.currency", null]},
+          fund_progress: {$multiply :["$invested_capital_diff", 100]},        
+        }
+      }
+
+
+    ];
+
+    // let cumulativequery = [
+    //   {
+    //     $match: {
+    //       user : new ObjectId(req.payload.userId) 
+    //     }
+    //   },
+    //   {
+    //     $sort: {
+    //       createdAt: -1,
+    //     },
+    //   },
+
+    //   {
+    //     $project: {
+    //       propertyId: "$_id",
+    //       property_location: "$property_detail.property_location",
+    //       property_type: "$property_detail.property_overview.property_type",
+
+    //       thumbnail: "$property_detail.property_images",
+    //       property_name: "$property_detail.property_overview.property_name",
+    //       property_progress: "$property_progress",
+
+    //       property_amount: "$property_detail.property_overview.price",
+    //       property_dates: "$property_detail.property_overview.date",
+         
+    //       company: "$company.company_information.name" || ""
+    //     }
+    //   }
+
+
+    // ];
+
+    
+
+
+    // let allquery = [
+    //   {
+    //     $match: {
+    //       user : new ObjectId(req.payload.userId) ,
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "transactions",
+    //       localField: "transactions",
+    //       foreignField: "_id",
+    //       as: "transactionuser",
+    //     }
+    //   },
+    //   {
+    //     $unwind: "$transactionuser"
+    //   },
+    //   {
+    //     $addFields: {
+    //       capital_invested: {
+    //       "$sum": {$sum: "$transactionuser.paid.amount"}
+    //       }
+
+    //     },
+    //   },
+    //   {
+    //     $sort: {
+    //       createdAt: -1,
+    //     },
+    //   },
+     
+
+    //   {
+    //     $project: {
+    //       propertyId: "$_id",
+    //       property_type: "$property_detail.property_overview.property_type",
+    //       "invested_amount": {$sum: "$capital_invested"},
+    //       property_amount: "$property_detail.property_overview.price",
+    //     }
+    //   }
+
+
+    // ];
+    // let investorsquery = [
+    //   {
+    //     $match: {
+    //       user : new ObjectId(req.payload.userId) ,
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "transactions",
+    //       localField: "transactions",
+    //       foreignField: "_id",
+    //       pipeline: [
+    //         {
+    //           $lookup: {
+    //             from: "users",
+    //             localField: "investor",
+    //             foreignField: "_id",
+    //             as: "transactionuser",
+    //           },
+    //         },
+    //         {
+    //     $addFields: {
+    //       transaction_user: {
+    //         $arrayElemAt: ["$transactionuser", 0]
+    //       }
+    //     }
+    //         },
+    //         {
+    //           $project: {
+    //             transaction_user: 1,
+    //             paid: 1
+    //           }
+    //         }
+
+    //       ],
+    //       as: "transactionuser",
+    //     }
+    //   },
+    //   {
+    //     $unwind: "$transactionuser"
+    //   },
+
+    //   {
+    //     $addFields: {
+    //       capital_invested: {
+    //       "$sum": {$sum: "$transactionuser.paid.amount"}
+    //       }
+
+    //     },
+    //   },
+
+    //   {
+    //     $group:{
+    //       _id: "$transactionuser.transaction_user._id",
+    //       investor_name: {$first: "$transactionuser.transaction_user.username"},
+    //       invested_amount: {$sum: "$capital_invested"},
+    //       currency: {$first: "$transactionuser.paid.currency"}
+    //     }
+    //   },
+      
+    //   {
+    //     $sort: {
+    //       invested_amount: -1,
+    //     },
+    //   },
+
+    // ];
+
+    const ongoing_funds = await Fund.aggregate(query);
+    // const cumulativeproject = await properties.aggregate(cumulativequery);
+
+    // const allProject = await properties.aggregate(allquery);
+
+    // const top_Investors = await properties.aggregate(investorsquery);
+
+    // const property_type = cumulativeproject.reduce(function(total, item) {
+      
+    //       if(total[item.property_type] ){
+    //          ++total[item.property_type]
+    //       }else {
+    //        total[item.property_type] = 1;
+    //       }
+    //       return total;
+    // }, {
+    //   Residential: 0,
+    //   Commercial: 0,
+    //   Industrial: 0
+    // }); 
+
+    // const total_paid_by_investors = allProject.reduce(function(total, item) {
+    //   return total + item.invested_amount
+    // }, 0); 
+    // const total_amount_revenue = allProject.reduce(function(total, item) {
+    //   return total + item.property_amount.amount
+    // }, 0); 
+
+    // const percentagevalue = () => {
+
+    //   if(total_paid_by_investors < total_amount_revenue) {
+    //     return {
+    //       type: "ascending",
+    //       percentage: (total_paid_by_investors / total_amount_revenue) * 100 || 0
+    //     }
+    //   } else {
+    //     return {
+    //       type: "decending",
+    //       percentage: ( total_amount_revenue / total_paid_by_investors) * 100 || 0
+    //     }
+    //   }
+
+
+      
+    // }
+
+
+    return res.status(200).json({status:"success", data: {
+      ongoing_funds,
+      // property_type,
+      // totalProject: cumulativeproject.length,
+      // total_paid_by_investors,
+      // total_amount_revenue,
+      // percentage: percentagevalue(),
+      // top_Investors
+      
+    }})
+    
+  } catch (error) {
+    
+    
+  }
+
+}
+
+
 exports.submitFund = async (req, res, next) => {
   req.body.isSubmitted = true
   next()
