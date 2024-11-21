@@ -107,12 +107,11 @@ exports.institionalDashbroad = async (req, res, next) => {
     ]
     
     let userInvestors = [
-
-      // {
-      //   $match: {
-      //     user : new ObjectId(req.payload.userId) ,
-      //   }
-      // },
+      {
+        $match: {
+          user : new ObjectId(req.payload.userId) ,
+        }
+      },
       {
         $lookup: {
           from: "limited_partners",
