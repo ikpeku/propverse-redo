@@ -69,6 +69,7 @@ exports.institionalDashbroad = async (req, res, next) => {
       }
     ];
 
+
     let userData = [
 
       {
@@ -100,26 +101,91 @@ exports.institionalDashbroad = async (req, res, next) => {
           _id: 0,
           capital_deploy: {$ifNull : [{ $sum: "$capital_deploy_by_user"}, 0]},
           total_investors: {$ifNull : [{ $sum: "$total_user_investors"}, 0]},
-          management_asset: 0
+          management_asset:  {$ifNull : [{ $sum: "$management_asset"}, 0]}
         }
       }
     ]
+    
+    let userInvestors = [
+
+      // {
+      //   $match: {
+      //     user : new ObjectId(req.payload.userId) ,
+      //   }
+      // },
+      {
+        $lookup: {
+          from: "limited_partners",
+          localField: "limitedpartners",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "limitedPartnerUser"
+              }
+            },
+            {
+              $addFields: {
+                userDetail: {$arrayElemAt: ["$limitedPartnerUser", 0]}
+              }
+            },
+
+            // {
+            //   $project: {
+            //     userName: "$userDetail.username",
+            //     avatar: "$userDetail.avatar",
+            //   }
+            // }
+
+          ],
+          as: "fundlimitedPartners",
+        },
+      },
+      {$unwind: "$fundlimitedPartners"},
+
+      {
+        $group: {
+          _id: "$fundlimitedPartners.userDetail._id",
+          capital_deploy_by_user: { $sum: "$fundlimitedPartners.capital_deploy.amount"},
+          name: { $sum: 1}
+
+        }
+      },
+
+      // {
+      //   $project: {
+      //     _id: 0,
+      //     name: 1,
+
+      //     // capital_deploy: {$ifNull : [{ $sum: "$capital_deploy_by_user"}, 0]},
+      //     // total_investors: {$ifNull : [{ $sum: "$total_user_investors"}, 0]},
+      //     // management_asset:  {$ifNull : [{ $sum: "$management_asset"}, 0]}
+      //   }
+      // }
+    ]
+
 
 
     const ongoing_funds = await Fund.aggregate(query);
     const userDashbroard = await Fund.aggregate(userData);
+
+    const Investorments = await Fund.aggregate(userInvestors);
   
     return res.status(200).json({status:"success", data: {
       capital_deploy: userDashbroard[0]?.capital_deploy || 0,
       total_investors: userDashbroard[0]?.total_investors || 0,
       management_asset: userDashbroard[0]?.management_asset || 0,
       ongoing_funds,
+      Investorments
       
     }})
     
   } catch (error) {
     
-    
+    next(error)
   }
 
 }
