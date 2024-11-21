@@ -133,12 +133,19 @@ exports.institionalDashbroad = async (req, res, next) => {
               }
             },
 
-            // {
-            //   $project: {
-            //     userName: "$userDetail.username",
-            //     avatar: "$userDetail.avatar",
-            //   }
-            // }
+            {
+              $lookup: {
+                from: "funds",
+                localField: "fund",
+                foreignField: "_id",
+                as: "limitedPartnerFunds"
+              }
+            },
+            {
+              $addFields: {
+                fundDetail: {$arrayElemAt: ["$limitedPartnerFunds", 0]}
+              }
+            },
 
           ],
           as: "fundlimitedPartners",
@@ -149,9 +156,14 @@ exports.institionalDashbroad = async (req, res, next) => {
       {
         $group: {
           _id: "$fundlimitedPartners.userDetail._id",
-          capital_deploy_by_user: { $sum: "$fundlimitedPartners.capital_deploy.amount"},
-          name: { $sum: 1}
-
+          // capital_deploy_by_user: { $sum: "$fundlimitedPartners.capital_deploy.amount"},
+          investor_name:  {$first : "$fundlimitedPartners.userDetail.username"},
+          investor_avatar:  {$first : "$fundlimitedPartners.userDetail.avatar"},
+          invested_amount: {$sum: "$fundlimitedPartners.capital_deploy.amount"},
+          invested_currency: {$first: "$fundlimitedPartners.capital_deploy.currency"},
+          investor_date:  {$first : "$fundlimitedPartners.createdAt"},
+          investment_structure:  {$first : "$fundlimitedPartners.fundDetail.investment_structure"},
+          fund_name:  {$first : "$fundlimitedPartners.fundDetail.name"},
         }
       },
 
