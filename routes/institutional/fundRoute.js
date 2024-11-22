@@ -19,6 +19,7 @@ const {
   userIvestmentFundById,
   userIvestmentFundById_graph,
   institionalDashbroad,
+  dashbroadFundChart,
 } = require('../../controller/institutional/fund');
 
 const {
@@ -31,6 +32,10 @@ const route = express.Router();
 route.get('/dashbroad', 
   // checkInstitutionalUser, 
   institionalDashbroad);
+
+route.get('/dashbroadchart', 
+  // checkInstitutionalUser, 
+  dashbroadFundChart);
 
 
 route.post('/fund/submit/:fundId', checkInstitutionalUser, submitFund, createFund);

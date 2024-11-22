@@ -1219,3 +1219,346 @@ exports.userIvestmentFundById_graph = async (req, res, next) =>{
   }
 }
 
+exports.dashbroadFundChart = async (req, res, next) =>{
+  // const {partnerId} = req.params;
+  const year = parseInt(req?.query?.year) || new Date().getFullYear();
+
+  const query = [
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    // {
+    //   $match: {_id: new ObjectId(partnerId)}
+    // },
+   
+    // {
+    //   $lookup: {
+    //     from: "funds",
+    //     localField: "fund",
+    //     foreignField: "_id",
+    //     let: {userId: "$user"},
+    //     pipeline: [
+
+    //       {
+    //         $set: {userId: "$$userId"}
+    //       },
+
+    //     {
+    //     $lookup: {
+    //       from: "transactions",
+    //       localField: "investments",
+    //       foreignField: "_id",
+    //       pipeline: [
+
+    //         {
+    //            $project: {
+    //             investor: 1,
+    //             paymentDate: 1,
+    //             paid: 1
+    //            }
+    //         }
+    //      ] ,
+    //       as: "investmenttxn",
+    //     },
+    //   },
+     
+    //       {
+    //         $project: {
+    //           transaction_items: {
+    //             $filter: {
+    //                input: "$investmenttxn",
+    //                as: "investmentitem",
+    //                cond: { $eq: ["$$investmentitem.investor", "$userId" ] }
+    //             }
+    //          }
+    //         }
+    //       }
+    //     ],
+    //     as: "fund",
+    //   },
+    // },
+    // {
+    //   $addFields: {
+    //     fund_detail: {
+    //       $arrayElemAt: ["$fund", 0]
+    //     }
+    //   }
+    // },
+
+      {
+        $project: {
+          // transactions: "$fund_detail.transaction_items",
+          investment_structure: 1,
+          updatedAt: 1
+        }
+      }
+  ]
+
+  
+  try {
+    const data = await Fund.aggregate(query);
+
+    
+    const chartData = data.reduce(function(total, item) {
+
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      
+      const d = new Date(item.updatedAt);
+
+      const month = monthNames[d.getMonth()];
+
+
+      if(year == d.getFullYear()){
+
+        if(total[month]){
+          // total[month].amount += item.paid.amount
+          // total[month].currency = item.paid.currency
+       }
+
+      }
+      // investment_structure: {
+//   type: String,
+//   enum: ['reit','residential', 'commercial','industrial'],
+//   default: 'reit',
+//   // required: [true, 'Select Investment structure'],
+// },
+      
+      return total;
+}, {
+  January :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  February :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  March :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  April :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  May :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  June :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  July :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  August :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  September :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  October :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  November : {
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  December : {
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  }
+
+}); 
+
+
+
+
+    res.status(200).json({
+      success: true,
+      // data: chartData || null,
+      data,
+      chartData
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+}
+

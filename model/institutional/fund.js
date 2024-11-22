@@ -104,8 +104,8 @@ const fundSchema = new Schema(
 
     investment_structure: {
       type: String,
-      enum: ['opportunistic', 'reit'],
-      default: 'opportunistic',
+      enum: ['reit','residential', 'commercial','industrial'],
+      default: 'reit',
       // required: [true, 'Select Investment structure'],
     },
 
