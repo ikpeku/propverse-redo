@@ -215,6 +215,14 @@ exports.institionalDashbroad = async (req, res, next) => {
       },
     ];
 
+    let section_alocation_query = [
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ]
+
 
 
     const capital_deploy_response = await Fund.aggregate(capital_deploy_query);
@@ -222,6 +230,7 @@ exports.institionalDashbroad = async (req, res, next) => {
     const userDashbroard = await Fund.aggregate(userData);
 
     const Investorments = await Fund.aggregate(userInvestors);
+    const section_allocation_response = await Fund.aggregate(section_alocation_query);
 
     const capital_deploy = capital_deploy_response.reduce(function(total, item) {
       if(item.payout_investment_currency){
@@ -241,7 +250,8 @@ exports.institionalDashbroad = async (req, res, next) => {
       total_investors: userDashbroard[0]?.total_investors || 0,
       management_asset: userDashbroard[0]?.management_asset || 0,
       ongoing_funds,
-      Investorments
+      Investorments,
+      // section_allocation_response
       
     }})
     
