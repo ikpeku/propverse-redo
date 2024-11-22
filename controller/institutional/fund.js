@@ -71,7 +71,6 @@ exports.institionalDashbroad = async (req, res, next) => {
 
 
     let userData = [
-
       {
         $match: {
           user : new ObjectId(req.payload.userId) ,
@@ -99,9 +98,9 @@ exports.institionalDashbroad = async (req, res, next) => {
       {
         $project: {
           _id: 0,
-          capital_deploy: {$ifNull : [{ $sum: "$capital_deploy_by_user"}, 0]},
+          // capital_deploy: {$ifNull : [{ $sum: "$capital_deploy_by_user"}, 0]},
           total_investors: {$ifNull : [{ $sum: "$total_user_investors"}, 0]},
-          management_asset:  {$ifNull : [{ $sum: "$management_asset"}, 0]}
+          management_asset:  {$ifNull : [{ $sum: "$capital_deploy_by_user"}, 0]}
         }
       }
     ]
@@ -178,15 +177,67 @@ exports.institionalDashbroad = async (req, res, next) => {
       // }
     ]
 
+    let capital_deploy_query = [
+      {
+        $match: {
+          user : new ObjectId(req.payload.userId)
+        }
+      },
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "payout",
+          foreignField: "_id",
+          as: "payouttxn",
+        },
+      },
+
+      {
+        $addFields: {
+          payout_investment: {$sum: "$payouttxn.paid.amount"}
+        }
+      },
+      {
+        $addFields: {
+          payout_investment_currency: {
+            $arrayElemAt: ["$payouttxn", 0]
+          }
+        }
+
+      },
+
+      {
+        $project: {
+          _id: 0,
+          payout_investment: 1,
+          payout_investment_currency: {$ifNull : ["$payout_investment_currency.paid.currency", null]},       
+        }
+      },
+    ];
 
 
+
+    const capital_deploy_response = await Fund.aggregate(capital_deploy_query);
     const ongoing_funds = await Fund.aggregate(query);
     const userDashbroard = await Fund.aggregate(userData);
 
     const Investorments = await Fund.aggregate(userInvestors);
+
+    const capital_deploy = capital_deploy_response.reduce(function(total, item) {
+      if(item.payout_investment_currency){
+          total.amount += item.payout_investment
+          total.currency = item.payout_investment_currency
+      }
+      return total;
+
+
+    }, {
+       amount: 0,
+    currency: "$"
+    })
   
     return res.status(200).json({status:"success", data: {
-      capital_deploy: userDashbroard[0]?.capital_deploy || 0,
+      capital_deploy,
       total_investors: userDashbroard[0]?.total_investors || 0,
       management_asset: userDashbroard[0]?.management_asset || 0,
       ongoing_funds,
