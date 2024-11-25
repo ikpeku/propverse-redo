@@ -579,7 +579,7 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
     }
 
   }
-  
+
   exports.AdminDashbroadActivities = async(req,res,next) => {
 
     const days = parseInt(req?.query?.days) || 7;
@@ -626,18 +626,18 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
           //   // {$match: {account_type: "Institutional Investor"}},
           //   {$count: "count"}
           // ],
-          Institutional_Investor: [
-            {$match: {account_type: "Institutional Investor"}},
-            {$count: "count"}
-          ],
-          Developer: [
-            {$match: {account_type: "Developer"}},
-            {$count: "count"}
-          ],
-          Non_Institutional_Investor: [
-            {$match: {account_type: "Non-Institutional Investor"}},
-            {$count: "count"}
-          ],
+          // Institutional_Investor: [
+          //   {$match: {account_type: "Institutional Investor"}},
+          //   {$count: "count"}
+          // ],
+          // Developer: [
+          //   {$match: {account_type: "Developer"}},
+          //   {$count: "count"}
+          // ],
+          // Non_Institutional_Investor: [
+          //   {$match: {account_type: "Non-Institutional Investor"}},
+          //   {$count: "count"}
+          // ],
           Institutional_Investor_Activity: [
             {$match: {account_type: "Institutional Investor", addedDate: {$gte: activity_days}}},
             {$count: "count"}
@@ -656,11 +656,11 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
       },
 
 
-      {
-        $addFields: {
-          totalUser: {$add: [{$arrayElemAt: ['$Institutional_Investor.count', 0]},{ $arrayElemAt: ['$Developer.count', 0] }, { $arrayElemAt: ['$Non_Institutional_Investor.count', 0] } ]}
-        }
-      },
+      // {
+      //   $addFields: {
+      //     totalUser: {$add: [{$arrayElemAt: ['$Institutional_Investor.count', 0]},{ $arrayElemAt: ['$Developer.count', 0] }, { $arrayElemAt: ['$Non_Institutional_Investor.count', 0] } ]}
+      //   }
+      // },
       {
         $addFields: {
           totalUser_Activity: {$add: [{$arrayElemAt: ['$Institutional_Investor_Activity.count', 0]},{ $arrayElemAt: ['$Developer_Activity.count', 0] }, { $arrayElemAt: ['$Non_Institutional_Investor_Activity.count', 0] } ]}
@@ -669,28 +669,28 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
 
       {
         $project: {
-         investor_data: {
-          Institutional_Investor: { $arrayElemAt: ['$Institutional_Investor.count', 0] },
-          Institutional_Investor_percentage:  {
-            percentage: {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Institutional_Investor.count', 0] }, "$totalUser"]}, 100]}},
-            type: "ascending",
-          },
+        //  investor_data: {
+        //   Institutional_Investor: { $arrayElemAt: ['$Institutional_Investor.count', 0] },
+        //   Institutional_Investor_percentage:  {
+        //     percentage: {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Institutional_Investor.count', 0] }, "$totalUser"]}, 100]}},
+        //     type: "ascending",
+        //   },
 
-          developers_percentage: {
-            percentage:  {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Developer.count', 0] }, "$totalUser"]}, 100]}},
-            type: "ascending",
-          },
+        //   developers_percentage: {
+        //     percentage:  {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Developer.count', 0] }, "$totalUser"]}, 100]}},
+        //     type: "ascending",
+        //   },
 
-          Non_Institutional_Investor_percentage:  {
-            percentage: {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Non_Institutional_Investor.count', 0] }, "$totalUser"]}, 100]}},
-            type: "ascending",
-          },
+        //   Non_Institutional_Investor_percentage:  {
+        //     percentage: {$floor: {$multiply: [{$divide : [{ $arrayElemAt: ['$Non_Institutional_Investor.count', 0] }, "$totalUser"]}, 100]}},
+        //     type: "ascending",
+        //   },
 
 
-          developers: { $arrayElemAt: ['$Developer.count', 0] },
-          private_investors: { $arrayElemAt: ['$Non_Institutional_Investor.count', 0] },
+        //   developers: { $arrayElemAt: ['$Developer.count', 0] },
+        //   private_investors: { $arrayElemAt: ['$Non_Institutional_Investor.count', 0] },
          
-         },
+        //  },
 
 
         activities: {
@@ -712,216 +712,216 @@ const activity_days = addWeeksToDate(new Date(), numberOfWeeks);
   )
 
 
-  const funds = await Limited_partners.aggregate([
-    {
-      $lookup: {
-        from: "funds",
-        localField: "fund",
-        foreignField: "_id",
-        as: "fund",
-      },
-    },
+  // const funds = await Limited_partners.aggregate([
+  //   {
+  //     $lookup: {
+  //       from: "funds",
+  //       localField: "fund",
+  //       foreignField: "_id",
+  //       as: "fund",
+  //     },
+  //   },
     
 
-    {
-      $facet: {
-      //   table: [
-      //     {
-      //       $set: {
-      //         addedDate: "$createdAt"
-      //       }
-      //     },
-      //     {$match:{addedDate: {$gte: graph_days}}},
+  //   {
+  //     $facet: {
+  //     //   table: [
+  //     //     {
+  //     //       $set: {
+  //     //         addedDate: "$createdAt"
+  //     //       }
+  //     //     },
+  //     //     {$match:{addedDate: {$gte: graph_days}}},
        
-      //   { 
-      //     $group: {
-      //         // _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
-      //         _id: {month: {$month: "$createdAt"}},
-      //         cumulative_capital_committed: { $sum: "$capital_committed.amount" },
-      //         cumulative_capital_raise: { $sum: "$capital_deploy.amount" }
-      //     }
-      // },
-      //   {
-      //     $project: {
-      //       cumulative_capital_committed: 1,
-      //       cumulative_capital_raise: 1,
-      //       // createdAt: {$month: "$createdAt"}
-      //     }
-      //    }
+  //     //   { 
+  //     //     $group: {
+  //     //         // _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+  //     //         _id: {month: {$month: "$createdAt"}},
+  //     //         cumulative_capital_committed: { $sum: "$capital_committed.amount" },
+  //     //         cumulative_capital_raise: { $sum: "$capital_deploy.amount" }
+  //     //     }
+  //     // },
+  //     //   {
+  //     //     $project: {
+  //     //       cumulative_capital_committed: 1,
+  //     //       cumulative_capital_raise: 1,
+  //     //       // createdAt: {$month: "$createdAt"}
+  //     //     }
+  //     //    }
          
-      //   ],
-        account: [
-          {
-            $project: {
-              fund_raise: { $sum: "$capital_deploy.amount" },
-              funds_committed: { $sum: "$capital_committed.amount" },
-            },
-          },
-        ],
-        Institutional_Investor: [
-          {
-            $unwind: "$fund",
-          },
-          {
-            $group: {
-              _id: "$fund.user",
-            }
-          }
-        ],
-        Investor: [
-          {
-            $group: {
-              _id: "$user",
-            }
-          }
-        ],
+  //     //   ],
+  //       account: [
+  //         {
+  //           $project: {
+  //             fund_raise: { $sum: "$capital_deploy.amount" },
+  //             funds_committed: { $sum: "$capital_committed.amount" },
+  //           },
+  //         },
+  //       ],
+  //       Institutional_Investor: [
+  //         {
+  //           $unwind: "$fund",
+  //         },
+  //         {
+  //           $group: {
+  //             _id: "$fund.user",
+  //           }
+  //         }
+  //       ],
+  //       Investor: [
+  //         {
+  //           $group: {
+  //             _id: "$user",
+  //           }
+  //         }
+  //       ],
         
-      },
-    },
+  //     },
+  //   },
 
-    {
-      $project: {
-        funds: {
-          Institutional_Investor_that_raise: {
-            $size: "$Institutional_Investor",
-          },
-          Institutional_Investor_that_committed: {
-            $size: "$Investor",
-          },
+  //   {
+  //     $project: {
+  //       funds: {
+  //         Institutional_Investor_that_raise: {
+  //           $size: "$Institutional_Investor",
+  //         },
+  //         Institutional_Investor_that_committed: {
+  //           $size: "$Investor",
+  //         },
   
-          fund_raise: {
-            $sum: "$account.fund_raise",
-          },
-          funds_committed: {
-            $sum: "$account.funds_committed",
-          },
-        }
+  //         fund_raise: {
+  //           $sum: "$account.fund_raise",
+  //         },
+  //         funds_committed: {
+  //           $sum: "$account.funds_committed",
+  //         },
+  //       }
       
-        // table: 1
-      },
-    },
-  ]);
+  //       // table: 1
+  //     },
+  //   },
+  // ]);
 
-  const properties = await TransactionsPayIn.aggregate([
+  // const properties = await TransactionsPayIn.aggregate([
    
-    {
-      $match: { transaction_type: "property" }
-    },
-    {
-      $facet: {
-        all_txn: [
-              {
-                $project: {
-                   revenue: "$paid.amount"
-                  }
-              },
-               ],
-        developers: [
-             {
-           $lookup: {
-             from: "properties",
-             localField: "property",
-             foreignField: "_id",
-             as: "property_detail",
-           },
-         },
+  //   {
+  //     $match: { transaction_type: "property" }
+  //   },
+  //   {
+  //     $facet: {
+  //       all_txn: [
+  //             {
+  //               $project: {
+  //                  revenue: "$paid.amount"
+  //                 }
+  //             },
+  //              ],
+  //       developers: [
+  //            {
+  //          $lookup: {
+  //            from: "properties",
+  //            localField: "property",
+  //            foreignField: "_id",
+  //            as: "property_detail",
+  //          },
+  //        },
      
-         {
-           $addFields: {
-             investedproperty: {
-               $arrayElemAt: ["$property_detail", 0]
-             }
-           }
-          },
+  //        {
+  //          $addFields: {
+  //            investedproperty: {
+  //              $arrayElemAt: ["$property_detail", 0]
+  //            }
+  //          }
+  //         },
 
-          {$unwind: "$property_detail"},
+  //         {$unwind: "$property_detail"},
 
-          {
-            $group: {
-              _id:  "$property_detail.user",
-              count: { "$first": 1 }
-            }
+  //         {
+  //           $group: {
+  //             _id:  "$property_detail.user",
+  //             count: { "$first": 1 }
+  //           }
            
 
-          },
-          {
-            $project: {
-              developer_count: "$count",  // Include only the 'funder' field
-              _id: 0      // Optionally exclude the '_id' field
-            }
-          }
+  //         },
+  //         {
+  //           $project: {
+  //             developer_count: "$count",  // Include only the 'funder' field
+  //             _id: 0      // Optionally exclude the '_id' field
+  //           }
+  //         }
 
 
-        ],
-        project_investors: [
-          {
-            $match: {
-              $or: [
-                { funder: null },
-                { funder: undefined },
-                { funder: "" },
-              ]
-            }
-          },
-          {
-            $group: {
-              _id:  "$investor",
-              count: { "$first": 1 }
-            }
+  //       ],
+  //       project_investors: [
+  //         {
+  //           $match: {
+  //             $or: [
+  //               { funder: null },
+  //               { funder: undefined },
+  //               { funder: "" },
+  //             ]
+  //           }
+  //         },
+  //         {
+  //           $group: {
+  //             _id:  "$investor",
+  //             count: { "$first": 1 }
+  //           }
            
 
-          },
-          {
-            $project: {
-              investor_count: "$count",  // Include only the 'funder' field
-              _id: 0      // Optionally exclude the '_id' field
-            }
-          }
-        ],
-        insitutional_investors: [
+  //         },
+  //         {
+  //           $project: {
+  //             investor_count: "$count",  // Include only the 'funder' field
+  //             _id: 0      // Optionally exclude the '_id' field
+  //           }
+  //         }
+  //       ],
+  //       insitutional_investors: [
 
-          {
-            $match: {
-              funder: { $ne: null, $ne: "" , $ne: undefined}  // Match documents where 'funder' is not null or empty
-            }
-          },
-          {
-            $group: {
-              _id:  "$funder",
-              count: { "$first": 1 }
-            }
+  //         {
+  //           $match: {
+  //             funder: { $ne: null, $ne: "" , $ne: undefined}  // Match documents where 'funder' is not null or empty
+  //           }
+  //         },
+  //         {
+  //           $group: {
+  //             _id:  "$funder",
+  //             count: { "$first": 1 }
+  //           }
            
 
-          },
-          {
-            $project: {
-              funder_count: "$count",  // Include only the 'funder' field
-              _id: 0      // Optionally exclude the '_id' field
-            }
-          }
+  //         },
+  //         {
+  //           $project: {
+  //             funder_count: "$count",  // Include only the 'funder' field
+  //             _id: 0      // Optionally exclude the '_id' field
+  //           }
+  //         }
           
-        ]
+  //       ]
         
-           }
-    },
+  //          }
+  //   },
   
-      {
-      $project: {
-        property: {
-          total_revenue: {$sum: "$all_txn.revenue"},
-          developers_that_sold: {$sum: "$developers.developer_count"},
-          insitutional_investors_that_paid: {$sum: "$insitutional_investors.funder_count"},
-          investors_that_paid: {$sum: "$project_investors.investor_count"},
-        }
-      }
-    },
-  ]);
+  //     {
+  //     $project: {
+  //       property: {
+  //         total_revenue: {$sum: "$all_txn.revenue"},
+  //         developers_that_sold: {$sum: "$developers.developer_count"},
+  //         insitutional_investors_that_paid: {$sum: "$insitutional_investors.funder_count"},
+  //         investors_that_paid: {$sum: "$project_investors.investor_count"},
+  //       }
+  //     }
+  //   },
+  // ]);
 
       res.status(200).json({
         data: {
           ...admindashbroad[0],
-           ...funds[0],
-          ...properties[0]
+          //  ...funds[0],
+          // ...properties[0]
           }
       })
       

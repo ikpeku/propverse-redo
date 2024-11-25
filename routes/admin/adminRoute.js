@@ -18,7 +18,7 @@ const {
 
 
 const { get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance, get_All_Funds_Investors} = require("../../controller/Admin/Non_Institutional/non_institutional");
-const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayIn, AdminDashbroad, AdminDashbroadChart} = require("../../controller/Admin/GeneralAdmin");
+const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayIn, AdminDashbroad, AdminDashbroadChart, AdminDashbroadActivities} = require("../../controller/Admin/GeneralAdmin");
 const { FundsManagement ,currentListed, fundsListedApproval, statusFund, approveFund, rejectFund, pauseFund, unPauseFund} = require("../../controller/Admin/Institutional/funds");
 const { get_All_Institutional, get_Institutional } = require("../../controller/Admin/Institutional/institutional");
 const { uploadActivities } = require("../../controller/Developer/properties");
@@ -150,6 +150,7 @@ route.patch(
  */
 route.get("/dashbroad", AdminDashbroad)
 route.get("/dashbroadchart", AdminDashbroadChart)
+route.get("/dashbroadactivities", AdminDashbroadActivities)
 
 /**
  * transaction
