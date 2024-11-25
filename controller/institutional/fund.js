@@ -1287,9 +1287,19 @@ exports.dashbroadFundChart = async (req, res, next) =>{
     //   }
     // },
 
+         {
+        $lookup: {
+          from: "transactions",
+          localField: "investments",
+          foreignField: "_id",
+    as: "investmenttxn",
+        }},
+
       {
         $project: {
-          // transactions: "$fund_detail.transaction_items",
+          transactions: {$sum: "$investmenttxn.paid.amount"},
+          // investmenttxn: 1,
+          // root: "$$ROOT",
           investment_structure: 1,
           updatedAt: 1
         }
@@ -1315,17 +1325,14 @@ exports.dashbroadFundChart = async (req, res, next) =>{
       if(year == d.getFullYear()){
 
         if(total[month]){
-          // total[month].amount += item.paid.amount
+          if(total[month][item.investment_structure]){
+            total[month][item.investment_structure].amount += item.transactions
+
+          }
           // total[month].currency = item.paid.currency
        }
 
       }
-      // investment_structure: {
-//   type: String,
-//   enum: ['reit','residential', 'commercial','industrial'],
-//   default: 'reit',
-//   // required: [true, 'Select Investment structure'],
-// },
       
       return total;
 }, {
@@ -1554,7 +1561,7 @@ exports.dashbroadFundChart = async (req, res, next) =>{
     res.status(200).json({
       success: true,
       // data: chartData || null,
-      data,
+      // data,
       chartData
     });
   } catch (error) {
