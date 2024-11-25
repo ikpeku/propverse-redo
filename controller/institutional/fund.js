@@ -217,10 +217,24 @@ exports.institionalDashbroad = async (req, res, next) => {
 
     let section_alocation_query = [
       {
-        $sort: {
-          createdAt: -1,
-        },
+        $match: { user : new ObjectId(req.payload.userId)}
       },
+     
+           {
+          $lookup: {
+            from: "transactions",
+            localField: "investments",
+            foreignField: "_id",
+      as: "investmenttxn",
+          }},
+  
+        {
+          $project: {
+            transactions: {$sum: "$investmenttxn.paid.amount"},
+            investment_structure: 1,
+            // updatedAt: 1
+          }
+        }
     ]
 
 
@@ -243,7 +257,63 @@ exports.institionalDashbroad = async (req, res, next) => {
     }, {
        amount: 0,
     currency: "$"
-    })
+    });
+
+    const section_allocationchartData = section_allocation_response.reduce(function(total, item) {
+
+          if(total[item.investment_structure]){
+            total[item.investment_structure].amount += item.transactions
+          }
+
+      return total;
+}, {
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+ 
+}); 
+
+    const section_allocation_percentage = section_allocation_response.reduce(function(total, item) {
+
+          if(total[item.investment_structure]){
+            total[item.investment_structure].percentage += 1
+          }
+
+      return total;
+}, {
+    residential: {
+      percentage: 0,
+    },
+    reit: {
+      percentage: 0,
+    },
+    commercial: {
+      percentage: 0,
+    },
+    industrial: {
+      percentage: 0,
+    },
+ 
+}); 
+
+
+
+
+ const total_allocation_funds = section_allocation_percentage.residential.percentage + section_allocation_percentage.reit.percentage + section_allocation_percentage.commercial.percentage + section_allocation_percentage.industrial.percentage;
+
   
     return res.status(200).json({status:"success", data: {
       capital_deploy,
@@ -251,7 +321,16 @@ exports.institionalDashbroad = async (req, res, next) => {
       management_asset: userDashbroard[0]?.management_asset || 0,
       ongoing_funds,
       Investorments,
-      // section_allocation_response
+      section_allocation: {
+        totalsection_allocation: section_allocationchartData.residential.amount + section_allocationchartData.reit.amount + section_allocationchartData.commercial.amount + section_allocationchartData.industrial.amount,
+        ...section_allocationchartData,
+        // section_allocation_percentage
+        residentialPercentage : (section_allocation_percentage.residential.percentage/ total_allocation_funds) * 100,
+        reitPercentage : (section_allocation_percentage.reit.percentage/ total_allocation_funds) * 100,
+        commercialPercentage : (section_allocation_percentage.commercial.percentage/ total_allocation_funds) * 100,
+        industrialPercentage : (section_allocation_percentage.industrial.percentage/ total_allocation_funds) * 100,
+       
+      }
       
     }})
     
@@ -1220,73 +1299,15 @@ exports.userIvestmentFundById_graph = async (req, res, next) =>{
 }
 
 exports.dashbroadFundChart = async (req, res, next) =>{
-  // const {partnerId} = req.params;
+
   const year = parseInt(req?.query?.year) || new Date().getFullYear();
 
   const query = [
-    {
-      $sort: {
-        createdAt: -1,
-      },
-    },
-    // {
-    //   $match: {_id: new ObjectId(partnerId)}
-    // },
    
-    // {
-    //   $lookup: {
-    //     from: "funds",
-    //     localField: "fund",
-    //     foreignField: "_id",
-    //     let: {userId: "$user"},
-    //     pipeline: [
-
-    //       {
-    //         $set: {userId: "$$userId"}
-    //       },
-
-    //     {
-    //     $lookup: {
-    //       from: "transactions",
-    //       localField: "investments",
-    //       foreignField: "_id",
-    //       pipeline: [
-
-    //         {
-    //            $project: {
-    //             investor: 1,
-    //             paymentDate: 1,
-    //             paid: 1
-    //            }
-    //         }
-    //      ] ,
-    //       as: "investmenttxn",
-    //     },
-    //   },
-     
-    //       {
-    //         $project: {
-    //           transaction_items: {
-    //             $filter: {
-    //                input: "$investmenttxn",
-    //                as: "investmentitem",
-    //                cond: { $eq: ["$$investmentitem.investor", "$userId" ] }
-    //             }
-    //          }
-    //         }
-    //       }
-    //     ],
-    //     as: "fund",
-    //   },
-    // },
-    // {
-    //   $addFields: {
-    //     fund_detail: {
-    //       $arrayElemAt: ["$fund", 0]
-    //     }
-    //   }
-    // },
-
+    {
+      $match: { user : new ObjectId(req.payload.userId)}
+    },
+   
          {
         $lookup: {
           from: "transactions",
@@ -1298,8 +1319,6 @@ exports.dashbroadFundChart = async (req, res, next) =>{
       {
         $project: {
           transactions: {$sum: "$investmenttxn.paid.amount"},
-          // investmenttxn: 1,
-          // root: "$$ROOT",
           investment_structure: 1,
           updatedAt: 1
         }

@@ -15,6 +15,16 @@ exports.uploadPropertyDoc = async(req, res, next) => {
 
   try {
 
+    if (!req.payload.userId) return next(errorHandler(401, "forbidden"));
+ 
+    const project  = await Property.findById(prodId);
+
+    if(!project){
+      return next(errorHandler(401, "invalid project"))
+    }
+
+
+    if(req.payload.status === "Admin") {
     property_documents.forEach(async(product) => {
       await Property.findByIdAndUpdate(
         prodId,
@@ -22,6 +32,27 @@ exports.uploadPropertyDoc = async(req, res, next) => {
          { new: true, useFindAndModify: false }
        );
     }) 
+
+    return res.status(200).json({
+      message: "success"
+    })
+
+  }
+
+
+
+if(req.payload.userId !== project.user.toString()){
+  return next(errorHandler(401, "forbidden"));
+}
+
+property_documents.forEach(async(product) => {
+  await Property.findByIdAndUpdate(
+    prodId,
+     { $push: { "property_detail.property_documents": product } },
+     { new: true, useFindAndModify: false }
+   );
+}) 
+
      
     res.status(200).json({
       message: "success"
