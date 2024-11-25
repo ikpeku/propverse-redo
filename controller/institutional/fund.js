@@ -1560,9 +1560,7 @@ exports.dashbroadFundChart = async (req, res, next) =>{
 
     res.status(200).json({
       success: true,
-      // data: chartData || null,
-      // data,
-      chartData
+      data: chartData || null,
     });
   } catch (error) {
     next(errorHandler(500, "server error"));
