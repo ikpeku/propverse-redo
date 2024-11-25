@@ -1209,4 +1209,177 @@ exports.getDevelopersInvestors = async (req, res, next) => {
 };
 
 
+exports.getPropertyFinances = async (req, res, next) => {
+  const { prodId } = req.params;
+
+
+  const page = parseInt(req?.query?.page) || 1;
+
+  const limit = parseInt(req?.query?.limit) || 10;
+
+  const myCustomLabels = {
+    docs: 'data',
+  };
+
+  const options = {
+    page,
+    limit,
+    customLabels: myCustomLabels
+  };
+
+
+  try {
+    
+
+    const query = [
+      {
+        $match: {transaction_type: "property", property: prodId}
+      },
+      {
+        $lookup: {
+          from: "properties",
+          localField: "property",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $lookup: {
+                 from: "transactions",
+                 localField: "transactions",
+                foreignField: "_id",
+              
+                as: "transactions",
+              }},
+
+              {
+                $group: {
+
+                }
+              }
+          ],
+          as: "property_detail",
+        },
+      },
+  
+      {
+        $addFields: {
+          investedproperty: {
+            $arrayElemAt: ["$property_detail", 0]
+          }
+        }
+       },
+       {
+        $project: {
+          // root: "$$ROOT",
+          paid: "$paid",
+          paymentDate: "$paymentDate",
+          number_of_investors: {$ifNull : ["$user_detail", 1]}
+          
+        }
+       }
+  
+      ]
+
+    const project = await  PayInTransaction.aggregate(query);
+
+  const total_paid_by_investors = project.reduce(function(total, item) {
+    return total + item.paid.amount
+  }, 0); 
+
+
+  const chartData = project.reduce(function(total, item) {
+  
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    const d = new Date(item.paymentDate);
+
+    const month = monthNames[d.getMonth()];
+
+      if(total[month]){
+        total[month].amount_raised += item.paid.amount;
+        total[month].currency = item.paid.currency;
+     };
+    
+    return total;
+}, {
+January :{
+  date: 'Jan',
+  amount_raised: 0,
+  currency: "$",
+},
+February :{
+  ate: 'Feb',
+  amount_raised: 0,
+  currency: "$",
+},
+March :{
+  date: 'Mar',
+  amount_raised: 0,
+  currency: "$",
+},
+April :{
+  date: 'Apr',
+  amount_raised: 0,
+  currency: "$",
+},
+May :{
+  date: 'May',
+  amount_raised: 0,
+  currency: "$",
+},
+June :{
+  date: 'Jun',
+  amount_raised: 0,
+  currency: "$",
+},
+July :{
+  date: 'Jul',
+  amount_raised: 0,
+  currency: "$",
+},
+August :{
+  date: 'Aug',
+  amount_raised: 0,
+  currency: "$",
+},
+September :{
+  date: 'Sep',
+  amount_raised: 0,
+  currency: "$",
+},
+October :{
+  date: 'Oct',
+  amount_raised: 0,
+  currency: "$",
+},
+November : {
+  date: 'Nov',
+  amount_raised: 0,
+  currency: "$",
+},
+December : {
+  date: 'Dec',
+  amount_raised: 0,
+  currency: "$",
+}
+
+}); 
+
+
+
+   
+    return res.status(200).json({ status: "success", data: { 
+      total_paid_by_investors : total_paid_by_investors,
+      project,
+      chart:  Object.values(chartData) || null,
+      } });
+
+
+  } catch (error) {
+    next(error);
+    // next("failed to return data")
+  }
+};
+
 
