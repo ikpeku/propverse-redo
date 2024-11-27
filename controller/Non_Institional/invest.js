@@ -1,11 +1,396 @@
 // const Investment = require("../../model/developer/property_investment")
 // const Transactions = require("../../model/transaction/transactions");
 const Property = require("../../model/developer/properties");
-// const Funds = require("../../model/institutional/fund");
+const Funds = require("../../model/institutional/fund");
 const Non_Institiutional_Investor = require("../../model/non_institional/non_institutional");
 const { ObjectId } = require("mongodb");
+const Limited_partners = require("../../model/institutional/limitedpartners");
+
 
 const { errorHandler } = require("../../utils/error");
+
+
+
+exports.dashbroad_Non_Institutional = async (req, res, next) => {
+
+  // const year = parseInt(req?.query?.year) || new Date().getFullYear();
+
+  const query = [
+   
+ 
+    {
+      $match: { user : new ObjectId(req.payload.userId)}
+    },
+   
+    //      {
+    //     $lookup: {
+    //       from: "transactions",
+    //       localField: "investments",
+    //       foreignField: "_id",
+    // as: "investmenttxn",
+    //     }},
+
+    //   {
+    //     $project: {
+    //       transactions: {$sum: "$investmenttxn.paid.amount"},
+    //       investment_structure: 1,
+    //       updatedAt: 1
+    //     }
+    //   }
+    {
+      $lookup: {
+        from: "funds",
+        localField: "funds",
+        foreignField: "_id",
+        as: "fund",
+      },
+    },
+    {
+      $unwind: "$fund",
+    },
+     {
+      $sort: {
+        updatedAt: -1
+      }
+    },
+    // {
+    //   $addFields: {
+    //     invested_capital_diff: { $divide: ["$capital_deploy.amount", "$capital_deploy.amount"] }
+    //   }
+    // },
+    
+    {
+      $project: {
+        funds: {
+          fundname: "$fund.name",
+          property_type: "$fund.property_type",
+          invested_capital: "$capital_deploy",
+          current_fund_value: "$capital_deploy.amount",
+          annual_yield: "$fund.annual_yield",
+          investment_date: "$updatedAt",
+          fundId: "$fund._id",
+          userId: "$fund.user",
+          thumbnails: "$fund.thumbnails",
+          // invested_capital_percentage: {$multiply :["$invested_capital_diff", 0.1]},
+
+
+        }
+
+
+
+
+      },
+    },
+  ]
+
+  
+  try {
+    const data = await Non_Institiutional_Investor.aggregate(query);
+
+  
+
+
+
+    res.status(200).json({
+      success: true,
+      data: data || null,
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+}
+
+
+exports.dashbroad_Non_Institutional_FundChart = async (req, res, next) =>{
+
+  const year = parseInt(req?.query?.year) || new Date().getFullYear();
+
+  const query = [
+    // limitedpartners
+    {
+      $match: { user : new ObjectId(req.payload.userId)}
+    },
+   
+         {
+        $lookup: {
+          from: "transactions",
+          localField: "investments",
+          foreignField: "_id",
+    as: "investmenttxn",
+        }},
+
+      {
+        $project: {
+          transactions: {$sum: "$investmenttxn.paid.amount"},
+          investment_structure: 1,
+          updatedAt: 1
+        }
+      }
+  ]
+
+  
+  try {
+    const data = await Funds.aggregate(query);
+
+    
+    const chartData = data.reduce(function(total, item) {
+
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      
+      const d = new Date(item.updatedAt);
+
+      const month = monthNames[d.getMonth()];
+
+
+      if(year == d.getFullYear()){
+
+        if(total[month]){
+          if(total[month][item.investment_structure]){
+            total[month][item.investment_structure].amount += item.transactions
+
+          }
+          // total[month].currency = item.paid.currency
+       }
+
+      }
+      
+      return total;
+}, {
+  January :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  February :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  March :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  April :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  May :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  June :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  July :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  August :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  September :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  October :{
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  November : {
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  },
+  December : {
+    residential: {
+      amount: 0,
+      currency: "$",
+    },
+    reit: {
+      amount: 0,
+      currency: "$",
+    },
+    commercial: {
+      amount: 0,
+      currency: "$",
+    },
+    industrial: {
+      amount: 0,
+      currency: "$",
+    },
+  }
+
+}); 
+
+
+
+
+    res.status(200).json({
+      success: true,
+      data: chartData || null,
+    });
+  } catch (error) {
+    next(errorHandler(500, "server error"));
+  }
+}
+
+
+
 
 
 // exports.makeInvestmentOnproperty = async (req, res, next) => {

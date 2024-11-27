@@ -1212,22 +1212,6 @@ exports.getDevelopersInvestors = async (req, res, next) => {
 exports.getPropertyFinances = async (req, res, next) => {
   const { prodId } = req.params;
 
-
-  const page = parseInt(req?.query?.page) || 1;
-
-  const limit = parseInt(req?.query?.limit) || 10;
-
-  const myCustomLabels = {
-    docs: 'data',
-  };
-
-  const options = {
-    page,
-    limit,
-    customLabels: myCustomLabels
-  };
-
-
   try {
     
 
