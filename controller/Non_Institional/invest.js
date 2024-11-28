@@ -72,12 +72,7 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
           userId: "$fund.user",
           thumbnails: "$fund.thumbnails",
           // invested_capital_percentage: {$multiply :["$invested_capital_diff", 0.1]},
-
-
         }
-
-
-
 
       },
     },

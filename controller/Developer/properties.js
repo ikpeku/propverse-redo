@@ -1234,11 +1234,11 @@ exports.getPropertyFinances = async (req, res, next) => {
                 as: "transactions",
               }},
 
-              {
-                $group: {
+              // {
+              //   $group: {
 
-                }
-              }
+              //   }
+              // }
           ],
           as: "property_detail",
         },
