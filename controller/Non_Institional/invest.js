@@ -16,8 +16,6 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
   // const year = parseInt(req?.query?.year) || new Date().getFullYear();
 
   const query = [
-   
- 
     {
       $match: { user : new ObjectId(req.payload.userId)}
     },
@@ -53,26 +51,66 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
         updatedAt: -1
       }
     },
+
     // {
     //   $addFields: {
     //     invested_capital_diff: { $divide: ["$capital_deploy.amount", "$capital_deploy.amount"] }
     //   }
     // },
-    
+
+    {
+      $lookup: {
+           from: "properties",
+           localField: "properties",
+           foreignField: "_id",
+           pipeline: [{
+             $lookup: {
+               from: "due_deligences",
+               localField: "company",
+               foreignField: "user",
+               as: "company",
+             }},
+             {
+               "$unwind": "$company"
+             },
+
+              {
+      $project: {
+          property_location:  {$ifNull: ["$property_detail.property_location", ""]},
+          property_type:  {$ifNull: ["$property_detail.property_overview.property_type", ""]},
+
+          thumbnail:  {$ifNull: ["$property_detail.property_images", ""]},
+          property_name:  {$ifNull: ["$property_detail.property_overview.property_name", ""]},
+          property_progress:  {$ifNull: ["$property_progress", ""]},
+
+          property_amount:  {$ifNull: ["$property_detail.property_overview.price", ""]},
+          property_dates:  {$ifNull: ["$property_detail.property_overview.date", ""]},
+         
+          company:  {$ifNull: ["$company.company_information.name", ""]}
+      },
+    },
+            
+           ],
+           as: "project_investments",
+         },
+                  
+       },
+
     {
       $project: {
         funds: {
-          fundname: "$fund.name",
-          property_type: "$fund.property_type",
-          invested_capital: "$capital_deploy",
-          current_fund_value: "$capital_deploy.amount",
-          annual_yield: "$fund.annual_yield",
-          investment_date: "$updatedAt",
-          fundId: "$fund._id",
-          userId: "$fund.user",
-          thumbnails: "$fund.thumbnails",
+          fundname: {$ifNull: ["$fund.name", ""]},
+          property_type: {$ifNull: ["$fund.property_type", ""]},
+          invested_capital: {$ifNull: ["$capital_deploy", ""]},
+          current_fund_value: {$ifNull: ["$capital_deploy.amount", ""]},
+          annual_yield: {$ifNull: ["$fund.annual_yield", ""]},
+          investment_date: {$ifNull: ["$updatedAt", ""]},
+          fundId: {$ifNull: ["$fund._id", ""]},
+          userId: {$ifNull: ["$fund.user", ""]},
+          thumbnails: {$ifNull: ["$fund.thumbnails", ""]},
           // invested_capital_percentage: {$multiply :["$invested_capital_diff", 0.1]},
-        }
+        },
+        property: "$project_investments"
 
       },
     },
@@ -88,7 +126,9 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: data || null,
+      data: {
+        ongoing_investment: data || null,
+      }
     });
   } catch (error) {
     next(errorHandler(500, "server error"));
