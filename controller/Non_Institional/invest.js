@@ -127,7 +127,7 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: {
-        ongoing_investment: data || null,
+        ongoing_investment: data[0] || null,
       }
     });
   } catch (error) {
