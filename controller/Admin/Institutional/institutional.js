@@ -3,6 +3,7 @@ const { errorHandler } = require("../../../utils/error");
 const { ObjectId } = require("mongodb");
 const Funds = require("../../../model/institutional/fund");
 const Kyc = require("../../../model/compliance/kyc");
+const Limited_partners = require("../../../model/institutional/limitedpartners");
 
 exports.get_All_Institutional = async (req, res, next) => {
     const page = parseInt(req?.query?.page) || 1;
@@ -225,5 +226,289 @@ $match: {user:  new ObjectId(userId), funding_state: "Ongoing", isAdmin_Approved
     } catch (error) {
 
       next(errorHandler(500, "network error"));      
+    }
+  }
+
+
+  exports.userFundById = async (req, res, next) =>{
+    const {fundId} = req.params;
+  
+  
+    const query = [
+      {
+        $match: { fund:  fundId}
+      },
+     
+      {
+        $lookup: {
+          from: "funds",
+          localField: "fund",
+          foreignField: "_id",
+          let: {userId: "$user"},
+          pipeline: [
+  
+            {
+              $set: {userId: "$$userId"}
+            },
+  
+          {
+          $lookup: {
+            from: "transactions",
+            localField: "investments",
+            foreignField: "_id",
+            pipeline: [
+              {
+                 $project: {
+                  investor: 1,
+                  description: 1,
+                  paymentDate: 1,
+                  // funder: 1,
+                  paid:1
+                 }
+              }
+           ] ,
+            as: "investmenttxn",
+          },
+        },
+       
+            {
+              $project: {
+                name: 1,
+                property_type: 1,
+                distribution_period: 1,
+                funds_documents: 1,
+                transaction_items: {
+                  $filter: {
+                     input: "$investmenttxn",
+                     as: "investmentitem",
+                     cond: { $eq: ["$$investmentitem.investor", "$userId" ] }
+                  }
+               }
+              }
+            }
+          ],
+          as: "fund",
+        },
+      },
+      {
+        $addFields: {
+          fund_detail: {
+            $arrayElemAt: ["$fund", 0]
+          }
+        }
+      },
+  
+         {
+          $addFields: {
+            invest_year: {$year: "$createdAt"}
+          }
+         },
+         {
+          $addFields: {
+            current_year:{$year: new Date()}
+          }
+         },
+         {
+          $addFields: {
+            nos_invested_year: {$subtract: ["$current_year", "$invest_year"]}
+          }
+         },
+         {
+          $addFields: {
+            investment_increase_percentage:{$multiply:  [{ $divide: ["$fund_detail.annual_yield", 100]}, {$divide : ["$capital_deploy.amount", 100]} ]}
+          }
+         },
+  
+  
+  
+        {
+          $project: {
+            transactions: "$fund_detail.transaction_items",
+            "property.name": "$fund_detail.name",
+            "property.property_type": "$fund_detail.property_type",
+            "funds_documents": "$fund_detail.funds_documents",
+            "property.distribution_period": "$fund_detail.distribution_period",
+            "property.investment_date": "$updatedAt",
+            "earnings.annual_yield": "$fund_detail.annual_yield",
+            "earnings.capital_invested": "$capital_deploy",
+            "earnings.current_value": {$cond:  [{$eq: ["$nos_invested_year", 0]}, "$capital_deploy.amount",   { $add: [{$multiply:  ["$investment_increase_percentage", "$nos_invested_year"]}, "$capital_deploy.amount"]} ]}
+         
+          }
+        }
+    ]
+  
+    
+    try {
+      const data = await Limited_partners.aggregate(query);
+  
+      res.status(200).json({
+        success: true,
+        data: data[0] || null
+      });
+    } catch (error) {
+      next(error);
+      // next(errorHandler(500, "server error"));
+    }
+  }
+
+  exports.userFundById_graph = async (req, res, next) =>{
+    const {fundId} = req.params
+    const year = parseInt(req?.query?.year) || new Date().getFullYear();
+  
+    const query = [
+      {
+        $match: { fund:  fundId}
+      },
+     
+      {
+        $lookup: {
+          from: "funds",
+          localField: "fund",
+          foreignField: "_id",
+          let: {userId: "$user"},
+          pipeline: [
+  
+            {
+              $set: {userId: "$$userId"}
+            },
+  
+          {
+          $lookup: {
+            from: "transactions",
+            localField: "investments",
+            foreignField: "_id",
+            pipeline: [
+  
+              {
+                 $project: {
+                  investor: 1,
+                  paymentDate: 1,
+                  paid: 1
+                 }
+              }
+           ] ,
+            as: "investmenttxn",
+          },
+        },
+       
+            {
+              $project: {
+                transaction_items: {
+                  $filter: {
+                     input: "$investmenttxn",
+                     as: "investmentitem",
+                     cond: { $eq: ["$$investmentitem.investor", "$userId" ] }
+                  }
+               }
+              }
+            }
+          ],
+          as: "fund",
+        },
+      },
+      {
+        $addFields: {
+          fund_detail: {
+            $arrayElemAt: ["$fund", 0]
+          }
+        }
+      },
+  
+        {
+          $project: {
+            transactions: "$fund_detail.transaction_items",
+          }
+        }
+    ]
+  
+    
+    try {
+      const data = await Limited_partners.aggregate(query);
+  
+      
+      const chartData = data[0].transactions.reduce(function(total, item) {
+  
+       
+  
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        
+        const d = new Date(item.paymentDate);
+  
+        const month = monthNames[d.getMonth()];
+  
+  
+        if(year == d.getFullYear()){
+  
+          if(total[month]){
+            total[month].amount += item.paid.amount
+            total[month].currency = item.paid.currency
+         }
+  
+        }
+        
+        return total;
+  }, {
+    January :{
+      amount: 0,
+      currency: "$"
+    },
+    February :{
+      amount: 0,
+      currency: "$"
+    },
+    March :{
+      amount: 0,
+      currency: "$"
+    },
+    April :{
+      amount: 0,
+      currency: "$"
+    },
+    May :{
+      amount: 0,
+      currency: "$"
+    },
+    June :{
+      amount: 0,
+      currency: "$"
+    },
+    July :{
+      amount: 0,
+      currency: "$"
+    },
+    August :{
+      amount: 0,
+      currency: "$"
+    },
+    September :{
+      amount: 0,
+      currency: "$"
+    },
+    October :{
+      amount: 0,
+      currency: "$"
+    },
+    November : {
+      amount: 0,
+      currency: "$"
+    },
+    December : {
+      amount: 0,
+      currency: "$"
+    }
+  
+  }); 
+  
+  
+  
+  
+      res.status(200).json({
+        success: true,
+        data: chartData || null
+      });
+    } catch (error) {
+      next(errorHandler(500, "server error"));
     }
   }

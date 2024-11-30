@@ -20,7 +20,7 @@ const {
 const { get_All_Non_Institutional, get_Suspended_All_Non_Institutional, get_Non_Institutional, uploadPropertyDoc, get_All_Non_Institutional_Compliance, get_user_Compliance, get_All_Funds_Investors} = require("../../controller/Admin/Non_Institutional/non_institutional");
 const { suspendUserAccount , kycVerification, complianceVerification, VerifyPayIn, AdminDashbroad, AdminDashbroadChart, AdminDashbroadActivities} = require("../../controller/Admin/GeneralAdmin");
 const { FundsManagement ,currentListed, fundsListedApproval, statusFund, approveFund, rejectFund, pauseFund, unPauseFund} = require("../../controller/Admin/Institutional/funds");
-const { get_All_Institutional, get_Institutional } = require("../../controller/Admin/Institutional/institutional");
+const { get_All_Institutional, get_Institutional, userFundById, userFundById_graph } = require("../../controller/Admin/Institutional/institutional");
 const { uploadActivities } = require("../../controller/Developer/properties");
 const { create_Property_Transactions, create_Funds_Transactions, update_Transactions } = require("../../controller/General/user");
 const route = express.Router();
@@ -115,7 +115,9 @@ route.patch("/transaction/:type/:txnId", VerifyPayIn)
 /**
  * funds
  */
-route.get("/funds/unlimited", get_All_Funds_Investors)
+route.get("/funds/unlimited", get_All_Funds_Investors);
+route.get("/fund/:fundId", userFundById);
+route.get("/fundchart/:fundId", userFundById_graph);
 
 route.get("/institutional/approval",fundsListedApproval, FundsManagement)
 route.get("/institutional/currentlisted",currentListed, FundsManagement)
