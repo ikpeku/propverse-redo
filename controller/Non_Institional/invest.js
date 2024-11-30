@@ -17,22 +17,7 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
     {
       $match: { user : new ObjectId(req.payload.userId)}
     },
-   
-    //      {
-    //     $lookup: {
-    //       from: "transactions",
-    //       localField: "investments",
-    //       foreignField: "_id",
-    // as: "investmenttxn",
-    //     }},
 
-    //   {
-    //     $project: {
-    //       transactions: {$sum: "$investmenttxn.paid.amount"},
-    //       investment_structure: 1,
-    //       updatedAt: 1
-    //     }
-    //   }
     {
       $lookup: {
         from: "funds",
@@ -116,9 +101,7 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
 
   const txn_query = [
     {
-      $sort: {
-        updatedAt: -1
-      }
+      $match: { user : new ObjectId(req.payload.userId)}
     },
 
     {
@@ -137,45 +120,35 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
     const data = await Non_Institiutional_Investor.aggregate(query);
     const txn = await Transactions.aggregate(txn_query);
 
-//     const chartData = data.reduce(function(total, item) {
+    const userdata = txn.reduce(function(total, item) {
 
-//       const monthNames = ["January", "February", "March", "April", "May", "June",
-//         "July", "August", "September", "October", "November", "December"
-//       ];
+
+        if(item.transaction_type == "funds"){
+          total["net_funds_value"].amount += item.paid.amount
+      }
+
+        if(item.transaction_type == "property"){
+          total["net_funds_value"].amount += item.paid.amount
+      }
+
+
       
-//       const d = new Date(item.updatedAt);
+      return total;
+}, {
+  net_funds_value: {
+    amount: 0,
+    currency: "$",
+  },
+  net_property_value: {
+    amount: 0,
+    currency: "$",
+  },
+  total_dividend: {
+    amount: 0,
+    currency: "$",
+  },
 
-//       const month = monthNames[d.getMonth()];
-
-
-//       if(year == d.getFullYear()){
-
-//         if(total[month]){
-//           if(total[month][item.investment_structure]){
-//             total[month][item.investment_structure].amount += item.transactions
-
-//           }
-//           // total[month].currency = item.paid.currency
-//        }
-
-//       }
-      
-//       return total;
-// }, {
-//   residential: {
-//     amount: 0,
-//     currency: "$",
-//   },
-//   reit: {
-//     amount: 0,
-//     currency: "$",
-//   },
-//   commercial: {
-//     amount: 0,
-//     currency: "$",
-//   },
-
-// }); 
+}); 
 
 
 
@@ -183,6 +156,7 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: {
+        userdata,
         ongoing_investment: data[0] || null,
         activities: txn,
       }
