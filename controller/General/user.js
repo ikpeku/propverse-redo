@@ -1058,7 +1058,7 @@ exports.create_Property_Transactions = async (req, res, next) => {
       payment_method: "bank  transfer",
       payment_status,
       description,
-      paymentDate
+      paymentDate: paymentDate || new Date().toISOString()
     });
 
 
@@ -1114,7 +1114,7 @@ console.log("fundInvestment")
       payment_method: "bank  transfer",
       payment_status,
       description,
-      paymentDate
+      paymentDate: paymentDate || new Date().toISOString()
     });
 
     if(txnProperty){
@@ -1207,7 +1207,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       payment_method: "bank  transfer",
       payment_status,
       description,
-      paymentDate
+      paymentDate: paymentDate || new Date().toISOString()
     });
 
    const removebln =  await Funds.findByIdAndUpdate(
@@ -1296,7 +1296,7 @@ exports.create_Funds_Transactions = async (req, res, next) => {
       payment_method: "bank  transfer",
       payment_status,
       description,
-      paymentDate
+      paymentDate: paymentDate || new Date().toISOString()
     });
 
 

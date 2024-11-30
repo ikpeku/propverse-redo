@@ -1,10 +1,10 @@
 // const Investment = require("../../model/developer/property_investment")
-// const Transactions = require("../../model/transaction/transactions");
+const Transactions = require("../../model/transaction/transactions");
 const Property = require("../../model/developer/properties");
 const Funds = require("../../model/institutional/fund");
 const Non_Institiutional_Investor = require("../../model/non_institional/non_institutional");
 const { ObjectId } = require("mongodb");
-const Limited_partners = require("../../model/institutional/limitedpartners");
+// const Limited_partners = require("../../model/institutional/limitedpartners");
 
 
 const { errorHandler } = require("../../utils/error");
@@ -12,8 +12,6 @@ const { errorHandler } = require("../../utils/error");
 
 
 exports.dashbroad_Non_Institutional = async (req, res, next) => {
-
-  // const year = parseInt(req?.query?.year) || new Date().getFullYear();
 
   const query = [
     {
@@ -116,11 +114,69 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
     },
   ]
 
+  const txn_query = [
+    {
+      $sort: {
+        updatedAt: -1
+      }
+    },
+
+    {
+      $project: {
+        transaction_type: 1,
+        paid: 1,
+        description: 1,
+        paymentDate: 1,
+      }
+    }
+
+  ]
+
   
   try {
     const data = await Non_Institiutional_Investor.aggregate(query);
+    const txn = await Transactions.aggregate(txn_query);
 
-  
+//     const chartData = data.reduce(function(total, item) {
+
+//       const monthNames = ["January", "February", "March", "April", "May", "June",
+//         "July", "August", "September", "October", "November", "December"
+//       ];
+      
+//       const d = new Date(item.updatedAt);
+
+//       const month = monthNames[d.getMonth()];
+
+
+//       if(year == d.getFullYear()){
+
+//         if(total[month]){
+//           if(total[month][item.investment_structure]){
+//             total[month][item.investment_structure].amount += item.transactions
+
+//           }
+//           // total[month].currency = item.paid.currency
+//        }
+
+//       }
+      
+//       return total;
+// }, {
+//   residential: {
+//     amount: 0,
+//     currency: "$",
+//   },
+//   reit: {
+//     amount: 0,
+//     currency: "$",
+//   },
+//   commercial: {
+//     amount: 0,
+//     currency: "$",
+//   },
+
+// }); 
+
 
 
 
@@ -128,7 +184,7 @@ exports.dashbroad_Non_Institutional = async (req, res, next) => {
       success: true,
       data: {
         ongoing_investment: data[0] || null,
-        activities: [],
+        activities: txn,
       }
     });
   } catch (error) {
@@ -425,156 +481,6 @@ exports.dashbroad_Non_Institutional_FundChart = async (req, res, next) =>{
   }
 }
 
-
-
-
-
-// exports.makeInvestmentOnproperty = async (req, res, next) => {
-//   const { userId } = req.params;
-//   const {
-//     prodId,
-//     paid: { amount, currency },
-//     proof_of_payment: { location, originalname, mimetype, size, key },
-//     payment_status,
-//     description,
-//     investmentType,
-//   } = req.body;
-
-//   try {
-//     const response = await Property.findById(prodId);
-
-//     if (!response) {
-//       return next(errorHandler(400, "confirm transact failed"));
-//     }
-
-//     const investment = await Transactions.create({
-//       investor: userId,
-//       company: response.user,
-//       transaction_type: "property purchase",
-//       property: prodId,
-//       name: response.property_detail.property_overview.property_name,
-//       status: "Pending",
-//       paid: {
-//         amount,
-//         currency,
-//       },
-//       property_amount: {
-//         amount: response.property_detail.property_overview.price.amount,
-//         currency: response.property_detail.property_overview.price.currency,
-//       },
-//       proof_of_payment: {
-//         location,
-//         originalname,
-//         mimetype,
-//         size,
-//         key,
-//       },
-//       payment_method: "bank  transfer",
-//       payment_status,
-//       description
-//     });
-
-
-//     // if (investmentType === "property") {
-
-//     //   await Non_Institutional_Investor.findByIdAndUpdate(
-//     //     userId,
-//     //     { $push: { transactions: investment._id, properties: prodId } },
-//     //     { new: true, useFindAndModify: false }
-//     //   );
-    
-//     //   await Property.findByIdAndUpdate(
-//     //   prodId,
-//     //     { $push: { transactions: investment._id } },
-//     //     { new: true, useFindAndModify: false }
-//     //   );
-
-//     // }
-
-//     return res
-//       .status(200)
-//       .json({
-//         status: "success",
-//         message: "congratulations record taken awaiting confirmation",
-//         // response,
-//       });
-//   } catch (error) {
-//     next(error);
-//     // next(errorHandler(400,"confirm transaction failed"))
-//   }
-// };
-
-// exports.makeInvestmentFunds = async (req, res, next) => {
-//   const { userId } = req.params;
-//   const {
-//     prodId,
-//     paid: { amount, currency },
-//     proof_of_payment: { location, originalname, mimetype, size, key },
-//     investmentType,
-//     description
-//   } = req.body;
-
-
-//   try {
-//     const response = await Funds.findById(prodId);
-
-//     if (!response) {
-//       return next(errorHandler(400, "confirm transact failed"));
-//     }
-
-//     const investment = await Transactions.create({
-//       investor: userId,
-//       transaction_type: "funds",
-//       funds: prodId,
-//       name: response.name,
-//       status: "Pending",
-//       paid: {
-//         amount,
-//         currency,
-//       },
-//       property_amount: {
-//         amount: response.raise_goal.amount,
-//         currency: response.raise_goal.currency,
-//       },
-//       proof_of_payment: {
-//         location,
-//         originalname,
-//         mimetype,
-//         size,
-//         key,
-//       },
-
-//       payment_method: "bank  transfer",
-//       description
-//     });
-
-//     // if (investmentType === "funds") {
-//     //   await Non_Institutional_Investor.findByIdAndUpdate(
-//     //     userId,
-//     //     { $push: { transactions: investment._id, funds: prodId } },
-//     //     { new: true, useFindAndModify: false }
-//     //   );
-      
-//     //   await Funds.findByIdAndUpdate(
-//     //     prodId,
-//     //     { $push: { investments: investment._id } },
-//     //     { new: true, useFindAndModify: false }
-//     //   );
-
-//     // }
-
-//     return res
-//       .status(200)
-//       .json({
-//         status: "success",
-//         message: "congratulations record taken awaiting confirmation",
-//         // response,
-//       });
-//   } catch (error) {
-//     next(error);
-//     // next(errorHandler(400,"confirm transaction failed"))
-//   }
-// };
 
 exports.getUserInvestment = async (req, res, next) => {
   const { userId } = req.params;
