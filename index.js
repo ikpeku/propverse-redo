@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
 
 const cors = require("cors");
 
@@ -46,6 +47,15 @@ app.use(jsonParser);
 
 
 app.use(getCurrentUser)
+
+
+// cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_secret: process.env.API_SECRET,
+    api_key:  process.env.API_KEY
+})
+
 
 app.use("/api/auth", cors(corsOptions), Authentication)
 app.use("/api/developer", cors(corsOptions), Developer)

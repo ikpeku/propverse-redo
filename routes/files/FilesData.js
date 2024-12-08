@@ -1,5 +1,16 @@
 const express = require("express");
+const DataUriParser = require('datauri/parser');
+const path = require("path");
+const cloudinary = require("cloudinary").v2;
 
+const Photos = require("../../model/photos");
+
+const getDataUri = (file) => {
+  const parser = new DataUriParser();
+  const extName = path.extname(file.originalname).toString()
+
+  return parser.format(extName, file.buffer);
+}
 
 const route = express.Router();
 // const Aws = require("@aws-sdk");
@@ -24,7 +35,8 @@ const { errorHandler } = require("../../utils/error");
 
 const s3 = new S3Client();
 
-
+const storage = multer.memoryStorage();
+const uploadMulter = multer({storage}).array();
 
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 
@@ -184,5 +196,121 @@ route.delete(
     }
   }
 );
+
+
+
+
+route.post("/fileupload",uploadMulter, async(req,res, next) => {
+
+  // const userId = req.payload.userId;
+  if (!req?.payload?.userId) return next(errorHandler(403, "route forbidden"));
+   
+    try {
+
+        let images = [];
+
+       for await (const img of req.files) {
+       
+          const file =  getDataUri(img);
+
+          const result = await cloudinary.uploader.upload(file.content, {folder: "propsversePhotos",});
+          // display_name:  img.originalname
+
+          if(result){
+           
+            const url =  cloudinary.url(result.public_id, {
+              transformation: [
+                  {
+                      quality: "auto",
+                      fetch_format: "auto",
+                  },
+                  {
+                      width: 500,
+                      height: 500,
+                      crop: "fill",
+                      gravity: "auto"
+                  }
+              ]
+            });
+  
+        const photoResponse =    await Photos.create({
+              user: req?.payload?.userId,
+          
+              location: url,
+              originalname: result.display_name,
+              mimetype: result.format,
+              size: result.bytes,
+              key: result.public_id
+
+            });
+
+            const {user,__v,updatedAt,_id, ...rest} = photoResponse._doc
+             images.push(rest)
+          } 
+        }
+
+    return res.status(200).json({
+      message: "file uploaded successfully.",
+      status: "success",
+      data: images,
+    });
+
+    } catch (error) {
+       return errorHandler(res, 400, "photo upload failed");
+    }
+
+
+});
+
+
+route.delete(
+  "/filedelete/:originalname",
+  async (req, res, next) => {
+    const originalname = req.params.originalname;
+
+    try {
+
+      const photoResponse =    await Photos.findOne({originalname});
+
+      if(!photoResponse) {
+        return next(errorHandler(400, "invalid image "));
+      }
+
+
+      if(photoResponse?.user?.toString() !== req?.payload?.userId || req?.payload?.status !== "Admin" ) {
+        return next(errorHandler(401, "unauthorise"));
+      }
+       
+
+      const isAvatar = await cloudinary.api.resource(photoResponse.key).then(result=>{
+        return result
+
+       }).catch(() => {
+       return null
+       })
+
+
+   if(isAvatar) {
+    await cloudinary.uploader.destroy(photoResponse.key);
+    await Photos.deleteOne({_id: photoResponse._id})
+       } else {
+        return next(errorHandler(400, "invalid image "));
+       }
+
+
+
+      return res.status(200).json({
+        message: "File Deleted Successfully.",
+        status: "success",
+      });
+
+
+    } catch (error) {
+      next(errorHandler(500, "Internal Server Error"));
+    }
+  }
+);
+
+
 
 module.exports = route;
