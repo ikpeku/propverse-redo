@@ -311,6 +311,68 @@ route.delete(
   }
 );
 
+route.get(
+  "/image/:originalname",
+  async (req, res, next) => {
+    const originalname = req.params.originalname;
+
+    try {
+
+      const photoResponse =    await Photos.findOne({originalname});
+
+      if(!photoResponse) {
+        return next(errorHandler(400, "invalid image "));
+      }
+
+
+      const isAvatar = await cloudinary.api.resource(photoResponse.key).then(result=>{
+        return result
+
+       }).catch(() => {
+       return null
+       })
+
+
+   if(isAvatar) {
+           
+      const url =  cloudinary.url(photoResponse.key, {
+        transformation: [
+            {
+                quality: "auto",
+                fetch_format: "auto",
+            },
+            {
+                width: 500,
+                height: 500,
+                crop: "fill",
+                gravity: "auto"
+            }
+        ]
+      });
+
+      return res.status(200).json({
+        status: "success",
+        data: url
+      });
+
+
+       } else {
+        return next(errorHandler(400, "invalid image "));
+       }
+
+
+
+    
+
+
+    } catch (error) {
+      next(errorHandler(500, "Internal Server Error"));
+    }
+  }
+);
+
+
+
 
 
 module.exports = route;
