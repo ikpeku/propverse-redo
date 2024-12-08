@@ -202,7 +202,6 @@ route.delete(
 
 route.post("/fileupload",uploadMulter, async(req,res, next) => {
 
-  // const userId = req.payload.userId;
   if (!req?.payload?.userId) return next(errorHandler(403, "route forbidden"));
    
     try {
