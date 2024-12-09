@@ -663,6 +663,21 @@ exports.getUserProperties = async (req, res, next) => {
       $match: { ...req.body },
     },
     {
+      $lookup: {
+        from: "due_deligences",
+        localField: "company",
+        foreignField: "user",
+        as: "company",
+      },
+    },
+    {
+      $addFields: {
+        company: {
+          $arrayElemAt: ["$company", 0],
+        },
+      },
+    },
+    {
       $sort: {
         createdAt: -1,
       },

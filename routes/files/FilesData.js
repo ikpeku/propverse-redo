@@ -36,7 +36,7 @@ const { errorHandler } = require("../../utils/error");
 const s3 = new S3Client();
 
 const storage = multer.memoryStorage();
-const uploadMulter = multer({storage}).array();
+const uploadMulter = multer({storage}).fields([{name: "files"}]);
 
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 
@@ -207,8 +207,9 @@ route.post("/fileupload",uploadMulter, async(req,res, next) => {
     try {
 
         let images = [];
+        // console.log(req.files)
 
-       for await (const img of req.files) {
+       for await (const img of req?.files?.files) {
        
           const file =  getDataUri(img);
 
