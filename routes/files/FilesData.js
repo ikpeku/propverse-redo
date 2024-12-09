@@ -213,9 +213,8 @@ route.post("/fileupload",uploadMulter, async(req,res, next) => {
        
           const file =  getDataUri(img);
 
-          const result = await cloudinary.uploader.upload(file.content, {folder: "propsversePhotos",});
-          // display_name:  img.originalname
-
+          const result = await cloudinary.uploader.upload(file.content, {folder: "propsversePhotos", display_name: img?.originalname +  Math.floor(Math.random())});
+          
           if(result){
            
             const url =  cloudinary.url(result.public_id, {
